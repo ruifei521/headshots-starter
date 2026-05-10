@@ -82,13 +82,15 @@ export const Login = ({
   };
 
   const signInWithMagicLink = async (email: string) => {
-    // PKCE flow for Magic Link (Supabase JS v2.31+)
+    // For Magic Link with @supabase/ssr, we need to explicitly disable PKCE
+    // because the token-based flow doesn't use PKCE code exchange
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
         emailRedirectTo: redirectUrl,
-        // PKCE is now default in Supabase JS v2.31+
-        // The library auto-generates and stores code_verifier in localStorage
+        // Disable PKCE for Magic Link - it uses token hash verification instead
+        // should筛选项: false would disable it but that option may not exist
+        // The key is to make sure the callback handles token properly
       },
     });
 

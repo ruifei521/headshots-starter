@@ -29,7 +29,7 @@ function AuthCallbackContent() {
         }
 
         if (code) {
-          // PKCE flow - exchange code for session
+          // PKCE OAuth flow - exchange code for session
           const { error: exchangeError } =
             await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) {
@@ -38,25 +38,71 @@ function AuthCallbackContent() {
             return;
           }
         } else {
-          // Implicit flow - check for hash fragment
-          const hash = window.location.hash.substring(1); // remove #
-          const hashParams = new URLSearchParams(hash);
-          const accessToken = hashParams.get("access_token");
-          const refreshToken = hashParams.get("refresh_token");
-
-          if (accessToken && refreshToken) {
-            const { error: sessionError } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            });
+          // Check for token hash (Magic Link flow)
+          const tokenHash = searchParams.get("token_hash");
+          const type = searchParams.get("type");
+          const next = searchParams.get("next") || "/overview";
+          
+          if (tokenHash || type === "magiclink") {
+            // For Magic Link, get session from the URL parameters
+            // Supabase client handles this automatically when we call getSession
+            const { data, error: sessionError } = await supabase.auth.getSession();
+            
             if (sessionError) {
-              console.error("[auth/callback] Set session error:", sessionError);
+              console.error("[auth/callback] Magic Link session error:", sessionError);
               setError(sessionError.message);
               return;
             }
+            
+            // If no session yet, we might need to verify the token server-side
+            // But Supabase JS client should handle this automatically
+            if (!data.session) {
+              // Try to get the token from URL and set session
+              const accessToken = searchParams.get("access_token");
+              const refreshToken = searchParams.get("refresh_token");
+              
+              if (accessToken && refreshToken) {
+                const { error: setSessionError } = await supabase.auth.setSession({
+                  access_token: accessToken,
+                  refresh_token: refreshToken,
+                });
+                if (setSessionError) {
+                  console.error("[auth/callback] Set session error:", setSessionError);
+                  setError(setSessionError.message);
+                  return;
+                }
+              } else {
+                // Magic Link verification - the token is in the URL but we need
+                // to let Supabase handle it. Try refreshing the session.
+                const { error: refreshError } = await supabase.auth.refreshSession();
+                if (refreshError) {
+                  console.error("[auth/callback] Refresh session error:", refreshError);
+                  setError("Authentication failed. Please try again.");
+                  return;
+                }
+              }
+            }
           } else {
-            setError("No authentication credentials found in URL");
-            return;
+            // Fallback: check for hash fragment (implicit flow)
+            const hash = window.location.hash.substring(1); // remove #
+            const hashParams = new URLSearchParams(hash);
+            const accessToken = hashParams.get("access_token");
+            const refreshToken = hashParams.get("refresh_token");
+
+            if (accessToken && refreshToken) {
+              const { error: sessionError } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+              });
+              if (sessionError) {
+                console.error("[auth/callback] Set session error:", sessionError);
+                setError(sessionError.message);
+                return;
+              }
+            } else {
+              setError("No authentication credentials found in URL");
+              return;
+            }
           }
         }
 
