@@ -1,8 +1,1 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  experimental: {
-    esmExternals: "loose",
-  },
-};
-
-module.exports = nextConfig;
+/** @type {import('next').NextConfig} */\nconst nextConfig = {\n  env: {\n    PACK_QUERY_TYPE: 'both',\n    NEXT_PUBLIC_TUNE_TYPE: 'tune',\n  },\n};\n\nmodule.exports = nextConfig;
