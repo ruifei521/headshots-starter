@@ -1,5 +1,5 @@
 import { Database } from "@/types/supabase";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { createServerClient } from "@supabase/ssr";
 import axios from "axios";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -26,7 +26,26 @@ export async function POST(request: Request) {
   const name = payload.name;
   const characteristics = payload.characteristics;
 
-  const supabase = createRouteHandlerClient<Database>({ cookies });
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookies().getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            try {
+              cookies().set(name, value, options);
+            } catch {
+              // The `set` method was called from a Server Component.
+            }
+          });
+        },
+      },
+    }
+  );
 
   const {
     data: { user },

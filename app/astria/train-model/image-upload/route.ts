@@ -1,4 +1,4 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { Database } from "@/types/supabase";
@@ -7,7 +7,26 @@ export const dynamic = "force-dynamic";
 
 // Upload images to Supabase Storage instead of Vercel Blob
 export async function POST(request: Request): Promise<NextResponse> {
-  const supabase = createRouteHandlerClient<Database>({ cookies });
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookies().getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            try {
+              cookies().set(name, value, options);
+            } catch {
+              // The `set` method was called from a Server Component.
+            }
+          });
+        },
+      },
+    }
+  );
   const {
     data: { user },
   } = await supabase.auth.getUser();
