@@ -1,1 +1,6 @@
-/** @type {import('next').NextConfig} */\nconst nextConfig = {\n  env: {\n    PACK_QUERY_TYPE: 'both',\n    NEXT_PUBLIC_TUNE_TYPE: 'tune',\n  },\n};\n\nmodule.exports = nextConfig;
+module.exports = {
+  env: {
+    PACK_QUERY_TYPE: 'both',
+    NEXT_PUBLIC_TUNE_TYPE: 'tune',
+  },
+};
