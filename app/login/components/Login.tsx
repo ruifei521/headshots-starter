@@ -1,19 +1,24 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { Database } from "@/types/supabase";
-import { createBrowserClient } from "@supabase/ssr";
-import disposableDomains from "disposable-email-domains";
-import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { AiOutlineGoogle } from "react-icons/ai";
-import { WaitingForMagicLink } from "./WaitingForMagicLink";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
+import { Database } from '@/types/supabase';
+import { createBrowserClient } from '@supabase/ssr';
+import { useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { AiOutlineGoogle } from 'react-icons/ai';
+import { WaitingForMagicLink } from './WaitingForMagicLink';
 
 type Inputs = {
   email: string;
 };
+
+// Common disposable email domains (small subset for client-side check)
+const DISPOSABLE_DOMAINS = new Set([
+  'tempmail.com', 'throwaway.com', 'guerrillamail.com', 'mailinator.com',
+  '10minutemail.com', 'fakeinbox.com', 'trashmail.com', 'temp-mail.org',
+]);
 
 export const Login = ({
   host,
@@ -42,8 +47,8 @@ export const Login = ({
       setTimeout(() => {
         setIsSubmitting(false);
         toast({
-          title: "Email sent",
-          description: "Check your inbox for a magic link to sign in.",
+          title: 'Email sent',
+          description: 'Check your inbox for a magic link to sign in.',
           duration: 5000,
         });
         setIsMagicLinkSent(true);
@@ -51,28 +56,28 @@ export const Login = ({
     } catch (error) {
       setIsSubmitting(false);
       toast({
-        title: "Something went wrong",
-        variant: "destructive",
+        title: 'Something went wrong',
+        variant: 'destructive',
         description:
-          "Please try again, if the problem persists, contact us at hello@tryleap.ai",
+          'Please try again, if the problem persists, contact us at hello@tryleap.ai',
         duration: 5000,
       });
     }
   };
 
   let inviteToken = null;
-  if (searchParams && "inviteToken" in searchParams) {
-    inviteToken = searchParams["inviteToken"];
+  if (searchParams && 'inviteToken' in searchParams) {
+    inviteToken = searchParams['inviteToken'];
   }
 
-  const protocol = host?.includes("localhost") ? "http" : "https";
+  const protocol = host?.includes('localhost') ? 'http' : 'https';
   const redirectUrl = `${protocol}://${host}/auth/callback`;
 
   console.log({ redirectUrl });
 
   const signInWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider: 'google',
       options: {
         redirectTo: redirectUrl,
       },
@@ -82,15 +87,10 @@ export const Login = ({
   };
 
   const signInWithMagicLink = async (email: string) => {
-    // For Magic Link with @supabase/ssr, we need to explicitly disable PKCE
-    // because the token-based flow doesn't use PKCE code exchange
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
         emailRedirectTo: redirectUrl,
-        // Disable PKCE for Magic Link - it uses token hash verification instead
-        // should筛选项: false would disable it but that option may not exist
-        // The key is to make sure the callback handles token properly
       },
     });
 
@@ -107,49 +107,42 @@ export const Login = ({
 
   return (
     <>
-      <div className="flex items-center justify-center p-8">
-        <div className="flex flex-col gap-4 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 p-4 rounded-xl max-w-sm w-full">
-          <h1 className="text-xl">Welcome</h1>
-          <p className="text-xs opacity-60">
+      <div className='flex items-center justify-center p-8'>
+        <div className='flex flex-col gap-4 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 p-4 rounded-xl max-w-sm w-full'>
+          <h1 className='text-xl'>Welcome</h1>
+          <p className='text-xs opacity-60'>
             Sign in or create an account to get started.
           </p>
-          {/* <Button
-            onClick={signInWithGoogle}
-            variant={"outline"}
-            className="font-semibold"
-          >
-            <AiOutlineGoogle size={20} />
-            Continue with Google
-          </Button>
-          <OR /> */}
 
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-2"
+            className='flex flex-col gap-2'
           >
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
+            <div className='flex flex-col gap-4'>
+              <div className='flex flex-col gap-2'>
                 <Input
-                  type="email"
-                  placeholder="Email"
-                  {...register("email", {
+                  type='email'
+                  placeholder='Email'
+                  {...register('email', {
                     required: true,
                     validate: {
                       emailIsValid: (value: string) =>
                         /^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) ||
-                        "Please enter a valid email",
+                        'Please enter a valid email',
                       emailDoesntHavePlus: (value: string) =>
                         /^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) ||
-                        "Email addresses with a '+' are not allowed",
-                      emailIsntDisposable: (value: string) =>
-                        !disposableDomains.includes(value.split("@")[1]) ||
-                        "Please use a permanent email address",
+                        'Email addresses with a \'+\' are not allowed',
+                      emailIsntDisposable: (value: string) => {
+                        const domain = value.split('@')[1];
+                        return !DISPOSABLE_DOMAINS.has(domain) ||
+                          'Please use a permanent email address';
+                      },
                     },
                   })}
                 />
                 {isSubmitted && errors.email && (
-                  <span className={"text-xs text-red-400"}>
-                    {errors.email?.message || "Email is required to sign in"}
+                  <span className={'text-xs text-red-400'}>
+                    {errors.email?.message || 'Email is required to sign in'}
                   </span>
                 )}
               </div>
@@ -158,9 +151,9 @@ export const Login = ({
             <Button
               isLoading={isSubmitting}
               disabled={isSubmitting}
-              variant="outline"
-              className="w-full"
-              type="submit"
+              variant='outline'
+              className='w-full'
+              type='submit'
             >
               Continue with Email
             </Button>
@@ -173,10 +166,10 @@ export const Login = ({
 
 export const OR = () => {
   return (
-    <div className="flex items-center my-1">
-      <div className="border-b flex-grow mr-2 opacity-50" />
-      <span className="text-sm opacity-50">OR</span>
-      <div className="border-b flex-grow ml-2 opacity-50" />
+    <div className='flex items-center my-1'>
+      <div className='border-b flex-grow mr-2 opacity-50' />
+      <span className='text-sm opacity-50'>OR</span>
+      <div className='border-b flex-grow ml-2 opacity-50' />
     </div>
   );
 };
