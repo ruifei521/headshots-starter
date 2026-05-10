@@ -1,7 +1,6 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { Database } from './types/supabase'
 
 export async function middleware(req: NextRequest) {
   let res = NextResponse.next({
@@ -10,33 +9,31 @@ export async function middleware(req: NextRequest) {
     },
   })
 
-  const supabase = createServerClient<
-    Database
-  >(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return req.cookies.get(name)?.value
+        getAll() {
+          return parseCookieHeader(req.headers.get('Cookie') ?? '').map(
+            (c) => ({ name: c.name, value: c.value ?? '' })
+          )
         },
-        set(name: string, value: string, options: CookieOptions) {
-          req.cookies.set({ name, value, ...options })
-          res = NextResponse.next({
-            request: {
-              headers: req.headers,
-            },
+        setAll(cookiesToSet, headers) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            req.cookies.set({ name, value, ...options })
+            res = NextResponse.next({
+              request: {
+                headers: req.headers,
+              },
+            })
+            res.cookies.set({ name, value, ...options })
           })
-          res.cookies.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          req.cookies.set({ name, value: '', ...options })
-          res = NextResponse.next({
-            request: {
-              headers: req.headers,
-            },
-          })
-          res.cookies.set({ name, value: '', ...options })
+          if (headers) {
+            Object.entries(headers).forEach(([key, value]) => {
+              res.headers.set(key, value)
+            })
+          }
         },
       },
     }
@@ -44,4 +41,10 @@ export async function middleware(req: NextRequest) {
 
   await supabase.auth.getSession()
   return res
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }

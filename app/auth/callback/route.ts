@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient, parseCookieHeader } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -16,27 +16,27 @@ export async function GET(req: NextRequest) {
   }
 
   if (code) {
-    // Create a response object that we can use to set cookies on
-    let res = NextResponse.redirect(new URL(next, req.url));
+    const res = NextResponse.redirect(new URL(next, req.url));
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          get(name: string) {
-            return req.cookies.get(name)?.value;
+          getAll() {
+            return parseCookieHeader(req.headers.get("Cookie") ?? "").map(
+              (c) => ({ name: c.name, value: c.value ?? "" })
+            );
           },
-          set(name: string, value: string, options: CookieOptions) {
-            // Set cookie on both the request and response
-            req.cookies.set({ name, value, ...options });
-            res = NextResponse.redirect(new URL(next, req.url));
-            res.cookies.set({ name, value, ...options });
-          },
-          remove(name: string, options: CookieOptions) {
-            req.cookies.set({ name, value: "", ...options });
-            res = NextResponse.redirect(new URL(next, req.url));
-            res.cookies.set({ name, value: "", ...options });
+          setAll(cookiesToSet, headers) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              res.cookies.set(name, value, options ?? {})
+            );
+            if (headers) {
+              Object.entries(headers).forEach(([key, value]) =>
+                res.headers.set(key, value)
+              );
+            }
           },
         },
       }
@@ -51,7 +51,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Return the response with cookies set
     return res;
   }
 
