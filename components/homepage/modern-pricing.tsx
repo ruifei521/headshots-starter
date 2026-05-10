@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import type React from "react"
-import { Check } from "lucide-react"
+import { Check, Camera, Clock, Shield, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -15,42 +15,81 @@ interface PricingFeature {
 interface PricingTier {
   title: string
   price: string
+  originalPrice?: string
   description: string
   features: string[]
   buttonText: string
   popular?: boolean
   bestValue?: boolean
+  credits?: string
+  headshots?: string
 }
 
 export default function ModernPricing() {
   const tiers: PricingTier[] = [
     {
-      title: "Starter",
-      price: "1 Credit",
-      description: "Perfect for individuals looking to enhance their online presence.",
-      features: ["4 AI Headshots"],
-      buttonText: "Choose Starter",
-    },
-    {
       title: "Basic",
-      price: "3 Credits",
-      description: "Ideal for professionals requiring frequent updates to their profiles.",
-      features: ["12 AI Headshots"],
-      buttonText: "Choose Basic",
-      popular: true,
+      price: "$19.99",
+      description: "Perfect for individuals looking to enhance their LinkedIn or CV.",
+      features: [
+        "4 Professional AI Headshots",
+        "Multiple Styles Included",
+        "Commercial License",
+        "High-Resolution Download",
+        "14-Day Money-Back Guarantee",
+      ],
+      buttonText: "Get Basic Headshots",
+      credits: "1 Credit",
+      headshots: "4 Headshots",
     },
     {
-      title: "Premium",
-      price: "5 Credits",
-      description: "The best value with unlimited possibilities.",
-      features: ["20 AI Headshots"],
-      buttonText: "Choose Premium",
+      title: "Professional",
+      price: "$39.99",
+      originalPrice: "$59",
+      description: "Ideal for professionals who want variety and different styles.",
+      features: [
+        "12 Professional AI Headshots",
+        "Multiple Styles Included",
+        "Commercial License",
+        "High-Resolution Download",
+        "Priority Processing",
+        "14-Day Money-Back Guarantee",
+      ],
+      buttonText: "Get Professional Headshots",
+      popular: true,
+      credits: "3 Credits",
+      headshots: "12 Headshots",
+    },
+    {
+      title: "Executive",
+      price: "$59.99",
+      originalPrice: "$89",
+      description: "The complete package for maximum variety and professional use.",
+      features: [
+        "20 Professional AI Headshots",
+        "All Styles & Backgrounds",
+        "Commercial License",
+        "High-Resolution Download",
+        "Priority Processing",
+        "14-Day Money-Back Guarantee",
+      ],
+      buttonText: "Get Executive Headshots",
       bestValue: true,
+      credits: "5 Credits",
+      headshots: "20 Headshots",
     },
   ]
 
+  const traditionalComparison = [
+    { feature: "Average Cost", traditional: "$200 – $500", ourPrice: "$19.99 – $59.99" },
+    { feature: "Session Time", traditional: "1 – 3 hours", ourPrice: "6 selfies, 2 mins" },
+    { feature: "Turnaround", traditional: "3 – 14 days", ourPrice: "~30 minutes" },
+    { feature: "Editing Rounds", traditional: "1 – 2 included", ourPrice: "Unlimited AI generations" },
+    { feature: "Photo Count", traditional: "10 – 20 shots", ourPrice: "4 – 20 headshots" },
+  ]
+
   return (
-    <div className="mx-auto max-w-4xl px-4">
+    <div className="mx-auto max-w-5xl px-4">
       <div className="flex flex-col items-center justify-center space-y-8">
         {/* Pricing Cards */}
         <div className="mt-8 grid gap-6 md:grid-cols-3 lg:gap-8">
@@ -91,11 +130,17 @@ export default function ModernPricing() {
 
               <h3 className="text-xl font-bold">{tier.title}</h3>
 
-              <div className="mt-4 flex items-baseline">
+              <div className="mt-4 flex items-baseline gap-2">
                 <span className="text-5xl font-extrabold">{tier.price}</span>
+                {tier.originalPrice && (
+                  <span className="text-lg text-muted-foreground line-through">{tier.originalPrice}</span>
+                )}
               </div>
+              {tier.credits && (
+                <p className="mt-1 text-sm font-medium text-primary">{tier.credits} · {tier.headshots}</p>
+              )}
 
-              <p className="mt-4 text-sm text-muted-foreground">{tier.description}</p>
+              <p className="mt-3 text-sm text-muted-foreground">{tier.description}</p>
 
               <ul className="my-6 space-y-4">
                 {tier.features.map((feature, featureIndex) => (
@@ -109,7 +154,7 @@ export default function ModernPricing() {
               <Link href="/login" className="mt-8 block w-full" aria-label={`Select ${tier.title} plan`}>
                 <Button
                   className={cn(
-                    "w-full",
+                    "w-full min-h-[44px]",
                     tier.popular
                       ? "bg-primary hover:bg-primary/90 text-primary-foreground"
                       : "bg-secondary hover:bg-secondary/80"
@@ -119,18 +164,42 @@ export default function ModernPricing() {
                   {tier.buttonText}
                 </Button>
               </Link>
+              {/* Money-back guarantee badge */}
+              <div className="mt-3 flex items-center justify-center gap-1 text-sm text-green-600">
+                <Shield className="h-4 w-4" />
+                <span>14-Day Money-Back Guarantee</span>
+              </div>
             </div>
           ))}
         </div>
 
+        {/* Comparison Table: Traditional Photography vs SnapProHead */}
+        <div className="mt-12 w-full max-w-3xl">
+          <h3 className="text-center text-xl font-bold mb-6">Why Choose AI Headshots?</h3>
+          <div className="overflow-x-auto rounded-lg border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="px-4 py-3 text-left font-semibold"></th>
+                  <th className="px-4 py-3 text-center font-semibold">Photo Studio</th>
+                  <th className="px-4 py-3 text-center font-semibold text-primary">SnapProHead</th>
+                </tr>
+              </thead>
+              <tbody>
+                {traditionalComparison.map((row, i) => (
+                  <tr key={i} className="border-b last:border-0">
+                    <td className="px-4 py-3 font-medium">{row.feature}</td>
+                    <td className="px-4 py-3 text-center text-muted-foreground">{row.traditional}</td>
+                    <td className="px-4 py-3 text-center font-medium text-primary">{row.ourPrice}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          All plans include a 7-day satisfaction guarantee. Need a custom plan?{" "}
-          <Link 
-            href="/contact" 
-            className="text-primary hover:underline"
-            aria-label="Contact our sales team">
-            Contact sales
-          </Link>
+          All plans include a <strong>14-day money-back guarantee</strong>. Not satisfied? Full refund, no questions asked.
         </p>
       </div>
     </div>

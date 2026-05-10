@@ -13,13 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -29,10 +22,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { FaFemale, FaImages, FaMale, FaRainbow } from "react-icons/fa";
 import * as z from "zod";
 import { fileUploadFormSchema } from "@/types/zod";
-import { upload } from "@vercel/blob/client";
 import axios from "axios";
 import { ImageInspector } from "./ImageInspector";
 import { ImageInspectionResult, aggregateCharacteristics } from "@/lib/imageInspection";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "@/types/supabase";
 
 type FormInput = z.infer<typeof fileUploadFormSchema>;
 
@@ -64,7 +58,6 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
           (file: File) => !files.some((f) => f.name === file.name)
         ) || [];
 
-      // if user tries to upload more than 10 files, display a toast
       if (newFiles.length + files.length > 10) {
         toast({
           title: "Too many images",
@@ -75,7 +68,6 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         return;
       }
 
-      // display a toast if any duplicate files were found
       if (newFiles.length !== acceptedFiles.length) {
         toast({
           title: "Duplicate file names",
@@ -85,7 +77,6 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         });
       }
 
-      // check that in total images do not exceed a combined 4.5MB
       const totalSize = files.reduce((acc, file) => acc + file.size, 0);
       const newSize = newFiles.reduce((acc, file) => acc + file.size, 0);
 
@@ -123,24 +114,41 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
 
   const trainModel = useCallback(async () => {
     setIsLoading(true);
-    // Upload each file to Vercel blob and store the resulting URLs
-    const blobUrls = [];
+    // Upload each file to Supabase Storage and store the resulting URLs
+    const storageUrls = [];
 
     if (files) {
       for (const file of files) {
-        const blob = await upload(file.name, file, {
-          access: "public",
-          handleUploadUrl: "/astria/train-model/image-upload",
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fileName", file.name);
+
+        const response = await fetch("/astria/train-model/image-upload", {
+          method: "POST",
+          body: formData,
         });
-        blobUrls.push(blob.url);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Upload failed:", errorData);
+          toast({
+            title: "Upload failed",
+            description: errorData.error || "Failed to upload image",
+            duration: 5000,
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        const data = await response.json();
+        storageUrls.push(data.url);
       }
     }
 
-    // console.log(blobUrls, "blobUrls");
     const aggregatedCharacteristics = aggregateCharacteristics(characteristics);
 
     const payload = {
-      urls: blobUrls,
+      urls: storageUrls,
       name: form.getValues("name").trim(),
       type: form.getValues("type"),
       pack: packSlug,

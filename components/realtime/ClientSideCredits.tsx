@@ -14,18 +14,20 @@ type ClientSideCreditsProps = {
 export default function ClientSideCredits({
   creditsRow,
 }: ClientSideCreditsProps) {
-
-  if (!creditsRow) return (
-    <p>Credits: 0</p>
-  )
-
-  const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+  // Hooks must be called unconditionally at the top level
+  const [credits, setCredits] = useState<creditsRow | null>(creditsRow);
+  
+  // Create Supabase client only once
+  const [supabase] = useState(() =>
+    createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
   );
-  const [credits, setCredits] = useState<creditsRow>(creditsRow);
 
   useEffect(() => {
+    if (!creditsRow) return;
+    
     const channel = supabase
       .channel("realtime credits")
       .on(
@@ -40,11 +42,9 @@ export default function ClientSideCredits({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, credits, setCredits]);
+  }, [supabase, creditsRow]);
 
-  if (!credits) return null;
+  if (!credits) return <p>Credits: 0</p>;
 
-  return (
-    <p>Credits: {credits.credits}</p>
-  );
+  return <p>Credits: {credits.credits}</p>;
 }

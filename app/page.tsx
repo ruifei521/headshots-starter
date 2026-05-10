@@ -4,11 +4,13 @@ import { redirect } from "next/navigation"
 import HeroSection from "@/components/homepage/HeroSection"
 import BrandsSection from "@/components/homepage/BrandsSection"
 import ProcessSection from "@/components/homepage/ProcessSection"
+import ComparisonSection from "@/components/homepage/ComparisonSection"
 import FeaturesSection from "@/components/homepage/FeaturesSection"
 import ExamplesSection from "@/components/homepage/ExamplesSection"
 import TestimonialsSection from "@/components/homepage/TestimonialsSection"
 import PricingSection from "@/components/homepage/PricingSection"
 import FAQSection from "@/components/homepage/FAQSection"
+import PrivacySection from "@/components/homepage/PrivacySection"
 import CTASection from "@/components/homepage/CTASection"
 
 export const dynamic = "force-dynamic"
@@ -30,11 +32,13 @@ export default async function Index() {
         <HeroSection />
         <BrandsSection />
         <ProcessSection />
+        <ComparisonSection />
         <FeaturesSection />
         <ExamplesSection />
         <TestimonialsSection />
         <PricingSection />
         <FAQSection />
+        <PrivacySection />
         <CTASection />
       </div>
     </div>

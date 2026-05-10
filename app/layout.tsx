@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
@@ -7,6 +8,7 @@ import AnnouncementBar from "@/components/homepage/announcement-bar"
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/homepage/theme-provider"
 import { validateConfig } from "@/lib/config";
+import { HashAuthHandler } from "@/components/HashAuthHandler";
 
 // Validate configuration at app initialization
 validateConfig();
@@ -17,9 +19,20 @@ export const viewport = {
   maximumScale: 1,
 };
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Headshots AI",
-  description: "Generate awesome headshots in minutes using AI",
+  description: "Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. Trusted by 50,000+ professionals. 14-day money-back guarantee. Plans from $19.99.",
+    alternates: {
+      canonical: "https://headshots.study",
+    },
+  openGraph: {
+    title: "Headshots AI - Professional AI Headshot Generator",
+    description: "Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. Trusted by 50,000+ professionals. 14-day money-back guarantee.",
+    url: "https://headshots.study",
+    siteName: "Headshots AI",
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -31,6 +44,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <HashAuthHandler />
           <AnnouncementBar />
           {/* Remove the section wrapper as it's interfering with sticky positioning */}
           <Suspense

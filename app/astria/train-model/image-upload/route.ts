@@ -1,61 +1,65 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { Database } from "@/types/supabase";
 
-// Configure Vercel Blob (#7 step in the README)
+export const dynamic = "force-dynamic";
+
+// Upload images to Supabase Storage instead of Vercel Blob
 export async function POST(request: Request): Promise<NextResponse> {
-  const body = (await request.json()) as HandleUploadBody;
-
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = createRouteHandlerClient<Database>({ cookies });
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const jsonResponse = await handleUpload({
-      body,
-      request,
-      onBeforeGenerateToken: async (
-        pathname: string
-        /* clientPayload?: string, */
-      ) => {
-        // Generate a client token for the browser to upload the file
-        // ⚠️ Authenticate and authorize users before generating the token.
-        // Otherwise, you're allowing anonymous uploads.
-        if (!user) {
-          throw new Error("Unauthorized");
-        }
-        return {
-          allowedContentTypes: ["image/jpeg", "image/png", "image/gif"],
-          tokenPayload: JSON.stringify({
-            userId: user.id, // Including the user ID in the token payload
-            // optional, sent to your server on upload completion
-            // you could pass a user id from auth, or a value from clientPayload
-          }),
-        };
-      },
-      onUploadCompleted: async ({ blob, tokenPayload }) => {
-        // Get notified of client upload completion
-        // ⚠️ This will not work on `localhost` websites,
-        // Use ngrok or similar to get the full upload flow
-        console.log("blob upload completed", blob, tokenPayload);
+    const formData = await request.formData();
+    const file = formData.get("file") as File;
+    const fileName = formData.get("fileName") as string;
 
-        try {
-          // Run any logic after the file upload completed
-          // const { userId } = JSON.parse(tokenPayload);
-          // await db.update({ avatar: blob.url, userId });
-        } catch (error) {
-          throw new Error("Could not update user");
-        }
-      },
+    if (!file) {
+      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+
+    // Generate unique path: userId/timestamp-originalName
+    const timestamp = Date.now();
+    const sanitized = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const filePath = `${user.id}/${timestamp}-${sanitized}`;
+
+    // Upload to Supabase Storage 'headshots' bucket
+    const { data, error } = await supabase.storage
+      .from("headshots")
+      .upload(filePath, file, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (error) {
+      console.error("Storage upload error:", error);
+      return NextResponse.json(
+        { error: `Upload failed: ${error.message}` },
+        { status: 500 }
+      );
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from("headshots")
+      .getPublicUrl(filePath);
+
+    return NextResponse.json({
+      url: urlData.publicUrl,
+      path: data.path,
     });
-
-    return NextResponse.json(jsonResponse);
   } catch (error) {
+    console.error("Upload error:", error);
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 400 } // The webhook will retry 5 times waiting for a 200
+      { status: 500 }
     );
   }
 }

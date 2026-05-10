@@ -71,12 +71,12 @@ export default function FAQSection() {
     {
       question: "What if I'm not satisfied with the results?",
       answer:
-        "We stand behind our AI technology and want you to be completely satisfied. If you're not happy with your headshots, contact our support team within 7 days of delivery, and we'll work with you to improve the results or provide a refund.",
+        "We stand behind our AI technology and want you to be completely satisfied. If you're not happy with your headshots, contact our support team within 14 days of delivery, and we'll work with you to improve the results or provide a full refund.",
     },
     {
       question: "How quickly will I receive my headshots?",
       answer:
-        "Standard processing time is approximately 20 minutes. Premium plan users receive priority processing. Once your headshots are ready, you'll receive an email notification with a link to view and download your images.",
+        "Standard processing time is ~30 minutes. Executive plan users receive priority processing. Once your headshots are ready, you'll receive an email notification with a link to view and download your images.",
     },
   ]
 

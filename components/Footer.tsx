@@ -19,17 +19,17 @@ export default function Footer() {
             <h3 className="text-sm font-medium">Product</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="#how-it-works" className="min-h-[44px] py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
                   How It Works
                 </Link>
               </li>
               <li>
-                <Link href="#examples" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="#examples" className="min-h-[44px] py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Examples
                 </Link>
               </li>
               <li>
-                <Link href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="#pricing" className="min-h-[44px] py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Pricing
                 </Link>
               </li>
@@ -40,7 +40,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link 
-                  href="https://github.com/astriaai/headshots-starter" 
+                  href="https://github.com/astriaai/headshots-starter" rel="noopener" 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   target="_blank"
                 >
@@ -49,7 +49,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
-                  href="https://docs.astria.ai/docs/api/pack/pack/" 
+                  href="https://docs.astria.ai/docs/api/pack/pack/" rel="noopener" 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   target="_blank"
                 >
@@ -58,7 +58,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
-                  href="https://twitter.com/Astria_AI" 
+                  href="https://twitter.com/Astria_AI" rel="noopener" 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   target="_blank"
                 >
@@ -72,7 +72,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link 
-                  href="mailto:support@astria.ai" 
+                  href="mailto:support@astria.ai" rel="noopener" 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Contact
@@ -80,7 +80,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
-                  href="https://choosealicense.com/licenses/mit/" 
+                  href="https://choosealicense.com/licenses/mit/" rel="noopener" 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   target="_blank"
                 >
@@ -98,7 +98,7 @@ export default function Footer() {
             <p className="text-sm text-muted-foreground">
               Open-source powered by{" "}
               <Link
-                href="https://www.astria.ai/"
+                href="https://www.astria.ai/" rel="noopener"
                 className="text-primary hover:underline"
                 target="_blank"
               >
@@ -106,7 +106,7 @@ export default function Footer() {
               </Link>
               ,{" "}
               <Link
-                href="https://supabase.com/"
+                href="https://supabase.com/" rel="noopener"
                 className="text-primary hover:underline"
                 target="_blank"
               >
@@ -123,7 +123,7 @@ export default function Footer() {
                 </Link>
               ) : (
                 <Link
-                  href="https://vercel.com/"
+                  href="https://vercel.com/" rel="noopener"
                   className="text-primary hover:underline"
                   target="_blank"
                 >

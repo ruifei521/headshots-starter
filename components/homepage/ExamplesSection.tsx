@@ -2,6 +2,34 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { ArrowRight } from "lucide-react"
+
+const comparisons = [
+  {
+    before: "/homepage/example0001.png",
+    after: "/homepage/example0002.png",
+    style: "Corporate Executive",
+    description: "Selfie to LinkedIn-ready headshot",
+  },
+  {
+    before: "/homepage/example0003.png",
+    after: "/homepage/example0004.png",
+    style: "Creative Professional",
+    description: "Casual photo to editorial portrait",
+  },
+  {
+    before: "/homepage/example0005.png",
+    after: "/homepage/example0006.png",
+    style: "Real Estate Agent",
+    description: "Phone selfie to trust-building portrait",
+  },
+  {
+    before: "/homepage/example0007.png",
+    after: "/homepage/example0008.png",
+    style: "Tech Startup Founder",
+    description: "Candid shot to modern professional",
+  },
+]
 
 export default function ExamplesSection() {
   return (
@@ -16,35 +44,61 @@ export default function ExamplesSection() {
             See how our AI transforms regular selfies into professional headshots that make you stand out.
           </p>
         </div>
-        <div className="mt-16 grid gap-4 sm:gap-6 md:gap-8 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 8 }, (_, i) => `/homepage/example000${i + 1}.png`).map((src, i) => (
-            <div
-              key={i}
-              className="group relative overflow-hidden rounded-lg border bg-background transition-all hover:shadow-lg"
-            >
-              <div className="h-96 overflow-hidden">
-                <div className="relative h-full w-full transition-all group-hover:scale-105">
-                  <Image
-                    src={src || "/placeholder.svg"}
-                    alt="AI Generated Headshot"
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute bottom-2 right-2 rounded-full bg-primary/80 px-2 py-1 text-xs text-white">
-                    <span className="flex items-center gap-1">
-                      <span className="h-1.5 w-1.5 rounded-full bg-white"></span>
-                      AI Generated
+
+        {/* Before / After Grid */}
+        <div className="mt-16 grid gap-8 sm:grid-cols-2 max-w-4xl mx-auto">
+          {comparisons.map((item, i) => (
+            <div key={i} className="rounded-lg border bg-background overflow-hidden">
+              <div className="px-4 pt-4 pb-2">
+                <p className="font-semibold">{item.style}</p>
+                <p className="text-sm text-muted-foreground">{item.description}</p>
+              </div>
+              <div className="grid grid-cols-2">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-start p-2 z-10">
+                    <span className="rounded bg-black/60 px-1.5 py-0.5 text-[11px] font-medium text-white">
+                      Before
                     </span>
+                  </div>
+                  <div className="h-56 overflow-hidden">
+                    <Image
+                      src={item.before || "/placeholder.svg"}
+                      alt={`${item.style} - Before`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-start p-2 z-10">
+                    <span className="rounded bg-primary/90 px-1.5 py-0.5 text-[11px] font-medium text-white">
+                      After
+                    </span>
+                  </div>
+                  <div className="h-56 overflow-hidden">
+                    <Image
+                      src={item.after || "/placeholder.svg"}
+                      alt={`${item.style} - After`}
+                      fill
+                      className="object-cover"
+                    />
                   </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
-        <div className="mt-12 flex justify-center">
+
+        {/* CTA */}
+        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/login">
+            <Button size="lg" className="gap-2">
+              Try It Yourself <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Link href="#pricing">
             <Button variant="outline" size="lg">
-              View More Examples
+              View Pricing
             </Button>
           </Link>
         </div>

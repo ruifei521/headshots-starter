@@ -1,7 +1,4 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { Database } from "../../types/supabase";
+import { headers } from "next/headers";
 import { Login } from "./components/Login";
 
 export const dynamic = "force-dynamic";
@@ -11,15 +8,8 @@ export default async function LoginPage({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const supabase = createServerComponentClient<Database>({ cookies });
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user) {
-    redirect("/");
-  }
+  // Server-side auth check removed - let client component handle it
+  // This prevents timeouts during server-side rendering
 
   const headersList = headers();
   const host = headersList.get("host");
