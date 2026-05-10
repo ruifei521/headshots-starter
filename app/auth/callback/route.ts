@@ -1,12 +1,9 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const requestUrl = new URL(req.url);
   const code = requestUrl.searchParams.get("code");
-  const tokenHash = requestUrl.searchParams.get("token_hash");
-  const type = requestUrl.searchParams.get("type");
   const next = requestUrl.searchParams.get("next") || "/overview";
   const error = requestUrl.searchParams.get("error");
   const errorDescription = requestUrl.searchParams.get("error_description");
@@ -18,9 +15,9 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // PKCE flow: code parameter present (OAuth or Magic Link with PKCE)
   if (code) {
-    const cookieStore = await cookies();
+    // Create a response object that we can use to set cookies on
+    let res = NextResponse.redirect(new URL(next, req.url));
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -28,13 +25,18 @@ export async function GET(req: NextRequest) {
       {
         cookies: {
           get(name: string) {
-            return cookieStore.get(name)?.value;
+            return req.cookies.get(name)?.value;
           },
-          set(name: string, value: string, options: Record<string, unknown>) {
-            cookieStore.set({ name, value, ...options });
+          set(name: string, value: string, options: CookieOptions) {
+            // Set cookie on both the request and response
+            req.cookies.set({ name, value, ...options });
+            res = NextResponse.redirect(new URL(next, req.url));
+            res.cookies.set({ name, value, ...options });
           },
-          remove(name: string, options: Record<string, unknown>) {
-            cookieStore.set({ name, value: "", ...options });
+          remove(name: string, options: CookieOptions) {
+            req.cookies.set({ name, value: "", ...options });
+            res = NextResponse.redirect(new URL(next, req.url));
+            res.cookies.set({ name, value: "", ...options });
           },
         },
       }
@@ -48,13 +50,11 @@ export async function GET(req: NextRequest) {
         `${requestUrl.origin}/login?error=${encodeURIComponent(exchangeError.message)}`
       );
     }
+
+    // Return the response with cookies set
+    return res;
   }
 
-  // If no code and no token_hash, nothing to process
-  if (!code && !tokenHash) {
-    console.warn("[auth/callback] No code or token_hash in URL");
-    return NextResponse.redirect(`${requestUrl.origin}/login`);
-  }
-
-  return NextResponse.redirect(new URL(next, req.url));
+  // No code parameter - nothing to process
+  return NextResponse.redirect(`${requestUrl.origin}/login`);
 }
