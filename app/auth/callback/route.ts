@@ -10,11 +10,19 @@ export async function GET(req: NextRequest) {
   const next = requestUrl.searchParams.get("next") || "/overview";
   const error = requestUrl.searchParams.get("error");
   const errorDescription = requestUrl.searchParams.get("error_description");
+  const email = requestUrl.searchParams.get("email");
 
-  // Log all params for debugging
-  console.log("[auth/callback] Full URL:", req.url);
-  console.log("[auth/callback] Params:", { code, token_hash: tokenHash, token, type, error, errorDescription });
-  console.log("[auth/callback] Cookies:", req.headers.get("Cookie")?.substring(0, 200));
+  // 记录完整 URL 用于调试
+  console.log("========== AUTH CALLBACK DEBUG ==========");
+  console.log("Full URL:", req.url);
+  console.log("code:", code ? code.substring(0, 20) + "..." : null);
+  console.log("token_hash:", tokenHash ? tokenHash.substring(0, 20) + "..." : null);
+  console.log("token:", token ? token.substring(0, 20) + "..." : null);
+  console.log("type:", type);
+  console.log("email:", email);
+  console.log("next:", next);
+  console.log("error:", error);
+  console.log("errorDescription:", errorDescription);
 
   if (error) {
     console.error("[auth/callback] Error from provider:", error, errorDescription);
@@ -175,7 +183,21 @@ export async function GET(req: NextRequest) {
     return res;
   }
 
-  // No recognized parameter
-  console.log("[auth/callback] No recognized auth parameter, redirecting to login");
-  return NextResponse.redirect(`${requestUrl.origin}/login`);
+  // No recognized parameter - 添加详细日志
+  console.log("========== NO RECOGNIZED PARAM ==========");
+  console.log("Available params:", {
+    hasCode: !!code,
+    hasTokenHash: !!tokenHash,
+    hasToken: !!token,
+    hasType: !!type,
+    hasEmail: !!email,
+    hasNext: !!next
+  });
+  console.log("This means none of the expected auth parameters were found.");
+  console.log("Possible causes:");
+  console.log("1. Magic Link URL format changed");
+  console.log("2. Site URL in Supabase dashboard is incorrect");
+  console.log("3. The link has already been used");
+  console.log("=========================================");
+  return NextResponse.redirect(`${requestUrl.origin}/login?error=Invalid+auth+link`);
 }
