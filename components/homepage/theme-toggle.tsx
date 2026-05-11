@@ -3,9 +3,24 @@
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun } from "lucide-react"
+import { useState, useEffect } from "react"
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Avoid hydration mismatch - render nothing until client-side mounted
+  if (!mounted) {
+    return (
+      <Button variant="ghost" size="icon" aria-label="Toggle theme" className="opacity-0">
+        <Sun className="h-5 w-5" />
+      </Button>
+    )
+  }
 
   return (
     <Button
@@ -19,4 +34,3 @@ export function ThemeToggle() {
     </Button>
   )
 }
-

@@ -3,7 +3,7 @@
 import { Database } from "@/types/supabase";
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 /**
  * Handles Supabase auth hash fragments that land on the root URL.
@@ -12,11 +12,15 @@ import { useEffect, useState } from "react";
  * This component detects those tokens, establishes a session, and redirects.
  */
 export function HashAuthHandler() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createBrowserClient<Database>(supabaseUrl, supabaseKey);
   const router = useRouter();
   const [processing, setProcessing] = useState(false);
+
+  const supabase = useMemo(() => {
+    return createBrowserClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+  }, []);
 
   useEffect(() => {
     const hash = window.location.hash.substring(1);
@@ -39,7 +43,7 @@ export function HashAuthHandler() {
 
     if (!accessToken || !refreshToken) return;
 
-    // Found auth tokens in hash — process them
+    // Found auth tokens in hash - process them
     setProcessing(true);
 
     const handleAuth = async () => {

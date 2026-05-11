@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { Database } from '@/types/supabase';
 import { createBrowserClient } from '@supabase/ssr';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { AiOutlineGoogle } from 'react-icons/ai';
 import { WaitingForMagicLink } from './WaitingForMagicLink';
@@ -27,9 +27,13 @@ export const Login = ({
   host: string | null;
   searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createBrowserClient<Database>(supabaseUrl, supabaseKey);
+  const supabase = useMemo(() => {
+    return createBrowserClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+  }, []);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMagicLinkSent, setIsMagicLinkSent] = useState(false);
   const { toast } = useToast();
@@ -73,8 +77,6 @@ export const Login = ({
   const protocol = host?.includes('localhost') ? 'http' : 'https';
   const redirectUrl = `${protocol}://${host}/auth/callback`;
 
-  console.log({ redirectUrl });
-
   const signInWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -82,8 +84,6 @@ export const Login = ({
         redirectTo: redirectUrl,
       },
     });
-
-    console.log(data, error);
   };
 
   const signInWithMagicLink = async (email: string) => {
@@ -131,7 +131,7 @@ export const Login = ({
                         'Please enter a valid email',
                       emailDoesntHavePlus: (value: string) =>
                         /^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) ||
-                        'Email addresses with a \'+\' are not allowed',
+                        'Email addresses with a + are not allowed',
                       emailIsntDisposable: (value: string) => {
                         const domain = value.split('@')[1];
                         return !DISPOSABLE_DOMAINS.has(domain) ||
