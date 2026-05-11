@@ -1,10 +1,9 @@
 import { Camera } from "lucide-react"
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import React from "react";
-import { Database } from "@/types/supabase";
 import ClientSideCredits from "./realtime/ClientSideCredits";
 import { ThemeToggle } from "./homepage/theme-toggle";
 import UserDropdown from "./UserDropdown";
@@ -16,22 +15,22 @@ const packsIsEnabled = process.env.NEXT_PUBLIC_TUNE_TYPE === "packs";
 export const revalidate = 0;
 
 export default async function Navbar() {
-  const cookieStore = cookies();
-  const supabase = createServerClient<
-    Database
-  >(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
+        getAll() {
+          return cookies().getAll();
         },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: "", ...options });
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            try {
+              cookies().set(name, value, options);
+            } catch {
+              // The `set` method was called from a Server Component.
+            }
+          });
         },
       },
     }
