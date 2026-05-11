@@ -112,7 +112,11 @@ export async function GET(req: NextRequest) {
 
   // Legacy token flow (plain token)
   if (token && type === "magiclink") {
-    console.log("[auth/callback] Legacy token flow (plain token)");
+    const email = requestUrl.searchParams.get("email");
+    console.log("[auth/callback] Legacy token flow (plain token)", {
+      token: token.substring(0, 10) + "...",
+      email,
+    });
     const res = NextResponse.redirect(new URL(next, req.url));
 
     const supabase = createServerClient(
@@ -139,10 +143,26 @@ export async function GET(req: NextRequest) {
       }
     );
 
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      token_hash: token,
-      type: "magiclink",
-    });
+    // 如果有 email，使用 email + token 验证（正确方式）
+    // 如果没有 email，向后兼容：假设 token 是 token_hash
+    let verifyResult;
+    if (email) {
+      console.log("[auth/callback] Verifying with email + token");
+      verifyResult = await supabase.auth.verifyOtp({
+        email: email,
+        token: token,
+        type: "magiclink",
+      });
+    } else {
+      // 向后兼容：假设 token 实际上是 token_hash
+      console.warn("[auth/callback] No email provided with token, assuming token is token_hash");
+      verifyResult = await supabase.auth.verifyOtp({
+        token_hash: token,
+        type: "magiclink",
+      });
+    }
+
+    const { error: verifyError } = verifyResult;
 
     if (verifyError) {
       console.error("[auth/callback] Token verify error:", verifyError.message);
