@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  // 判断是否为 localhost 环境
+  const isLocalhost = request.nextUrl.hostname === 'localhost' || request.nextUrl.hostname === '127.0.0.1';
+
   const response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -25,7 +28,7 @@ export async function middleware(request: NextRequest) {
             request.cookies.set(name, value)
             response.cookies.set(name, value, {
               httpOnly: options?.httpOnly ?? true,
-              secure: options?.secure ?? true,
+              secure: options?.secure ?? !isLocalhost,
               sameSite: options?.sameSite ?? 'lax',
               path: options?.path ?? '/',
               maxAge: options?.maxAge,

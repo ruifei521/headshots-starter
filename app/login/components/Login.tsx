@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,10 +8,17 @@ import { createBrowserClient } from '@supabase/ssr';
 import { useState, useMemo } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { AiOutlineGoogle } from 'react-icons/ai';
-import { WaitingForMagicLink } from './WaitingForMagicLink';
+import { useRouter } from 'next/navigation';
 
-type Inputs = {
+type LoginInputs = {
   email: string;
+  password: string;
+};
+
+type SignupInputs = {
+  email: string;
+  password: string;
+  confirmPassword: string;
 };
 
 // Common disposable email domains (small subset for client-side check)
@@ -19,6 +26,8 @@ const DISPOSABLE_DOMAINS = new Set([
   'tempmail.com', 'throwaway.com', 'guerrillamail.com', 'mailinator.com',
   '10minutemail.com', 'fakeinbox.com', 'trashmail.com', 'temp-mail.org',
 ]);
+
+type Mode = 'login' | 'signup';
 
 export const Login = ({
   host,
@@ -34,45 +43,25 @@ export const Login = ({
     );
   }, []);
 
+  const [mode, setMode] = useState<Mode>('login');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isMagicLinkSent, setIsMagicLinkSent] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
+
+  const loginForm = useForm<LoginInputs>();
+  const signupForm = useForm<SignupInputs>();
 
   const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitted },
-  } = useForm<Inputs>();
+    register: registerLogin,
+    handleSubmit: handleSubmitLogin,
+    formState: { errors: loginErrors, isSubmitted: loginIsSubmitted },
+  } = loginForm;
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    setIsSubmitting(true);
-    try {
-      await signInWithMagicLink(data.email);
-      setTimeout(() => {
-        setIsSubmitting(false);
-        toast({
-          title: 'Email sent',
-          description: 'Check your inbox for a magic link to sign in.',
-          duration: 5000,
-        });
-        setIsMagicLinkSent(true);
-      }, 1000);
-    } catch (error) {
-      setIsSubmitting(false);
-      toast({
-        title: 'Something went wrong',
-        variant: 'destructive',
-        description:
-          'Please try again, if the problem persists, contact us at hello@tryleap.ai',
-        duration: 5000,
-      });
-    }
-  };
-
-  let inviteToken = null;
-  if (searchParams && 'inviteToken' in searchParams) {
-    inviteToken = searchParams['inviteToken'];
-  }
+  const {
+    register: registerSignup,
+    handleSubmit: handleSubmitSignup,
+    formState: { errors: signupErrors, isSubmitted: signupIsSubmitted },
+  } = signupForm;
 
   const protocol = host?.includes('localhost') ? 'http' : 'https';
   const redirectUrl = `${protocol}://${host}/auth/callback`;
@@ -86,24 +75,124 @@ export const Login = ({
     });
   };
 
-  const signInWithMagicLink = async (email: string) => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: redirectUrl,
-      },
-    });
+  const handleLogin: SubmitHandler<LoginInputs> = async (data) => {
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
 
-    if (error) {
-      console.log(`Error: ${error.message}`);
+      if (error) {
+        toast({
+          title: 'Login failed',
+          variant: 'destructive',
+          description: 'Invalid login credentials',
+          duration: 5000,
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      router.push('/overview');
+    } catch (error) {
+      toast({
+        title: 'Something went wrong',
+        variant: 'destructive',
+        description:
+          'Please try again, if the problem persists, contact us at hello@tryleap.ai',
+        duration: 5000,
+      });
+      setIsSubmitting(false);
     }
   };
 
-  if (isMagicLinkSent) {
-    return (
-      <WaitingForMagicLink toggleState={() => setIsMagicLinkSent(false)} />
-    );
-  }
+  const handleSignup: SubmitHandler<SignupInputs> = async (data) => {
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (error) {
+        if (error.message.includes('already registered') || error.message.includes('already exists')) {
+          toast({
+            title: 'Registration failed',
+            variant: 'destructive',
+            description: 'User already registered',
+            duration: 5000,
+          });
+        } else {
+          toast({
+            title: 'Registration failed',
+            variant: 'destructive',
+            description: error.message,
+            duration: 5000,
+          });
+        }
+        setIsSubmitting(false);
+        return;
+      }
+
+      toast({
+        title: 'Success',
+        description: 'Registration successful, please sign in',
+        duration: 5000,
+      });
+      setMode('login');
+      signupForm.reset();
+      setIsSubmitting(false);
+    } catch (error) {
+      toast({
+        title: 'Something went wrong',
+        variant: 'destructive',
+        description:
+          'Please try again, if the problem persists, contact us at hello@tryleap.ai',
+        duration: 5000,
+      });
+      setIsSubmitting(false);
+    }
+  };
+
+  const toggleMode = () => {
+    setMode(mode === 'login' ? 'signup' : 'login');
+    loginForm.reset();
+    signupForm.reset();
+  };
+
+  const validateEmail = (value: string) => {
+    if (!value) return 'Email is required';
+    if (!/^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+      return 'Please enter a valid email';
+    }
+    if (value.includes('+')) {
+      return 'Email addresses with a + are not allowed';
+    }
+    const domain = value.split('@')[1];
+    if (DISPOSABLE_DOMAINS.has(domain)) {
+      return 'Please use a permanent email address';
+    }
+    return true;
+  };
+
+  const validatePassword = (value: string) => {
+    if (!value) return 'Password is required';
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return true;
+  };
+
+  const validateConfirmPassword = (value: string) => {
+    if (mode === 'signup') {
+      const password = signupForm.getValues('password');
+      if (value !== password) {
+        return 'Passwords do not match';
+      }
+    }
+    return true;
+  };
 
   return (
     <>
@@ -114,50 +203,113 @@ export const Login = ({
             Sign in or create an account to get started.
           </p>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className='flex flex-col gap-2'
-          >
-            <div className='flex flex-col gap-4'>
-              <div className='flex flex-col gap-2'>
-                <Input
-                  type='email'
-                  placeholder='Email'
-                  {...register('email', {
-                    required: true,
-                    validate: {
-                      emailIsValid: (value: string) =>
-                        /^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) ||
-                        'Please enter a valid email',
-                      emailDoesntHavePlus: (value: string) =>
-                        /^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) ||
-                        'Email addresses with a + are not allowed',
-                      emailIsntDisposable: (value: string) => {
-                        const domain = value.split('@')[1];
-                        return !DISPOSABLE_DOMAINS.has(domain) ||
-                          'Please use a permanent email address';
-                      },
-                    },
-                  })}
-                />
-                {isSubmitted && errors.email && (
-                  <span className={'text-xs text-red-400'}>
-                    {errors.email?.message || 'Email is required to sign in'}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <Button
-              isLoading={isSubmitting}
-              disabled={isSubmitting}
-              variant='outline'
-              className='w-full'
-              type='submit'
+          {mode === 'login' ? (
+            <form
+              onSubmit={handleSubmitLogin(handleLogin)}
+              className='flex flex-col gap-2'
             >
-              Continue with Email
-            </Button>
-          </form>
+              <div className='flex flex-col gap-4'>
+                <div className='flex flex-col gap-2'>
+                  <Input
+                    type='email'
+                    placeholder='Email'
+                    {...registerLogin('email', {
+                      validate: validateEmail,
+                    })}
+                  />
+                  {loginIsSubmitted && loginErrors.email && (
+                    <span className={'text-xs text-red-400'}>
+                      {loginErrors.email.message}
+                    </span>
+                  )}
+                </div>
+                <div className='flex flex-col gap-2'>
+                  <Input
+                    type='password'
+                    placeholder='Password'
+                    {...registerLogin('password', {
+                      validate: validatePassword,
+                    })}
+                  />
+                  {loginIsSubmitted && loginErrors.password && (
+                    <span className={'text-xs text-red-400'}>
+                      {loginErrors.password.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <Button
+                isLoading={isSubmitting}
+                disabled={isSubmitting}
+                variant='outline'
+                className='w-full'
+                type='submit'
+              >
+                Sign In
+              </Button>
+            </form>
+          ) : (
+            <form
+              onSubmit={handleSubmitSignup(handleSignup)}
+              className='flex flex-col gap-2'
+            >
+              <div className='flex flex-col gap-4'>
+                <div className='flex flex-col gap-2'>
+                  <Input
+                    type='email'
+                    placeholder='Email'
+                    {...registerSignup('email', {
+                      validate: validateEmail,
+                    })}
+                  />
+                  {signupIsSubmitted && signupErrors.email && (
+                    <span className={'text-xs text-red-400'}>
+                      {signupErrors.email.message}
+                    </span>
+                  )}
+                </div>
+                <div className='flex flex-col gap-2'>
+                  <Input
+                    type='password'
+                    placeholder='Password'
+                    {...registerSignup('password', {
+                      validate: validatePassword,
+                    })}
+                  />
+                  {signupIsSubmitted && signupErrors.password && (
+                    <span className={'text-xs text-red-400'}>
+                      {signupErrors.password.message}
+                    </span>
+                  )}
+                </div>
+                <div className='flex flex-col gap-2'>
+                  <Input
+                    type='password'
+                    placeholder='Confirm Password'
+                    {...registerSignup('confirmPassword', {
+                      validate: validateConfirmPassword,
+                    })}
+                  />
+                  {signupIsSubmitted && signupErrors.confirmPassword && (
+                    <span className={'text-xs text-red-400'}>
+                      {signupErrors.confirmPassword.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <Button
+                isLoading={isSubmitting}
+                disabled={isSubmitting}
+                variant='outline'
+                className='w-full'
+                type='submit'
+              >
+                Sign Up
+              </Button>
+            </form>
+          )}
 
           <OR />
 
@@ -170,6 +322,17 @@ export const Login = ({
             <AiOutlineGoogle className='mr-2' />
             Continue with Google
           </Button>
+
+          <p className='text-xs text-center opacity-60'>
+            {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
+            <button
+              type='button'
+              onClick={toggleMode}
+              className='underline hover:opacity-80'
+            >
+              {mode === 'login' ? 'Sign up' : 'Sign in'}
+            </button>
+          </p>
         </div>
       </div>
     </>

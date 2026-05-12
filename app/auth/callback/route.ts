@@ -4,7 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   const requestUrl = new URL(req.url);
   const params = Object.fromEntries(requestUrl.searchParams.entries());
-  
+
+  // 判断是否为 localhost 环境
+  const isLocalhost = requestUrl.hostname === 'localhost' || requestUrl.hostname === '127.0.0.1';
+
   // 详细日志
   console.log("========== AUTH CALLBACK ==========");
   console.log("Full URL:", req.url);
@@ -29,7 +32,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // 创建 Supabase 客户端的辅助函数
+  // 创建 Supabase 服务端客户端的辅助函数
   const createSupabaseClient = () => {
     const res = NextResponse.redirect(new URL(next, req.url));
     const supabase = createServerClient(
@@ -42,15 +45,17 @@ export async function GET(req: NextRequest) {
               (c) => ({ name: c.name, value: c.value ?? "" })
             );
           },
-          setAll(cookiesToSet, headers) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              res.cookies.set(name, value, options ?? {})
-            );
-            if (headers) {
-              Object.entries(headers).forEach(([key, value]) =>
-                res.headers.set(key, value)
-              );
-            }
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              res.cookies.set(name, value, {
+                httpOnly: options?.httpOnly ?? true,
+                secure: options?.secure ?? !isLocalhost,
+                sameSite: options?.sameSite ?? 'lax',
+                path: options?.path ?? '/',
+                maxAge: options?.maxAge,
+                domain: options?.domain,
+              });
+            });
           },
         },
       }
@@ -62,16 +67,16 @@ export async function GET(req: NextRequest) {
   if (code) {
     console.log("Flow: PKCE (code exchange)");
     const { supabase, res } = createSupabaseClient();
-    
+
     const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-    
+
     if (exchangeError) {
       console.error("PKCE exchange failed:", exchangeError.message);
       return NextResponse.redirect(
         `${requestUrl.origin}/login?error=${encodeURIComponent(exchangeError.message)}`
       );
     }
-    
+
     console.log("PKCE success, user:", data.user?.email);
     return res;
   }
@@ -80,20 +85,20 @@ export async function GET(req: NextRequest) {
   if (token && email) {
     console.log("Flow: verifyOtp with email + token");
     const { supabase, res } = createSupabaseClient();
-    
+
     const { data, error: verifyError } = await supabase.auth.verifyOtp({
       email: email,
       token: token,
       type: "magiclink",
     });
-    
+
     if (verifyError) {
       console.error("verifyOtp failed:", verifyError.message);
       return NextResponse.redirect(
         `${requestUrl.origin}/login?error=${encodeURIComponent(verifyError.message)}`
       );
     }
-    
+
     console.log("verifyOtp success, user:", data.user?.email);
     return res;
   }
@@ -102,19 +107,19 @@ export async function GET(req: NextRequest) {
   if (tokenHash || (token && type === "magiclink")) {
     console.log("Flow: verifyOtp with token_hash");
     const { supabase, res } = createSupabaseClient();
-    
+
     const { data, error: verifyError } = await supabase.auth.verifyOtp({
       token_hash: (tokenHash || token) as string,
       type: "magiclink",
     });
-    
+
     if (verifyError) {
       console.error("token_hash verify failed:", verifyError.message);
       return NextResponse.redirect(
         `${requestUrl.origin}/login?error=${encodeURIComponent(verifyError.message)}`
       );
     }
-    
+
     console.log("token_hash verify success, user:", data.user?.email);
     return res;
   }
@@ -123,19 +128,19 @@ export async function GET(req: NextRequest) {
   if (token) {
     console.log("Flow: verifyOtp plain token (no email)");
     const { supabase, res } = createSupabaseClient();
-    
+
     const { data, error: verifyError } = await supabase.auth.verifyOtp({
       token_hash: token,
       type: "magiclink",
     });
-    
+
     if (verifyError) {
       console.error("plain token verify failed:", verifyError.message);
       return NextResponse.redirect(
         `${requestUrl.origin}/login?error=${encodeURIComponent(verifyError.message)}`
       );
     }
-    
+
     console.log("plain token verify success, user:", data.user?.email);
     return res;
   }
