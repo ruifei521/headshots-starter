@@ -43,6 +43,9 @@ export async function middleware(request: NextRequest) {
   // 这会触发 cookie 刷新，确保 PKCE verifier 被正确传递
   await supabase.auth.getSession()
 
+  // 防止 CDN 缓存认证页面，避免会话泄露
+  response.headers.set('Cache-Control', 'private, no-store')
+
   return response
 }
 

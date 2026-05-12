@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
   console.log("========== AUTH CALLBACK ==========");
   console.log("Full URL:", req.url);
   console.log("All params:", JSON.stringify(params, null, 2));
+  console.log("Is localhost:", isLocalhost);
   console.log("===================================");
 
   // 提取所有可能的参数
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest) {
   if (error) {
     console.error("Supabase error:", error, errorDescription);
     return NextResponse.redirect(
-      `${requestUrl.origin}/login?error=${encodeURIComponent(errorDescription || error)}`
+      `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
     );
   }
 
@@ -63,7 +64,7 @@ export async function GET(req: NextRequest) {
     return { supabase, res };
   };
 
-  // 方法 1: PKCE 流程 - 使用 code 交换 session (新版 Supabase)
+  // 方法 1: PKCE 流程 - 使用 code 交换 session (新版 Supabase 默认)
   if (code) {
     console.log("Flow: PKCE (code exchange)");
     const { supabase, res } = createSupabaseClient();
@@ -72,8 +73,20 @@ export async function GET(req: NextRequest) {
 
     if (exchangeError) {
       console.error("PKCE exchange failed:", exchangeError.message);
+
+      // PKCE 失败的友好错误提示
+      let userMessage = 'Login link expired or invalid. Please try again.';
+      if (exchangeError.message.includes('code challenge') || exchangeError.message.includes('code verifier')) {
+        userMessage = 'Your login session has expired. Please request a new magic link.';
+        console.error("Root cause: PKCE code verifier cookie was lost or expired. This can happen if:");
+        console.error("  - The link was opened in a different browser");
+        console.error("  - Browser cookies were cleared between sending the link and clicking it");
+        console.error("  - The link was opened in an incognito/private window");
+        console.error("  - Cookie SameSite settings blocked the verifier cookie");
+      }
+
       return NextResponse.redirect(
-        `${requestUrl.origin}/login?error=${encodeURIComponent(exchangeError.message)}`
+        `${requestUrl.origin}/login?error=${encodeURIComponent(userMessage)}`
       );
     }
 
@@ -95,7 +108,7 @@ export async function GET(req: NextRequest) {
     if (verifyError) {
       console.error("verifyOtp failed:", verifyError.message);
       return NextResponse.redirect(
-        `${requestUrl.origin}/login?error=${encodeURIComponent(verifyError.message)}`
+        `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
       );
     }
 
@@ -116,7 +129,7 @@ export async function GET(req: NextRequest) {
     if (verifyError) {
       console.error("token_hash verify failed:", verifyError.message);
       return NextResponse.redirect(
-        `${requestUrl.origin}/login?error=${encodeURIComponent(verifyError.message)}`
+        `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
       );
     }
 
@@ -137,7 +150,7 @@ export async function GET(req: NextRequest) {
     if (verifyError) {
       console.error("plain token verify failed:", verifyError.message);
       return NextResponse.redirect(
-        `${requestUrl.origin}/login?error=${encodeURIComponent(verifyError.message)}`
+        `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
       );
     }
 
@@ -149,5 +162,5 @@ export async function GET(req: NextRequest) {
   console.log("ERROR: No auth parameters found!");
   console.log("This Magic Link URL format is not recognized.");
   console.log("Params received:", Object.keys(params));
-  return NextResponse.redirect(`${requestUrl.origin}/login?error=Invalid+auth+link+format`);
+  return NextResponse.redirect(`${requestUrl.origin}/login?error=${encodeURIComponent('Invalid login link. Please request a new one.')}`);
 }
