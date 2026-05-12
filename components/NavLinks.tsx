@@ -9,17 +9,17 @@ interface NavLinksProps {
 
 export default function NavLinks({ packsIsEnabled, stripeIsConfigured }: NavLinksProps) {
   return (
-    <nav className="hidden md:flex gap-6">
+    <nav className="hidden md:flex gap-6 items-center">
       <Link 
         href="/overview" 
-        className="flex items-center min-h-[44px] py-1 text-sm font-medium hover:text-primary transition-colors"
+        className="px-3 py-2 min-h-[44px] inline-flex items-center text-sm font-medium hover:text-primary transition-colors"
       >
         Home
       </Link>
       {packsIsEnabled && (
         <Link 
           href="/overview/packs"
-          className="flex items-center text-sm font-medium hover:text-primary transition-colors"
+          className="px-3 py-2 inline-flex items-center text-sm font-medium hover:text-primary transition-colors"
         >
           Packs
         </Link>
@@ -27,7 +27,7 @@ export default function NavLinks({ packsIsEnabled, stripeIsConfigured }: NavLink
       {stripeIsConfigured && (
         <Link 
           href="/get-credits"
-          className="flex items-center text-sm font-medium hover:text-primary transition-colors"
+          className="px-3 py-2 inline-flex items-center text-sm font-medium hover:text-primary transition-colors"
         >
           Get Credits
         </Link>
