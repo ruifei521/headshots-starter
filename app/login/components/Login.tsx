@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -158,6 +158,18 @@ export const Login = ({
               Continue with Email
             </Button>
           </form>
+
+          <OR />
+
+          <Button
+            variant='outline'
+            className='w-full'
+            onClick={signInWithGoogle}
+            type='button'
+          >
+            <AiOutlineGoogle className='mr-2' />
+            Continue with Google
+          </Button>
         </div>
       </div>
     </>

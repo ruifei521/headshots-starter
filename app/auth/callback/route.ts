@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
     const { supabase, res } = createSupabaseClient();
     
     const { data, error: verifyError } = await supabase.auth.verifyOtp({
-      token_hash: tokenHash || token,
+      token_hash: (tokenHash || token)!,
       type: "magiclink",
     });
     

@@ -2,10 +2,10 @@ import { createServerClient, parseCookieHeader } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export async function middleware(req: NextRequest) {
-  let res = NextResponse.next({
+export async function middleware(request: NextRequest) {
+  const response = NextResponse.next({
     request: {
-      headers: req.headers,
+      headers: request.headers,
     },
   })
 
@@ -15,27 +15,32 @@ export async function middleware(req: NextRequest) {
     {
       cookies: {
         getAll() {
-          return parseCookieHeader(req.headers.get('Cookie') ?? '').map(
+          return parseCookieHeader(request.headers.get('Cookie') ?? '').map(
             (c) => ({ name: c.name, value: c.value ?? '' })
           )
         },
-        setAll(cookiesToSet, headers) {
+        setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            req.cookies.set(name, value)
-            res.cookies.set(name, value, options ?? {})
-          })
-          if (headers) {
-            Object.entries(headers).forEach(([key, value]) => {
-              res.headers.set(key, value)
+            // 同时设置到请求和响应中
+            request.cookies.set(name, value)
+            response.cookies.set(name, value, {
+              httpOnly: options?.httpOnly ?? true,
+              secure: options?.secure ?? true,
+              sameSite: options?.sameSite ?? 'lax',
+              path: options?.path ?? '/',
+              maxAge: options?.maxAge,
+              domain: options?.domain,
             })
-          }
+          })
         },
       },
     }
   )
 
+  // 这会触发 cookie 刷新，确保 PKCE verifier 被正确传递
   await supabase.auth.getSession()
-  return res
+
+  return response
 }
 
 export const config = {

@@ -47,37 +47,25 @@ export default async function Navbar() {
   return (
     <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <a 
-          href="/" 
-          className="flex items-center gap-2 font-bold text-xl cursor-pointer hover:opacity-80 transition-opacity"
-        >
+        <Link href="/" className="flex items-center gap-2 font-bold text-xl" style={{ pointerEvents: 'auto' }}>
           <Camera className="h-5 w-5 text-primary" />
           <span>Headshots AI</span>
-        </a>
+        </Link>
         
         {user && (
-          <nav className="hidden md:flex gap-6 items-center">
-            <a 
-              href="/overview" 
-              className="text-sm font-medium hover:text-primary transition-colors cursor-pointer"
-            >
+          <nav className="hidden md:flex gap-6">
+            <Link href="/overview" className="flex items-center min-h-[44px] py-1 text-sm font-medium hover:text-primary transition-colors">
               Home
-            </a>
+            </Link>
             {packsIsEnabled && (
-              <a 
-                href="/overview/packs" 
-                className="text-sm font-medium hover:text-primary transition-colors cursor-pointer"
-              >
+              <Link href="/overview/packs" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
                 Packs
-              </a>
+              </Link>
             )}
             {stripeIsConfigured && (
-              <a 
-                href="/get-credits" 
-                className="text-sm font-medium hover:text-primary transition-colors cursor-pointer"
-              >
+              <Link href="/get-credits" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
                 Get Credits
-              </a>
+              </Link>
             )}
           </nav>
         )}
@@ -87,15 +75,12 @@ export default async function Navbar() {
           
           {!user && (
             <>
-              <a 
-                href="/login" 
-                className="hidden sm:block text-sm font-medium hover:text-primary transition-colors py-2 cursor-pointer"
-              >
+              <Link href="/login" className="hidden sm:block text-sm font-medium hover:text-primary transition-colors py-2">
                 Login
-              </a>
-              <a href="/login">
-                <Button className="cursor-pointer">Create headshots</Button>
-              </a>
+              </Link>
+              <Link href="/login">
+                <Button>Create headshots</Button>
+              </Link>
             </>
           )}
 
