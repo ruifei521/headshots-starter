@@ -12,6 +12,7 @@ export default function NavLinks({ packsIsEnabled, stripeIsConfigured }: NavLink
     <nav className="hidden md:flex gap-6 items-center">
       <Link 
         href="/overview" 
+        translate="no"
         className="px-3 py-2 min-h-[44px] inline-flex items-center text-sm font-medium hover:text-primary transition-colors"
       >
         Home
@@ -19,6 +20,7 @@ export default function NavLinks({ packsIsEnabled, stripeIsConfigured }: NavLink
       {packsIsEnabled && (
         <Link 
           href="/overview/packs"
+          translate="no"
           className="px-3 py-2 inline-flex items-center text-sm font-medium hover:text-primary transition-colors"
         >
           Packs
@@ -27,6 +29,7 @@ export default function NavLinks({ packsIsEnabled, stripeIsConfigured }: NavLink
       {stripeIsConfigured && (
         <Link 
           href="/get-credits"
+          translate="no"
           className="px-3 py-2 inline-flex items-center text-sm font-medium hover:text-primary transition-colors"
         >
           Get Credits
