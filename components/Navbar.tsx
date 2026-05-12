@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 import ClientSideCredits from "./realtime/ClientSideCredits";
 import { ThemeToggle } from "./homepage/theme-toggle";
 import UserDropdown from "./UserDropdown";
+import NavLinks from "./NavLinks";
 
 export const dynamic = "force-dynamic";
 
@@ -53,21 +54,10 @@ export default async function Navbar() {
         </Link>
         
         {user && (
-          <nav className="hidden md:flex gap-6">
-            <Link href="/overview" className="flex items-center min-h-[44px] py-1 text-sm font-medium hover:text-primary transition-colors">
-              Home
-            </Link>
-            {packsIsEnabled && (
-              <Link href="/overview/packs" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
-                Packs
-              </Link>
-            )}
-            {stripeIsConfigured && (
-              <Link href="/get-credits" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
-                Get Credits
-              </Link>
-            )}
-          </nav>
+          <NavLinks 
+            packsIsEnabled={packsIsEnabled} 
+            stripeIsConfigured={stripeIsConfigured} 
+          />
         )}
         
         <div className="flex items-center gap-4">
