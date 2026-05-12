@@ -49,14 +49,14 @@ export default async function Navbar() {
   return (
     <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl min-h-[44px]">
+        <Link href="/" className="flex items-center gap-2 font-bold text-xl min-h-[44px] cursor-pointer">
           <Camera className="h-5 w-5 text-primary" />
           <span>Headshots AI</span>
         </Link>
         
         {user && (
           <nav className="hidden md:flex gap-6">
-            <Link href="/overview" className="min-h-[44px] py-1 text-sm font-medium hover:text-primary transition-colors">
+            <Link href="/overview" className="flex items-center min-h-[44px] py-1 text-sm font-medium hover:text-primary transition-colors cursor-pointer">
               Home
             </Link>
             {packsIsEnabled && (
