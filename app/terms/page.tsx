@@ -1,0 +1,120 @@
+import Link from "next/link";
+
+export const metadata = {
+  title: "Terms of Service - SnapProHead",
+  description: "SnapProHead Terms of Service - Rules and guidelines for using our AI headshot generation service.",
+};
+
+export default function TermsOfService() {
+  return (
+    <div className="container max-w-4xl py-16 px-4">
+      <h1 className="text-3xl font-bold mb-8">Terms of Service</h1>
+      <p className="text-sm text-muted-foreground mb-8">Last updated: May 15, 2026</p>
+
+      <section className="space-y-6 text-muted-foreground">
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">1. Acceptance of Terms</h2>
+          <p>By accessing or using SnapProHead (&quot;the Service&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.</p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">2. Description of Service</h2>
+          <p>SnapProHead provides AI-generated professional headshots from photos you upload. The Service uses artificial intelligence to create realistic headshot images based on your submitted photos.</p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">3. User Accounts</h2>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>You must create an account to use the Service.</li>
+            <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
+            <li>You must be at least 18 years old to create an account.</li>
+            <li>You agree to provide accurate and complete information when creating your account.</li>
+            <li>You are responsible for all activities that occur under your account.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">4. Photo Upload Guidelines</h2>
+          <p className="mb-3">When uploading photos to SnapProHead, you agree that:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>You own the rights to all photos you upload, or have authorization to use them.</li>
+            <li>The photos contain only your own likeness, or you have consent from the person depicted.</li>
+            <li>You will not upload photos containing explicit, illegal, or harmful content.</li>
+            <li>You will not upload photos of minors without parental consent.</li>
+            <li>You understand that uploaded photos will be processed by AI to generate headshots.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">5. Credits and Payments</h2>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>The Service operates on a credit-based system. You purchase credits to generate headshots.</li>
+            <li>All payments are processed securely through Stripe.</li>
+            <li>Prices are listed in USD and may change with notice.</li>
+            <li>Credits are non-transferable and cannot be exchanged for cash.</li>
+            <li>Credits do not expire unless otherwise stated at the time of purchase.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">6. Intellectual Property</h2>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>You retain ownership of the photos you upload to the Service.</li>
+            <li>Generated headshots are licensed to you for personal and commercial use.</li>
+            <li>You may not claim that AI-generated images are unaltered photographs of yourself.</li>
+            <li>You may not use generated images to impersonate or misrepresent other individuals.</li>
+            <li>SnapProHead reserves the right to use anonymized, aggregated data for service improvement.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">7. Prohibited Uses</h2>
+          <p>You agree not to use the Service to:</p>
+          <ul className="list-disc pl-6 space-y-2 mt-2">
+            <li>Generate images that are illegal, harmful, threatening, abusive, or defamatory</li>
+            <li>Create deepfakes or misleading content intended to deceive</li>
+            <li>Impersonate another person or entity</li>
+            <li>Violate any applicable laws or regulations</li>
+            <li>Interfere with or disrupt the Service or servers</li>
+            <li>Attempt to gain unauthorized access to any part of the Service</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">8. Disclaimer of Warranties</h2>
+          <p>The Service is provided &quot;as is&quot; without warranties of any kind. We do not guarantee that:</p>
+          <ul className="list-disc pl-6 space-y-2 mt-2">
+            <li>The Service will be uninterrupted, timely, or error-free</li>
+            <li>The results obtained from the use of the Service will be accurate or reliable</li>
+            <li>The quality of any generated images will meet your expectations</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">9. Limitation of Liability</h2>
+          <p>To the maximum extent permitted by law, SnapProHead shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Service.</p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">10. Termination</h2>
+          <p>We reserve the right to suspend or terminate your account at our sole discretion, without notice, for conduct that we believe violates these Terms or is harmful to other users, us, or third parties.</p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">11. Changes to Terms</h2>
+          <p>We may modify these Terms at any time. We will notify you of material changes by posting the updated Terms on our website. Your continued use of the Service after changes constitutes acceptance of the new Terms.</p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">12. Contact Us</h2>
+          <p>If you have any questions about these Terms, please contact us at:</p>
+          <p className="mt-2">
+            <Link href="mailto:contact@snapprohead.com" className="text-primary hover:underline">
+              contact@snapprohead.com
+            </Link>
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+}

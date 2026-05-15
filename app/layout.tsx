@@ -26,16 +26,16 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Headshots AI",
+  title: "SnapProHead",
   description: "Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. Trusted by 50,000+ professionals. 14-day money-back guarantee. Plans from $19.99.",
     alternates: {
-      canonical: "https://headshots.study",
+      canonical: "https://snapprohead.com",
     },
   openGraph: {
-    title: "Headshots AI - Professional AI Headshot Generator",
+    title: "SnapProHead - Professional AI Headshot Generator",
     description: "Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. Trusted by 50,000+ professionals. 14-day money-back guarantee.",
-    url: "https://headshots.study",
-    siteName: "Headshots AI",
+    url: "https://snapprohead.com",
+    siteName: "SnapProHead",
     locale: "en_US",
     type: "website",
   },
