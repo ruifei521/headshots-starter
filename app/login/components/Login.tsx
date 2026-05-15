@@ -95,7 +95,7 @@ export const Login = ({
         title: 'Something went wrong',
         variant: 'destructive',
         description:
-          'Please try again, if the problem persists, contact us at hello@tryleap.ai',
+          'Please try again, if the problem persists, contact us at contact@snapprohead.com',
         duration: 5000,
       });
     }

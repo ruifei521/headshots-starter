@@ -5,13 +5,13 @@ import { Shield, Lock, Trash2, Eye } from "lucide-react"
 const privacyItems = [
   {
     icon: <Shield className="h-6 w-6" />,
-    title: "SOC 2 Compliant",
-    description: "Your data is protected by industry-leading security standards used by Fortune 500 companies.",
+    title: "Secure Infrastructure",
+    description: "Your data is processed on secure, enterprise-grade cloud infrastructure with access controls.",
   },
   {
     icon: <Lock className="h-6 w-6" />,
-    title: "End-to-End Encryption",
-    description: "Your photos are encrypted during upload, processing, and delivery. No one else can access them.",
+    title: "Encrypted Transfer",
+    description: "Your photos are encrypted during upload and delivery via HTTPS/TLS. No one else can access them.",
   },
   {
     icon: <Trash2 className="h-6 w-6" />,

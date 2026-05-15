@@ -51,7 +51,7 @@ export default function FAQSection() {
     {
       question: "How does AI headshot generation work?",
       answer:
-        "Our AI technology analyzes your uploaded selfies to understand your facial features, expressions, and style. It then generates professional headshots that maintain your likeness while enhancing quality, lighting, and background. The entire process takes about 20 minutes from upload to delivery.",
+        "Our AI technology analyzes your uploaded selfies to understand your facial features, expressions, and style. It then generates professional headshots that maintain your likeness while enhancing quality, lighting, and background. The entire process takes about 30 minutes from upload to delivery.",
     },
     {
       question: "What kind of photos should I upload?",
