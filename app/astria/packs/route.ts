@@ -12,12 +12,15 @@ const API_KEY = process.env.ASTRIA_API_KEY;
 const QUERY_TYPE = process.env.PACK_QUERY_TYPE || "users"; // Default to 'users'
 const DOMAIN = "https://api.astria.ai";
 
-// Check if API Key is missing
-if (!API_KEY) {
-  throw new Error("MISSING API_KEY!");
-}
-
+// Check if API Key is missing (runtime check to avoid build failure)
 export async function GET(request: Request) {
+  if (!API_KEY) {
+    console.error("MISSING ASTRIA_API_KEY - packs endpoint unavailable");
+    return NextResponse.json(
+      { message: "Service unavailable" },
+      { status: 503 }
+    );
+  }
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
