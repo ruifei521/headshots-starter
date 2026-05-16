@@ -133,10 +133,10 @@ export default function ModernPricing() {
               <div className="mt-4 flex items-baseline gap-2">
                 <span className="text-5xl font-extrabold">{tier.price}</span>
                 {tier.originalPrice && (
-                  <div className="flex flex-col items-start ml-2">
+                  <>
                     <span className="text-lg text-muted-foreground line-through">${tier.originalPrice.replace('$', '')}</span>
-                    <span className="text-xs text-green-600 font-medium">Save ${parseInt(tier.originalPrice.replace('$', '')) - parseInt(tier.price.replace('$', ''))}</span>
-                  </div>
+                    <span className="text-xs text-green-600 font-medium ml-1">Save ${parseInt(tier.originalPrice.replace('$', '')) - parseInt(tier.price.replace('$', ''))}</span>
+                  </>
                 )}
               </div>
               {tier.credits && (
