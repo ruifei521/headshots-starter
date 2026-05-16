@@ -65,6 +65,11 @@
   .pricing-feature {
     @apply flex items-center gap-2 text-sm;
   }
+
+  /* 确保价格删除线样式生效 */
+  .line-through {
+    text-decoration: line-through !important;
+  }
 }
 
 .sentence-case:first-letter {

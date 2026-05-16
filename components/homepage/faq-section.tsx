@@ -45,7 +45,7 @@ function FAQItem({ question, answer, isOpen, onClick, index }: FAQItemProps) {
 }
 
 export default function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   const faqs = [
     {
