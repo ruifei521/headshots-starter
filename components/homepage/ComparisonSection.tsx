@@ -78,7 +78,7 @@ export default function ComparisonSection() {
             <div className="grid grid-cols-3 bg-muted/80 border-b font-semibold text-sm">
               <div className="p-4"></div>
               <div className="p-4 text-center">Photo Studio</div>
-              <div className="p-4 text-center text-primary">SnapProHead AI</div>
+              <div className="p-4 text-center text-primary">SnapProHead</div>
             </div>
             {/* Rows */}
             {comparisons.map((row, i) => (
