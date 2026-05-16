@@ -134,7 +134,7 @@ export default function ModernPricing() {
                 <span className="text-5xl font-extrabold">{tier.price}</span>
                 {tier.originalPrice && (
                   <>
-                    <span className="text-lg text-muted-foreground line-through">${tier.originalPrice.replace('$', '')}</span>
+                    <span className="text-lg text-muted-foreground line-through">{tier.originalPrice}</span>
                     <span className="text-xs text-green-600 font-medium ml-1">Save ${parseInt(tier.originalPrice.replace('$', '')) - parseInt(tier.price.replace('$', ''))}</span>
                   </>
                 )}
