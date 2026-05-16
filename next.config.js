@@ -8,7 +8,7 @@ module.exports = {
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: "/:path*",
         headers: [
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -28,7 +28,7 @@ module.exports = {
         ],
       },
       {
-        source: '/_next/image',
+        source: "/_next/image",
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
