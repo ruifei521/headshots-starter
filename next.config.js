@@ -1,11 +1,10 @@
-/** @type {import('next').NextConfig} */
+/** @type {import("next").NextConfig} */
 module.exports = {
   env: {
     PACK_QUERY_TYPE: 'both',
     NEXT_PUBLIC_TUNE_TYPE: 'tune',
   },
 
-  // Security & SEO headers
   async headers() {
     return [
       {
@@ -23,7 +22,7 @@ module.exports = {
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: https: blob:; " +
               "font-src 'self'; " +
-              "connect-src 'self' https://*.supabase.co https://*.vercel-insights.com; " +
+              "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com; " +
               "frame-src 'none';",
           },
         ],
@@ -37,7 +36,6 @@ module.exports = {
     ];
   },
 
-  // Image optimization
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**.vercel-storage.com' },
