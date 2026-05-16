@@ -69,7 +69,7 @@ export default function PacksGalleryZone() {
       {packs.map((pack) => (
         <Link href={`/overview/models/train/${pack.slug}`} key={pack.id} className="w-full h-70 bg-black rounded-md overflow-hidden transition-transform duration-300 hover:scale-105">
           <img
-            src={pack.cover_url ?? "https://www.astria.ai/assets/logo-b4e21f646fb5879eb91113a70eae015a7413de8920960799acb72c60ad4eaa99.png"}
+            src={pack.cover_url ?? "https://snapprohead.com/placeholder-logo.png"}
             alt={pack.title}
             className="w-full h-4/5 object-cover"
           />

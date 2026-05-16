@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/hero.png",
+        url: "/hero.jpg",
         width: 1200,
         height: 630,
         alt: "SnapProHead - Professional AI Headshot Generator",
@@ -51,7 +51,18 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SnapProHead - Professional AI Headshot Generator",
     description: "Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes.",
-    images: ["/hero.png"],
+    images: ["/hero.jpg"],
+  },
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
 };
 

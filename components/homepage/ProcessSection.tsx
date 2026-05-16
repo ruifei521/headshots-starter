@@ -12,21 +12,21 @@ const processSteps = [
     title: "Upload Your Photos",
     description: "Upload 6 high-quality selfies: front facing, 1 person in frame, no glasses or hats.",
     icon: <Camera className="h-5 w-5" />,
-    images: ["/example1.png", "/example2.png", "/example3.png"]
+    images: ["/example1.jpg", "/example2.jpg", "/example3.jpg"]
   },
   {
     number: 2,
     title: "Our AI Gets to Work",
     description: "The AI magic takes ~30 minutes. You'll get an email when it's ready!",
     icon: <Sparkles className="h-5 w-5" />,
-    processingImage: "/blur.png"
+    processingImage: "/blur.jpg"
   },
   {
     number: 3,
     title: "Get Amazing Headshots",
     description: "Once your model is trained, we'll give you amazing headshots!",
     icon: <Download className="h-5 w-5" />,
-    resultImages: ["/result1.png", "/result2.png", "/result3.png"]
+    resultImages: ["/result1.jpg", "/result2.jpg", "/result3.jpg"]
   }
 ]
 

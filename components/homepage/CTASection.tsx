@@ -3,10 +3,10 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 const images = [
-  "/homepage/example0001.png",
-  "/homepage/example0002.png",
-  "/homepage/example0004.png",
-  "/homepage/example0006.png",
+  "/homepage/example0001.jpg",
+  "/homepage/example0002.jpg",
+  "/homepage/example0004.jpg",
+  "/homepage/example0006.jpg",
 ]
 
 export default function CTASection() {
@@ -18,7 +18,7 @@ export default function CTASection() {
             Get your AI headshots today
           </h2>
           <p className="max-w-[700px] text-gray-300 text-lg">
-            Join thousands of professionals who have elevated their online presence with our AI-generated headshots.
+            Join professionals who have elevated their online presence with our AI-generated headshots.
           </p>
           <Link href="/login" className="mt-4">
             <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">

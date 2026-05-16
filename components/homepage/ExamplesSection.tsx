@@ -6,26 +6,26 @@ import { ArrowRight } from "lucide-react"
 
 const comparisons = [
   {
-    before: "/homepage/example0001.png",
-    after: "/homepage/example0002.png",
+    before: "/homepage/example0001.jpg",
+    after: "/homepage/example0002.jpg",
     style: "Corporate Executive",
     description: "Selfie to LinkedIn-ready headshot",
   },
   {
-    before: "/homepage/example0003.png",
-    after: "/homepage/example0004.png",
+    before: "/homepage/example0003.jpg",
+    after: "/homepage/example0004.jpg",
     style: "Creative Professional",
     description: "Casual photo to editorial portrait",
   },
   {
-    before: "/homepage/example0005.png",
-    after: "/homepage/example0006.png",
+    before: "/homepage/example0005.jpg",
+    after: "/homepage/example0006.jpg",
     style: "Real Estate Agent",
     description: "Phone selfie to trust-building portrait",
   },
   {
-    before: "/homepage/example0007.png",
-    after: "/homepage/example0008.png",
+    before: "/homepage/example0007.jpg",
+    after: "/homepage/example0008.jpg",
     style: "Tech Startup Founder",
     description: "Candid shot to modern professional",
   },
