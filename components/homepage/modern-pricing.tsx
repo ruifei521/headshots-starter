@@ -38,7 +38,7 @@ export default function ModernPricing() {
         "High-Resolution Download",
         "14-Day Money-Back Guarantee",
       ],
-      buttonText: "Get Starter Headshots",
+      buttonText: "Get Started",
       credits: "1 Credit",
       headshots: "40 Headshots",
     },
@@ -54,7 +54,7 @@ export default function ModernPricing() {
         "Priority Processing",
         "14-Day Money-Back Guarantee",
       ],
-      buttonText: "Get Pro Headshots",
+      buttonText: "Get Started",
       credits: "3 Credits",
       headshots: "100 Headshots",
     },
@@ -71,7 +71,7 @@ export default function ModernPricing() {
         "Priority Processing",
         "14-Day Money-Back Guarantee",
       ],
-      buttonText: "Get Executive Headshots",
+      buttonText: "Get Started",
       credits: "5 Credits",
       headshots: "200 Headshots",
     },
@@ -120,12 +120,7 @@ export default function ModernPricing() {
               
               <Link href="/login" className="mt-8 block w-full" aria-label={`Select ${tier.title} plan`}>
                 <Button
-                  className={cn(
-                    "w-full min-h-[44px]",
-                    tier.popular
-                      ? "bg-primary hover:bg-primary/90 text-primary-foreground"
-                      : "bg-secondary hover:bg-secondary/80"
-                  )}
+                  className="w-full min-h-[44px] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                   aria-label={`Select ${tier.title} plan`}
                 >
                   {tier.buttonText}
