@@ -28,64 +28,61 @@ interface PricingTier {
 export default function ModernPricing() {
   const tiers: PricingTier[] = [
     {
-      title: "Basic",
-      price: "$19.99",
+      title: "Starter",
+      price: "$29",
       description: "Perfect for individuals looking to enhance their LinkedIn or CV.",
       features: [
-        "4 Professional AI Headshots",
-        "Multiple Styles Included",
+        "5 Styles Included",
+        "40 AI-Generated Headshots",
         "Commercial License",
         "High-Resolution Download",
         "14-Day Money-Back Guarantee",
       ],
-      buttonText: "Get Basic Headshots",
+      buttonText: "Get Starter Headshots",
       credits: "1 Credit",
-      headshots: "4 Headshots",
+      headshots: "40 Headshots",
     },
     {
-      title: "Professional",
-      price: "$39.99",
-      originalPrice: "$59",
+      title: "Pro",
+      price: "$49",
       description: "Ideal for professionals who want variety and different styles.",
       features: [
-        "12 Professional AI Headshots",
-        "Multiple Styles Included",
+        "10 Styles Included",
+        "100 AI-Generated Headshots",
         "Commercial License",
         "High-Resolution Download",
         "Priority Processing",
         "14-Day Money-Back Guarantee",
       ],
-      buttonText: "Get Professional Headshots",
-      popular: true,
+      buttonText: "Get Pro Headshots",
       credits: "3 Credits",
-      headshots: "12 Headshots",
+      headshots: "100 Headshots",
     },
     {
       title: "Executive",
-      price: "$59.99",
-      originalPrice: "$89",
+      price: "$89",
       description: "The complete package for maximum variety and professional use.",
       features: [
-        "20 Professional AI Headshots",
-        "All Styles & Backgrounds",
+        "20 Styles Included",
+        "200 AI-Generated Headshots",
+        "All Backgrounds",
         "Commercial License",
         "High-Resolution Download",
         "Priority Processing",
         "14-Day Money-Back Guarantee",
       ],
       buttonText: "Get Executive Headshots",
-      bestValue: true,
       credits: "5 Credits",
-      headshots: "20 Headshots",
+      headshots: "200 Headshots",
     },
   ]
 
   const traditionalComparison = [
-    { feature: "Average Cost", traditional: "$200 – $500", ourPrice: "$19.99 – $59.99" },
+    { feature: "Average Cost", traditional: "$200 – $500", ourPrice: "$29 – $89" },
     { feature: "Session Time", traditional: "1 – 3 hours", ourPrice: "6 selfies, 2 mins" },
     { feature: "Turnaround", traditional: "3 – 14 days", ourPrice: "~30 minutes" },
-    { feature: "Editing Rounds", traditional: "1 – 2 included", ourPrice: "Unlimited AI generations" },
-    { feature: "Photo Count", traditional: "10 – 20 shots", ourPrice: "4 – 20 headshots" },
+    { feature: "Style Options", traditional: "1 – 2 per session", ourPrice: "5 – 20 styles included" },
+    { feature: "Photo Count", traditional: "10 – 20 shots", ourPrice: "40 – 200 headshots" },
   ]
 
   return (
@@ -101,43 +98,10 @@ export default function ModernPricing() {
                 tier.popular && "pricing-card-popular"
               )}
             >
-              {tier.popular && (
-                <div className="pricing-badge">
-                  Most Popular
-                </div>
-              )}
-
-              {tier.bestValue && (
-                <div className="absolute -top-3 right-6 rounded-full bg-blue-600 px-3 py-1 text-xs font-medium text-white dark:bg-blue-500">
-                  <span className="flex items-center gap-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                    Best Value
-                  </span>
-                </div>
-              )}
-
               <h3 className="text-xl font-bold">{tier.title}</h3>
 
               <div className="mt-4 flex items-baseline gap-2">
                 <span className="text-5xl font-extrabold">{tier.price}</span>
-                {tier.originalPrice && (
-                  <>
-                    <span className="text-lg text-muted-foreground line-through">{tier.originalPrice}</span>
-                    <span className="text-xs text-green-600 font-medium ml-1">Save ${parseInt(tier.originalPrice.replace('$', '')) - parseInt(tier.price.replace('$', ''))}</span>
-                  </>
-                )}
               </div>
               {tier.credits && (
                 <p className="mt-1 text-sm font-medium text-primary">{tier.credits} · {tier.headshots}</p>

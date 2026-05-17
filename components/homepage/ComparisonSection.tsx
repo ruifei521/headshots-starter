@@ -9,7 +9,7 @@ const comparisons = [
   {
     feature: "Cost",
     traditional: "$200 – $500 per session",
-    ours: "$19.99 – $59.99",
+    ours: "$29 – $89",
     icon: <DollarSign className="h-4 w-4" />,
   },
   {
@@ -33,7 +33,7 @@ const comparisons = [
   {
     feature: "Retakes / Edits",
     traditional: "$50 – $150 extra per round",
-    ours: "Included — regenerate anytime",
+    ours: "Multiple style regenerations",
     icon: <Check className="h-4 w-4" />,
   },
   {
@@ -68,7 +68,7 @@ export default function ComparisonSection() {
             Photo Studio vs AI Headshots
           </h2>
           <p className="max-w-[700px] text-muted-foreground text-lg">
-            Same professional quality. A fraction of the cost and time.
+            Professional quality at a fraction of the cost and time.
           </p>
         </div>
 

@@ -10,10 +10,10 @@ export default function PricingSection() {
             Pricing
           </Badge>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            Professional-grade headshots for <span className="text-primary">a fraction</span> of the cost
+            Professional headshots for <span className="text-primary">a fraction</span> of the cost
           </h2>
           <p className="max-w-[700px] text-muted-foreground text-lg">
-            Professional photographers charge $200-$500 for a session. Our AI creates stunning headshots for much less.
+            Traditional photography sessions cost $200–$500. Get AI-generated professional headshots starting at $29.
           </p>
         </div>
         <div className="mt-16">

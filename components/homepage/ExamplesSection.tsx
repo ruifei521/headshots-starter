@@ -39,9 +39,9 @@ export default function ExamplesSection() {
           <Badge variant="outline" className="mb-2">
             See the Results
           </Badge>
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Stunning Transformations</h2>
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">See the Difference</h2>
           <p className="max-w-[700px] text-muted-foreground text-lg">
-            See how our AI transforms regular selfies into professional headshots that make you stand out.
+            See how our AI transforms regular selfies into professional headshots.
           </p>
         </div>
 

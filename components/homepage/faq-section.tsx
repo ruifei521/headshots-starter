@@ -66,7 +66,7 @@ export default function FAQSection() {
     {
       question: "How many different styles can I get?",
       answer:
-        "The number of styles depends on your plan. Basic and Premium plans include multiple style options such as professional, corporate, creative, casual, and industry-specific looks. You can preview all available styles before making your final selection.",
+        "The number of styles depends on your plan. Starter includes 5 styles, Pro includes 10 styles, and Executive includes all 20 styles. You can preview all available styles before making your final selection.",
     },
     {
       question: "What if I'm not satisfied with the results?",

@@ -9,7 +9,7 @@ export default function PrivacyPolicy() {
   return (
     <div className="container max-w-4xl py-16 px-4">
       <h1 className="text-3xl font-bold mb-8">Privacy Policy</h1>
-      <p className="text-sm text-muted-foreground mb-8">Last updated: May 15, 2026</p>
+      <p className="text-sm text-muted-foreground mb-8">Last updated: May 17, 2026</p>
 
       <section className="space-y-6 text-muted-foreground">
         <div>
@@ -18,7 +18,7 @@ export default function PrivacyPolicy() {
           <ul className="list-disc pl-6 space-y-2">
             <li><strong className="text-foreground">Account Information:</strong> Email address, name, and authentication data when you sign up or log in via Google OAuth.</li>
             <li><strong className="text-foreground">Photos You Upload:</strong> The photos you submit for AI headshot generation. These photos are processed by our AI provider to generate your headshots.</li>
-            <li><strong className="text-foreground">Payment Information:</strong> Billing details processed securely through Stripe. We do not store your full credit card number.</li>
+            <li><strong className="text-foreground">Payment Information:</strong> Billing details processed securely through our payment provider (Dodo Payments). We do not store your full credit card number.</li>
             <li><strong className="text-foreground">Usage Data:</strong> Information about how you interact with our service, including pages visited, features used, and device information.</li>
           </ul>
         </div>
@@ -27,9 +27,10 @@ export default function PrivacyPolicy() {
           <h2 className="text-xl font-semibold text-foreground mb-3">2. How We Use Your Photos</h2>
           <p className="mb-3">Your uploaded photos are used solely for the purpose of generating AI headshots. Specifically:</p>
           <ul className="list-disc pl-6 space-y-2">
-            <li>Photos are sent to our AI processing provider for model training and image generation.</li>
+            <li>Photos are sent to our AI processing provider to train a custom model and generate headshots based on your likeness.</li>
+            <li>Model training is necessary to produce accurate, personalized headshots — your photos are not used for any other purpose.</li>
             <li>Generated headshots are stored in your account and available for download.</li>
-            <li>We do not use your photos for any other purpose without your explicit consent.</li>
+            <li>We do not use your photos for marketing, advertising, or any other purpose without your explicit consent.</li>
             <li>You may request deletion of your photos and generated images at any time.</li>
           </ul>
         </div>
@@ -49,9 +50,9 @@ export default function PrivacyPolicy() {
           <p className="mb-3">We use the following third-party services that may have access to your data:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li><strong className="text-foreground">Supabase:</strong> Database and authentication services</li>
-            <li><strong className="text-foreground">Stripe:</strong> Payment processing</li>
+            <li><strong className="text-foreground">Dodo Payments:</strong> Payment processing (acting as Merchant of Record)</li>
             <li><strong className="text-foreground">Vercel:</strong> Application hosting and file storage</li>
-            <li><strong className="text-foreground">AI Processing Provider:</strong> For headshot generation</li>
+            <li><strong className="text-foreground">AI Processing Provider:</strong> For headshot generation (photos are sent to our AI provider for model training and image generation as part of the service)</li>
           </ul>
           <p className="mt-3">Each third-party provider has their own privacy policy governing the use of your information.</p>
         </div>

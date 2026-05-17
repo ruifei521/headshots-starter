@@ -9,7 +9,7 @@ export default function RefundPolicy() {
   return (
     <div className="container max-w-4xl py-16 px-4">
       <h1 className="text-3xl font-bold mb-8">Refund Policy</h1>
-      <p className="text-sm text-muted-foreground mb-8">Last updated: May 15, 2026</p>
+      <p className="text-sm text-muted-foreground mb-8">Last updated: May 17, 2026</p>
 
       <section className="space-y-6 text-muted-foreground">
         <div>
@@ -48,7 +48,7 @@ export default function RefundPolicy() {
           <h2 className="text-xl font-semibold text-foreground mb-3">4. Refund Processing</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>Approved refunds will be processed within 5-10 business days.</li>
-            <li>Refunds will be issued to the original payment method.</li>
+            <li>Refunds are processed through Dodo Payments, our Merchant of Record, and will be issued to the original payment method.</li>
             <li>Depending on your bank or credit card company, it may take additional time for the refund to appear on your statement.</li>
           </ul>
         </div>

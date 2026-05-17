@@ -4,17 +4,17 @@ import { Badge } from "@/components/ui/badge"
 const features = [
   {
     title: "Multiple Styles",
-    description: "Choose from various professional styles and backgrounds",
+    description: "Choose from up to 20 professional styles and backgrounds",
     icon: <Camera className="h-6 w-6" />
   },
   {
     title: "High Resolution",
-    description: "Get print-ready images in stunning 4K resolution",
+    description: "Get high-resolution images suitable for print and digital use",
     icon: <Camera className="h-6 w-6" />
   },
   {
     title: "Fast Delivery",
-    description: "Receive your photos in ~30 minutes",
+    description: "Receive your headshots in ~30 minutes",
     icon: <Clock className="h-6 w-6" />
   },
   {
@@ -24,7 +24,7 @@ const features = [
   },
   {
     title: "AI Enhancement",
-    description: "Advanced AI technology for natural-looking results",
+    description: "AI-powered technology for professional-looking results",
     icon: <Star className="h-6 w-6" />
   },
 ]
@@ -36,7 +36,7 @@ export default function FeaturesSection() {
         <div className="text-center mb-12">
           <Badge variant="outline" className="mb-4">Features</Badge>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            Everything You Need for Perfect Headshots
+            Everything You Need for Professional Headshots
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

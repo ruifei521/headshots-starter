@@ -14,7 +14,7 @@ export default function TrustBadges() {
         </div>
         <div className="flex items-center gap-2">
           <CreditCard className="h-5 w-5 text-primary" />
-          <span className="font-medium">Secure Payment via Stripe</span>
+          <span className="font-medium">Secure Payment Processing</span>
         </div>
       </div>
 

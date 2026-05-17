@@ -23,8 +23,8 @@ const processSteps = [
   },
   {
     number: 3,
-    title: "Get Amazing Headshots",
-    description: "Once your model is trained, we'll give you amazing headshots!",
+    title: "Get Your Headshots",
+    description: "Once your model is trained, we'll deliver your professional headshots!",
     icon: <Download className="h-5 w-5" />,
     resultImages: ["/result1.jpg", "/result2.jpg", "/result3.jpg"]
   }

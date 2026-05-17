@@ -14,15 +14,15 @@ export default function HeroSection() {
             Professional AI Headshots in Minutes
           </Badge>
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6">
-            Studio-Quality Headshots <span className="text-primary">Without the Studio</span>
+            Professional Headshots <span className="text-primary">Without the Studio</span>
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto">
-            Turn your selfies into professional headshots in ~30 minutes. Save <strong>$200-$500</strong> compared to traditional photography.
+            Turn your selfies into professional headshots in ~30 minutes. Starting at <strong>$29</strong> — a fraction of traditional photography costs.
           </p>
           <div className="mt-4 flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/login" className="w-full sm:w-auto">
               <Button size="lg" className="group w-full sm:w-auto">
-                Get Professional Headshots — From $19.99
+                Get Professional Headshots — From $29
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>

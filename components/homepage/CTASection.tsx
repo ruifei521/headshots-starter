@@ -18,7 +18,7 @@ export default function CTASection() {
             Get your AI headshots today
           </h2>
           <p className="max-w-[700px] text-gray-300 text-lg">
-            Join professionals who have elevated their online presence with our AI-generated headshots.
+            Elevate your online presence with AI-generated professional headshots.
           </p>
           <Link href="/login" className="mt-4">
             <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">

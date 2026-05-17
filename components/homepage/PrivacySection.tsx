@@ -20,8 +20,8 @@ const privacyItems = [
   },
   {
     icon: <Eye className="h-6 w-6" />,
-    title: "No Data Sharing — Ever",
-    description: "Your photos are never used to train AI models or shared with third parties.",
+    title: "Your Data, Your Control",
+    description: "Your photos are processed only to generate your headshots and are never shared with third parties for marketing or other purposes.",
   },
 ]
 

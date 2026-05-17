@@ -27,7 +27,7 @@ export const viewport = {
 
 export const metadata: Metadata = {
   title: "SnapProHead",
-  description: "Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. 14-day money-back guarantee. Plans from $19.99.",
+  description: "Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. 14-day money-back guarantee. Plans from $29.",
     alternates: {
       canonical: "https://snapprohead.com",
     },
