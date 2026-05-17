@@ -44,6 +44,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
     defaultValues: {
       name: "",
       type: "man",
+      dataConsent: false,
     },
   });
 
