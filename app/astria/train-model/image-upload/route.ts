@@ -1,39 +1,22 @@
-import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { Database } from "@/types/supabase";
 
 export const dynamic = "force-dynamic";
 
-// Upload images to Supabase Storage instead of Vercel Blob
+// Upload images to Supabase Storage - use service_role_key to bypass RLS
 export async function POST(request: Request): Promise<NextResponse> {
-  const supabase = createServerClient<Database>(
+  // Use service_role_key for storage operations to bypass RLS
+  const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
-      cookies: {
-        getAll() {
-          return cookies().getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            try {
-              cookies().set(name, value, options);
-            } catch {
-              // The `set` method was called from a Server Component.
-            }
-          });
-        },
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
       },
     }
   );
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
 
   try {
     const formData = await request.formData();
@@ -44,10 +27,10 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Generate unique path: userId/timestamp-originalName
+    // Generate unique path: uploads/timestamp-originalName
     const timestamp = Date.now();
     const sanitized = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const filePath = `${user.id}/${timestamp}-${sanitized}`;
+    const filePath = `uploads/${timestamp}-${sanitized}`;
 
     // Upload to Supabase Storage 'headshots' bucket
     const { data, error } = await supabase.storage

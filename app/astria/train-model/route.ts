@@ -1,5 +1,6 @@
 import { Database } from "@/types/supabase";
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -9,7 +10,6 @@ export const dynamic = "force-dynamic";
 const astriaApiKey = process.env.ASTRIA_API_KEY;
 const astriaTestModeIsOn = process.env.ASTRIA_TEST_MODE === "true";
 const packsIsEnabled = process.env.NEXT_PUBLIC_TUNE_TYPE === "packs";
-// For local development, recommend using an Ngrok tunnel for the domain
 
 const appWebhookSecret = process.env.APP_WEBHOOK_SECRET;
 const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
@@ -26,7 +26,8 @@ export async function POST(request: Request) {
   const name = payload.name;
   const characteristics = payload.characteristics;
 
-  const supabase = createServerClient<Database>(
+  // First verify user is authenticated using anon key + cookies
+  const supabaseAuth = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabaseAuth.auth.getUser();
 
   if (!user) {
     return NextResponse.json(
@@ -59,6 +60,18 @@ export async function POST(request: Request) {
       { status: 401 }
     );
   }
+
+  // Use service_role_key for database writes to bypass RLS
+  const supabase = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  );
 
   if (!astriaApiKey) {
     return NextResponse.json(
