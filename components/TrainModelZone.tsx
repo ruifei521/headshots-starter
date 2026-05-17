@@ -25,8 +25,6 @@ import { fileUploadFormSchema } from "@/types/zod";
 import axios from "axios";
 import { ImageInspector } from "./ImageInspector";
 import { ImageInspectionResult, aggregateCharacteristics } from "@/lib/imageInspection";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "@/types/supabase";
 
 type FormInput = z.infer<typeof fileUploadFormSchema>;
 
