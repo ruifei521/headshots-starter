@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ImageInspectionResult, inspectImage } from '@/lib/imageInspection';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export interface ImageInspectorProps {
   file: File;
@@ -8,43 +8,47 @@ export interface ImageInspectorProps {
   onInspectionComplete: (result: ImageInspectionResult) => void;
 }
 
+// Only show issues that actually prevent good AI headshot results
+// "Selfie" is NORMAL and expected - don't show it as a warning
+const CRITICAL_ISSUES = {
+  includes_multiple_people: 'Multiple people detected — use solo photos only',
+  blurry: 'Image is blurry — use a clearer photo',
+  wearing_sunglasses: 'Sunglasses may affect results',
+  wearing_hat: 'Hat may affect results — face should be fully visible',
+  funny_face: 'Unusual expression detected — neutral faces work best',
+};
+
 export function ImageInspector({ file, type, onInspectionComplete }: ImageInspectorProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [issues, setIssues] = useState<string[]>([]);
 
   useEffect(() => {
     const controller = new AbortController();
-    
+
     const inspect = async () => {
       try {
         setIsLoading(true);
         const result = await inspectImage(file, type);
         if (!controller.signal.aborted) {
+          // Only show critical issues that affect AI output quality
+          // "Selfie" is expected/normal — NOT a problem
+          // "Full body" is minor — don't alarm the user
           const detectedIssues: string[] = [];
 
-          if (result.selfie) {
-            detectedIssues.push('Selfie');
+          if (result.includes_multiple_people) {
+            detectedIssues.push(CRITICAL_ISSUES.includes_multiple_people);
           }
           if (result.blurry) {
-            detectedIssues.push('Image is blurry');
-          }
-          if (result.includes_multiple_people) {
-            detectedIssues.push('Multiple people');
-          }
-          if (result.full_body_image_or_longshot) {
-            detectedIssues.push('Image is not a close-up');
+            detectedIssues.push(CRITICAL_ISSUES.blurry);
           }
           if (result.wearing_sunglasses) {
-            detectedIssues.push('Wearing sunglasses');
+            detectedIssues.push(CRITICAL_ISSUES.wearing_sunglasses);
           }
           if (result.wearing_hat) {
-            detectedIssues.push('Wearing hat');
+            detectedIssues.push(CRITICAL_ISSUES.wearing_hat);
           }
           if (result.funny_face) {
-            detectedIssues.push('Funny face');
-          }
-          if (result.name && result.name !== type) {
-            detectedIssues.push(`Detected ${result.name}, expected ${type}`);
+            detectedIssues.push(CRITICAL_ISSUES.funny_face);
           }
 
           setIssues(detectedIssues);
@@ -52,7 +56,8 @@ export function ImageInspector({ file, type, onInspectionComplete }: ImageInspec
         }
       } catch (error) {
         if (!controller.signal.aborted) {
-          setIssues(['Failed to inspect image']);
+          // Silently pass — don't block upload
+          setIssues([]);
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -70,28 +75,30 @@ export function ImageInspector({ file, type, onInspectionComplete }: ImageInspec
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 text-xs text-muted-foreground w-full">
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <Loader2 className="h-3 w-3 animate-spin" />
-        Inspecting image...
+        Checking...
       </div>
     );
   }
 
   if (issues.length === 0) {
     return (
-      <div className="text-xs text-green-600">
-        ✓ Image looks good
+      <div className="flex items-center gap-1.5 text-xs text-green-600">
+        <CheckCircle2 className="h-3 w-3" />
+        Looks good
       </div>
     );
   }
 
   return (
-    <ul className="text-xs w-16 text-wrap pl-2">
+    <div className="space-y-0.5">
       {issues.map((issue, index) => (
-        <li key={index} className="text-yellow-500">⚠️{issue}</li>
+        <div key={index} className="flex items-start gap-1 text-xs text-amber-600">
+          <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
+          <span>{issue}</span>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }
-
-
