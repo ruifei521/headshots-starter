@@ -4,8 +4,9 @@ import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export interface ImageInspectorProps {
   file: File;
+  fileId?: string;  // optional ID to track which file the result belongs to
   type: string;
-  onInspectionComplete: (result: ImageInspectionResult) => void;
+  onInspectionComplete: (result: ImageInspectionResult, fileId?: string) => void;
 }
 
 // Only show issues that actually prevent good AI headshot results
@@ -18,7 +19,7 @@ const CRITICAL_ISSUES = {
   funny_face: 'Unusual expression detected — neutral faces work best',
 };
 
-export function ImageInspector({ file, type, onInspectionComplete }: ImageInspectorProps) {
+export function ImageInspector({ file, fileId, type, onInspectionComplete }: ImageInspectorProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [issues, setIssues] = useState<string[]>([]);
 
@@ -52,7 +53,7 @@ export function ImageInspector({ file, type, onInspectionComplete }: ImageInspec
           }
 
           setIssues(detectedIssues);
-          onInspectionComplete(result);
+          onInspectionComplete(result, fileId);
         }
       } catch (error) {
         if (!controller.signal.aborted) {

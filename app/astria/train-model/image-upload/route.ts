@@ -5,6 +5,12 @@ import { Database } from "@/types/supabase";
 export const dynamic = "force-dynamic";
 
 // Upload images to Supabase Storage - use service_role_key to bypass RLS
+
+// Allowed MIME types
+const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png"];
+// Maximum file size (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 export async function POST(request: Request): Promise<NextResponse> {
   // Use service_role_key for storage operations to bypass RLS
   const supabase = createClient<Database>(
@@ -25,6 +31,22 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+
+    // Server-side file type validation
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: `File type "${file.type}" is not allowed. Only JPEG and PNG are accepted.` },
+        { status: 400 }
+      );
+    }
+
+    // Server-side file size validation
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: `File size ${(file.size / 1024 / 1024).toFixed(2)}MB exceeds the 10MB limit.` },
+        { status: 400 }
+      );
     }
 
     // Generate unique path: uploads/timestamp-originalName
