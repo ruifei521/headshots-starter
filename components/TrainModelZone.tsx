@@ -36,6 +36,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [characteristics, setCharacteristics] = useState<ImageInspectionResult[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<Map<string, string>>(new Map());
   const { toast } = useToast();
   const router = useRouter();
 
@@ -91,6 +92,14 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         return;
       }
 
+      // Create preview URLs for new files
+      const newUrls = new Map(previewUrls);
+      newFiles.forEach((file, index) => {
+        const key = `${file.name}-${Date.now()}-${index}`;
+        newUrls.set(key, URL.createObjectURL(file));
+      });
+      setPreviewUrls(newUrls);
+
       setFiles([...files, ...newFiles]);
 
       toast({
@@ -99,14 +108,20 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         duration: 5000,
       });
     },
-    [files]
+    [files, previewUrls]
   );
 
   const removeFile = useCallback(
-    (file: File) => {
+    (file: File, urlKey: string) => {
+      // Revoke the object URL to free memory
+      const url = previewUrls.get(urlKey);
+      if (url) URL.revokeObjectURL(url);
+      const newUrls = new Map(previewUrls);
+      newUrls.delete(urlKey);
+      setPreviewUrls(newUrls);
       setFiles(files.filter((f) => f.name !== file.name));
     },
-    [files]
+    [files, previewUrls]
   );
 
   const handleInspectionComplete = (result: ImageInspectionResult, file: File) => {
@@ -325,31 +340,38 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
           </div>
           {files.length > 0 && (
             <div className="flex flex-row gap-4 flex-wrap">
-              {files.map((file) => (
-                <div key={file.name} className="flex flex-col gap-1">
-                  <div className="relative">
-                    <img
-                      src={URL.createObjectURL(file)}
-                      className="rounded-md w-24 h-24 object-cover"
-                      alt="Preview"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full mt-1"
-                      onClick={() => removeFile(file)}
-                    >
-                      Remove
-                    </Button>
+              {files.map((file, index) => {
+                // Find the preview URL for this file by index
+                const urlKeys = Array.from(previewUrls.keys());
+                const urlKey = urlKeys[index] || `${file.name}-${index}`;
+                const previewUrl = previewUrls.get(urlKey) || URL.createObjectURL(file);
 
-                    <ImageInspector
-                      file={file}
-                      type={form.getValues("type")}
-                      onInspectionComplete={(result) => handleInspectionComplete(result, file)}
-                    />
+                return (
+                  <div key={urlKey} className="flex flex-col gap-1">
+                    <div className="relative">
+                      <img
+                        src={previewUrl}
+                        className="rounded-md w-24 h-24 object-cover"
+                        alt="Preview"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full mt-1"
+                        onClick={() => removeFile(file, urlKey)}
+                      >
+                        Remove
+                      </Button>
+
+                      <ImageInspector
+                        file={file}
+                        type={form.getValues("type")}
+                        onInspectionComplete={(result) => handleInspectionComplete(result, file)}
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
