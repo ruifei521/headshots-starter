@@ -22,7 +22,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { FaFemale, FaImages, FaMale, FaRainbow } from "react-icons/fa";
 import * as z from "zod";
 import { fileUploadFormSchema } from "@/types/zod";
-import axios from "axios";
 import { ImageInspector } from "./ImageInspector";
 import { ImageInspectionResult, aggregateCharacteristics } from "@/lib/imageInspection";
 
@@ -40,16 +39,18 @@ interface FileObject {
   file: File;
   id: string;  // unique ID for React key and URL management
   previewUrl: string;
+  loadError?: boolean;  // track if image failed to load
 }
 
 export default function TrainModelZone({ packSlug }: { packSlug: string }) {
   const [fileObjects, setFileObjects] = useState<FileObject[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [characteristics, setCharacteristics] = useState<ImageInspectionResult[]>([]);
   const { toast } = useToast();
   const router = useRouter();
-  // Track which file IDs have characteristics
+  // Track characteristics by file ID to avoid race conditions
   const characteristicsMapRef = useRef<Map<string, ImageInspectionResult>>(new Map());
+  // Keep a ref to fileObjects for cleanup (avoids stale closure)
+  const fileObjectsRef = useRef<FileObject[]>([]);
 
   const form = useForm<FormInput>({
     resolver: zodResolver(fileUploadFormSchema),
@@ -60,10 +61,17 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
     },
   });
 
-  // Cleanup preview URLs on unmount
+  // Sync ref with state
+  useEffect(() => {
+    fileObjectsRef.current = fileObjects;
+  }, [fileObjects]);
+
+  // Cleanup ALL preview URLs on unmount using ref (not stale closure)
   useEffect(() => {
     return () => {
-      fileObjects.forEach(fo => URL.revokeObjectURL(fo.previewUrl));
+      fileObjectsRef.current.forEach(fo => {
+        try { URL.revokeObjectURL(fo.previewUrl); } catch {}
+      });
     };
   }, []);
 
@@ -72,89 +80,107 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
   };
 
   const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
-      // Check for duplicate file names
-      const existingNames = new Set(fileObjects.map(fo => fo.file.name));
-      const newFiles = acceptedFiles.filter(
-        (file: File) => !existingNames.has(file.name)
-      );
+    (acceptedFiles: File[]) => {
+      // Use functional state update to avoid stale closure issues
+      setFileObjects(prev => {
+        // Check for duplicate file names against CURRENT state
+        const existingNames = new Set(prev.map(fo => fo.file.name));
+        const newFiles = acceptedFiles.filter(
+          (file: File) => !existingNames.has(file.name)
+        );
 
-      if (newFiles.length === 0) {
-        toast({
-          title: "Duplicate file names",
-          description: "All selected files were already added.",
-          duration: 5000,
-        });
-        return;
-      }
+        if (newFiles.length === 0) {
+          toast({
+            title: "Duplicate file names",
+            description: "All selected files were already added.",
+            duration: 5000,
+          });
+          return prev; // no change
+        }
 
-      if (newFiles.length + fileObjects.length > MAX_IMAGES) {
-        toast({
-          title: "Too many images",
-          description: `You can only upload up to ${MAX_IMAGES} images. Currently have ${fileObjects.length}.`,
-          duration: 5000,
-        });
-        return;
-      }
+        if (newFiles.length + prev.length > MAX_IMAGES) {
+          toast({
+            title: "Too many images",
+            description: `You can only upload up to ${MAX_IMAGES} images. Currently have ${prev.length}.`,
+            duration: 5000,
+          });
+          return prev; // no change
+        }
 
-      const totalSize = fileObjects.reduce((acc, fo) => acc + fo.file.size, 0);
-      const newSize = newFiles.reduce((acc, file) => acc + file.size, 0);
+        const totalSize = prev.reduce((acc, fo) => acc + fo.file.size, 0);
+        const newSize = newFiles.reduce((acc, file) => acc + file.size, 0);
 
-      if (totalSize + newSize > MAX_TOTAL_SIZE) {
-        toast({
-          title: "Images exceed size limit",
-          description: `The total combined size cannot exceed ${MAX_TOTAL_SIZE / 1024 / 1024}MB.`,
-          duration: 5000,
-        });
-        return;
-      }
+        if (totalSize + newSize > MAX_TOTAL_SIZE) {
+          toast({
+            title: "Images exceed size limit",
+            description: `The total combined size cannot exceed ${MAX_TOTAL_SIZE / 1024 / 1024}MB.`,
+            duration: 5000,
+          });
+          return prev; // no change
+        }
 
-      // Create FileObjects with unique IDs and preview URLs
-      const newFileObjects: FileObject[] = newFiles.map((file) => ({
-        file,
-        id: `${file.name}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        previewUrl: URL.createObjectURL(file),
-      }));
+        // Create FileObjects with unique IDs and preview URLs
+        const newFileObjects: FileObject[] = newFiles.map((file, index) => ({
+          file,
+          id: `${file.name}-${Date.now()}-${index}-${Math.random().toString(36).substring(2, 11)}`,
+          previewUrl: URL.createObjectURL(file),
+        }));
 
-      setFileObjects(prev => [...prev, ...newFileObjects]);
+        const totalCount = prev.length + newFileObjects.length;
+        // Use setTimeout to show toast after state update (toast is stable ref)
+        setTimeout(() => {
+          toast({
+            title: "Images selected",
+            description: `${newFiles.length} image(s) added. ${totalCount} total.`,
+            duration: 3000,
+          });
+        }, 0);
 
-      toast({
-        title: "Images selected",
-        description: `${newFiles.length} image(s) added. ${fileObjects.length + newFiles.length} total.`,
-        duration: 3000,
+        return [...prev, ...newFileObjects];
       });
     },
-    [fileObjects, toast]
+    [toast]
   );
 
   const removeFile = useCallback(
     (fileObject: FileObject) => {
       // Revoke the object URL to free memory
-      URL.revokeObjectURL(fileObject.previewUrl);
-      
+      try { URL.revokeObjectURL(fileObject.previewUrl); } catch {}
+
       // Remove from fileObjects
       setFileObjects(prev => prev.filter(fo => fo.id !== fileObject.id));
-      
+
       // Remove from characteristics map
       characteristicsMapRef.current.delete(fileObject.id);
     },
     []
   );
 
-  const handleInspectionComplete = (result: ImageInspectionResult, fileId: string) => {
-    characteristicsMapRef.current.set(fileId, result);
-    
-    // Update characteristics array from map
-    const allCharacteristics = Array.from(characteristicsMapRef.current.values());
-    setCharacteristics(allCharacteristics);
-  };
+  // Handle image load error — mark as broken instead of showing blank
+  const handleImageError = useCallback((fileId: string) => {
+    setFileObjects(prev =>
+      prev.map(fo => fo.id === fileId ? { ...fo, loadError: true } : fo)
+    );
+  }, []);
+
+  const handleInspectionComplete = useCallback(
+    (result: ImageInspectionResult, fileId: string) => {
+      characteristicsMapRef.current.set(fileId, result);
+      // No need to trigger re-render here — characteristics are only
+      // read when submitting, so we just keep the ref up to date.
+    },
+    []
+  );
 
   const trainModel = useCallback(async () => {
+    // Read current fileObjects from ref to avoid stale closure
+    const currentFileObjects = fileObjectsRef.current;
+
     // Validate minimum images
-    if (fileObjects.length < MIN_IMAGES) {
+    if (currentFileObjects.length < MIN_IMAGES) {
       toast({
         title: "Not enough images",
-        description: `Please upload at least ${MIN_IMAGES} images. Currently have ${fileObjects.length}.`,
+        description: `Please upload at least ${MIN_IMAGES} images. Currently have ${currentFileObjects.length}.`,
         duration: 5000,
       });
       return;
@@ -164,7 +190,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
 
     try {
       // Upload all files in PARALLEL
-      const uploadPromises = fileObjects.map(async (fileObj) => {
+      const uploadPromises = currentFileObjects.map(async (fileObj) => {
         const formData = new FormData();
         formData.append("file", fileObj.file);
         formData.append("fileName", fileObj.file.name);
@@ -185,7 +211,9 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
 
       const storageUrls = await Promise.all(uploadPromises);
 
-      const aggregatedCharacteristics = aggregateCharacteristics(characteristics);
+      const aggregatedCharacteristics = aggregateCharacteristics(
+        Array.from(characteristicsMapRef.current.values())
+      );
 
       const payload = {
         urls: storageUrls,
@@ -235,8 +263,10 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       });
 
       // Clean up preview URLs before navigating away
-      fileObjects.forEach(fo => URL.revokeObjectURL(fo.previewUrl));
-      
+      currentFileObjects.forEach(fo => {
+        try { URL.revokeObjectURL(fo.previewUrl); } catch {}
+      });
+
       router.push("/overview");
     } catch (error) {
       setIsLoading(false);
@@ -247,7 +277,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         duration: 5000,
       });
     }
-  }, [fileObjects, characteristics, form, packSlug, toast, router]);
+  }, [form, packSlug, toast, router]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -365,39 +395,46 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
                 <div className="flex justify-center flex-col items-center gap-2">
                   <FaImages size={32} className="text-gray-700" />
                   <p className="self-center">
-                    Drag 'n' drop some files here, or click to select files.
+                    Drag &apos;n&apos; drop some files here, or click to select files.
                   </p>
                 </div>
               )}
             </div>
           </div>
           {fileObjects.length > 0 && (
-            <div className="flex flex-row gap-4 flex-wrap">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {fileObjects.map((fileObj) => {
                 return (
-                  <div key={fileObj.id} className="flex flex-col gap-1">
-                    <div className="relative">
-                      <img
-                        src={fileObj.previewUrl}
-                        className="rounded-md w-24 h-24 object-cover"
-                        alt="Preview"
-                      />
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full mt-1"
-                        onClick={() => removeFile(fileObj)}
-                      >
-                        Remove
-                      </Button>
-
-                      <ImageInspector
-                        file={fileObj.file}
-                        fileId={fileObj.id}
-                        type={form.getValues("type")}
-                        onInspectionComplete={(result) => handleInspectionComplete(result, fileObj.id)}
-                      />
+                  <div key={fileObj.id} className="flex flex-col gap-1 w-full">
+                    {/* Image thumbnail with fixed aspect ratio container */}
+                    <div className="relative w-full aspect-square rounded-md overflow-hidden bg-muted">
+                      {fileObj.loadError ? (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs p-2 text-center">
+                          Failed to load preview
+                        </div>
+                      ) : (
+                        <img
+                          src={fileObj.previewUrl}
+                          className="w-full h-full object-cover"
+                          alt="Preview"
+                          onError={() => handleImageError(fileObj.id)}
+                        />
+                      )}
                     </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => removeFile(fileObj)}
+                    >
+                      Remove
+                    </Button>
+                    <ImageInspector
+                      file={fileObj.file}
+                      fileId={fileObj.id}
+                      type={form.getValues("type")}
+                      onInspectionComplete={(result) => handleInspectionComplete(result, fileObj.id)}
+                    />
                   </div>
                 );
               })}
@@ -433,9 +470,9 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
             )}
           />
 
-          <Button 
-            type="submit" 
-            className="w-full" 
+          <Button
+            type="submit"
+            className="w-full"
             disabled={isLoading || fileObjects.length < MIN_IMAGES}
           >
             Train Model{stripeIsConfigured && <span className="ml-1">(1 Credit)</span>}
