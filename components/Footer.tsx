@@ -79,9 +79,22 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 md:flex-row">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} SnapProHead. All rights reserved.
-          </p>
+          <div className="text-center md:text-left">
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} SnapProHead. All rights reserved.
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Operated by Fei Rui (Individual Developer)
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Contact: contact@snapprohead.com
+            </p>
+          </div>
+          <div className="text-center md:text-right">
+            <p className="text-xs text-muted-foreground">
+              AI-generated content is computer-generated and for reference only.
+            </p>
+          </div>
         </div>
       </div>
     </footer>

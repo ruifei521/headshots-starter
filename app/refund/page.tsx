@@ -14,7 +14,13 @@ export default function RefundPolicy() {
       <section className="space-y-6 text-muted-foreground">
         <div>
           <h2 className="text-xl font-semibold text-foreground mb-3">1. 14-Day Money-Back Guarantee</h2>
-          <p>We offer a 14-day money-back guarantee on all credit purchases. If you are not satisfied with the Service within 14 days of your purchase, you may request a full refund.</p>
+          <p>We offer a 14-day money-back guarantee on all credit purchases. Refunds are available under the following conditions:</p>
+          <ul className="list-disc pl-6 space-y-2 mt-2">
+            <li><strong>AI Generation Failure:</strong> If our AI fails to generate any headshots after processing your uploaded photos.</li>
+            <li><strong>Technical Errors:</strong> If technical errors prevent you from accessing or downloading your generated headshots.</li>
+            <li><strong>Service Unavailability:</strong> If the service is unavailable for more than 48 hours during your 14-day period.</li>
+          </ul>
+          <p className="mt-3 text-sm">Refunds are <strong>not available</strong> for dissatisfaction with AI output quality, as results vary based on input photo quality, lighting, and facial features.</p>
         </div>
 
         <div>

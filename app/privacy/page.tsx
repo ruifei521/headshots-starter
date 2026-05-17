@@ -27,11 +27,12 @@ export default function PrivacyPolicy() {
           <h2 className="text-xl font-semibold text-foreground mb-3">2. How We Use Your Photos</h2>
           <p className="mb-3">Your uploaded photos are used solely for the purpose of generating AI headshots. Specifically:</p>
           <ul className="list-disc pl-6 space-y-2">
-            <li>Photos are sent to our AI processing provider to train a custom model and generate headshots based on your likeness.</li>
+            <li>Photos are sent to our AI processing provider (Astria AI) to train a custom model and generate headshots based on your likeness.</li>
             <li>Model training is necessary to produce accurate, personalized headshots — your photos are not used for any other purpose.</li>
-            <li>Generated headshots are stored in your account and available for download.</li>
-            <li>We do not use your photos for marketing, advertising, or any other purpose without your explicit consent.</li>
-            <li>You may request deletion of your photos and generated images at any time.</li>
+            <li><strong className="text-foreground">Original uploaded photos are automatically deleted within 7 days</strong> after your headshots are generated.</li>
+            <li><strong className="text-foreground">Generated headshots are stored for 30 days</strong>, after which they are automatically deleted.</li>
+            <li>We do not use your photos to train third-party AI models. Astria AI&apos;s data handling is governed by their privacy policy: <Link href="https://astria.ai/privacy" className="text-primary hover:underline" target="_blank">https://astria.ai/privacy</Link></li>
+            <li>You may request early deletion of your photos and generated images at any time by contacting us at <Link href="mailto:contact@snapprohead.com" className="text-primary hover:underline">contact@snapprohead.com</Link>.</li>
           </ul>
         </div>
 
@@ -60,9 +61,11 @@ export default function PrivacyPolicy() {
         <div>
           <h2 className="text-xl font-semibold text-foreground mb-3">5. Data Retention and Deletion</h2>
           <ul className="list-disc pl-6 space-y-2">
-            <li>We retain your account data for as long as your account is active.</li>
-            <li>You may request deletion of your account and all associated data at any time by contacting us.</li>
-            <li>Upon account deletion, we will remove your personal data, uploaded photos, and generated images within 30 days.</li>
+            <li><strong className="text-foreground">Original uploaded photos:</strong> Automatically deleted within 7 days after headshot generation is complete.</li>
+            <li><strong className="text-foreground">Generated headshots:</strong> Stored for 30 days after generation, then automatically deleted.</li>
+            <li><strong className="text-foreground">Account data:</strong> Retained while your account is active.</li>
+            <li>You may request early deletion of your photos and generated images at any time by contacting us at <Link href="mailto:contact@snapprohead.com" className="text-primary hover:underline">contact@snapprohead.com</Link>.</li>
+            <li>Upon account deletion request, we will remove your personal data, uploaded photos, and generated images within 7 days.</li>
           </ul>
         </div>
 

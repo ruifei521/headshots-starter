@@ -166,7 +166,7 @@ export default function ModernPricing() {
         </div>
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          All plans include a <strong>14-day money-back guarantee</strong>. Not satisfied? Full refund, no questions asked.
+          All plans include a <strong>14-day money-back guarantee</strong>. Refund applies if AI generation fails or technical errors prevent service delivery.
         </p>
       </div>
     </div>

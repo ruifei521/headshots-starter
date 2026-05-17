@@ -350,9 +350,37 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
             </div>
           )}
 
+          <FormField
+            control={form.control}
+            name="dataConsent"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormControl>
+                  <input
+                    type="checkbox"
+                    checked={field.value}
+                    onChange={field.onChange}
+                    className="h-4 w-4 mt-1 cursor-pointer"
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="text-sm font-normal cursor-pointer">
+                    I agree to the <a href="/privacy" className="text-primary hover:underline" target="_blank">Privacy Policy</a>. I understand that:
+                    <ul className="list-disc pl-6 mt-2 space-y-1 text-xs text-muted-foreground">
+                      <li>My photos will only be used to generate AI headshots</li>
+                      <li>Original photos will be automatically deleted within 7 days</li>
+                      <li>Generated headshots will be stored for 30 days, then automatically deleted</li>
+                      <li>I have the consent of the person(s) in the photos</li>
+                    </ul>
+                  </FormLabel>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+
           <Button type="submit" className="w-full" disabled={isLoading}>
-            Train Model{" "}
-            {stripeIsConfigured && <span className="ml-1">(1 Credit)</span>}
+            Train Model{stripeIsConfigured && <span className="ml-1">(1 Credit)</span>}
           </Button>
         </form>
       </Form>
