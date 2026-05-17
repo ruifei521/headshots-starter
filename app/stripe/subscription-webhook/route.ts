@@ -13,11 +13,11 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl) {
-  throw new Error("MISSING NEXT_PUBLIC_SUPABASE_URL!");
+  console.warn("MISSING NEXT_PUBLIC_SUPABASE_URL - stripe-webhook will not function.");
 }
 
 if (!supabaseServiceRoleKey) {
-  throw new Error("MISSING SUPABASE_SERVICE_ROLE_KEY!");
+  console.warn("MISSING SUPABASE_SERVICE_ROLE_KEY - stripe-webhook will not function.");
 }
 
 const oneCreditPriceId = process.env.STRIPE_PRICE_ID_ONE_CREDIT as string;

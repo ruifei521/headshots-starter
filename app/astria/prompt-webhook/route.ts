@@ -17,15 +17,15 @@ if (!resendApiKey) {
 }
 
 if (!supabaseUrl) {
-  throw new Error("MISSING NEXT_PUBLIC_SUPABASE_URL!");
+  console.warn("MISSING NEXT_PUBLIC_SUPABASE_URL - prompt-webhook will not function.");
 }
 
 if (!supabaseServiceRoleKey) {
-  throw new Error("MISSING SUPABASE_SERVICE_ROLE_KEY!");
+  console.warn("MISSING SUPABASE_SERVICE_ROLE_KEY - prompt-webhook will not function.");
 }
 
 if (!appWebhookSecret) {
-  throw new Error("MISSING APP_WEBHOOK_SECRET!");
+  console.warn("MISSING APP_WEBHOOK_SECRET - prompt-webhook will not function.");
 }
 
 export async function POST(request: Request) {

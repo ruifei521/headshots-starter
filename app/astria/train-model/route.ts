@@ -15,7 +15,7 @@ const appWebhookSecret = process.env.APP_WEBHOOK_SECRET;
 const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
 
 if (!appWebhookSecret) {
-  throw new Error("MISSING APP_WEBHOOK_SECRET!");
+  console.warn("MISSING APP_WEBHOOK_SECRET - train-model webhook will not function.");
 }
 
 export async function POST(request: Request) {
