@@ -27,7 +27,22 @@ export const Login = ({
   host: string | null;
   searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
-  const supabase = useMemo(() => {
+  // Magic Link 专用客户端 - 使用 implicit flow
+  // 关键修复：PKCE flow 依赖 code_verifier cookie，当用户在邮箱 App 内嵌浏览器
+  // 或不同浏览器中点击 Magic Link 时，cookie 不可用，导致 exchangeCodeForSession 失败
+  // implicit flow 将 token 直接放在 URL hash (#access_token=xxx) 中，由 HashAuthHandler 处理
+  // 不依赖 cookie，在任何浏览器上下文中都能可靠工作
+  const magicLinkClient = useMemo(() => {
+    return createBrowserClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { auth: { flowType: 'implicit' } }
+    );
+  }, []);
+
+  // Google OAuth 专用客户端 - 使用 PKCE flow（默认）
+  // OAuth 在同一浏览器窗口内完成重定向，code_verifier cookie 可靠可用
+  const oAuthClient = useMemo(() => {
     return createBrowserClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -66,19 +81,12 @@ export const Login = ({
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
+      // 使用 implicit flow 客户端发送 Magic Link
+      // implicit flow：邮件链接重定向到根 URL，token 在 URL hash (#access_token=xxx) 中
+      // 由客户端 HashAuthHandler 组件读取 hash 并建立 session，不依赖 code_verifier cookie
+      const { error } = await magicLinkClient.auth.signInWithOtp({
         email: data.email,
         options: {
-          // emailRedirectTo 指向根 URL，不要带 /auth/callback 路径
-          // 原因：Supabase Magic Link 有两种流程：
-          // 1. PKCE 流程：邮件链接带 ?code=xxx，需要 code_verifier cookie
-          //    - 如果用户在同一个浏览器中点击链接，code_verifier cookie 存在，PKCE 可工作
-          //    - 但如果用户在邮件 App 内嵌浏览器中点击，cookie 不共享，PKCE 会失败
-          // 2. Implicit 流程：邮件验证后重定向到根 URL，token 在 URL hash (#) 中
-          //    - 由客户端 HashAuthHandler 组件处理
-          // 指向根 URL 可以确保两种流程都能工作：
-          // - PKCE：HashAuthHandler 会检测 ?code= 参数并用 exchangeCodeForSession 交换
-          // - Implicit：HashAuthHandler 会检测 #access_token 并用 setSession 建立 session
           emailRedirectTo: `${protocol}://${host}`,
         },
       });
@@ -114,10 +122,10 @@ export const Login = ({
   };
 
   const signInWithGoogle = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    // Google OAuth 使用 PKCE flow（默认），回调到 /auth/callback 服务端路由处理
+    const { data, error } = await oAuthClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // Google OAuth 使用 PKCE 流程，回调到 /auth/callback 服务端路由处理
         redirectTo: `${protocol}://${host}/auth/callback`,
       },
     });
