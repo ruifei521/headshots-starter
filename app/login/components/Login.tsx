@@ -122,11 +122,17 @@ export const Login = ({
   };
 
   const signInWithGoogle = async () => {
-    // Google OAuth 使用 PKCE flow（默认），回调到 /auth/callback 服务端路由处理
+    // Google OAuth - 不指定 redirectTo，让 Supabase 使用默认流程
+    // 这样可以适配移动端，唤起原生 Google 授权弹窗
     const { data, error } = await oAuthClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${protocol}://${host}/auth/callback`,
+        // 不指定 redirectTo，使用 Supabase 默认配置
+        // 移动端会自动唤起原生 Google 授权弹窗
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
       },
     });
   };
