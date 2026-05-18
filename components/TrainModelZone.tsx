@@ -445,14 +445,17 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
             control={form.control}
             name="dataConsent"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/50 transition-colors">
                 <FormControl>
-                  <input
-                    type="checkbox"
-                    checked={field.value}
-                    onChange={field.onChange}
-                    className="h-4 w-4 mt-1 cursor-pointer"
-                  />
+                  <div className="flex items-center h-10">
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className="h-6 w-6 mt-0 cursor-pointer accent-primary"
+                      style={{ minWidth: '24px', minHeight: '24px' }}
+                    />
+                  </div>
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="text-sm font-normal cursor-pointer">
