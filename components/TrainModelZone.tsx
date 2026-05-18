@@ -187,17 +187,12 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
     }
 
     setIsLoading(true);
-    const toastId = "training-toast";
+    const loadingToast = toast({
+      title: "Step 1/3: Uploading images...",
+      description: "Please wait while we upload your photos.",
+    });
 
     try {
-      // Show initial loading toast
-      toast({
-        id: toastId,
-        title: "Step 1/3: Uploading images...",
-        description: "Please wait while we upload your photos.",
-        duration: Infinity, // keep showing until we dismiss
-      });
-
       // Upload all files in PARALLEL
       const uploadPromises = currentFileObjects.map(async (fileObj) => {
         const formData = new FormData();
@@ -220,12 +215,11 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
 
       const storageUrls = await Promise.all(uploadPromises);
 
-      // Show step 2
-      toast({
-        id: toastId,
+      // Update toast to step 2
+      loadingToast.update({
+        id: loadingToast.id,
         title: "Step 2/3: Starting AI training...",
         description: "This usually takes about 30 minutes. You can close this page and we'll email you when ready!",
-        duration: Infinity,
       });
 
       const aggregatedCharacteristics = aggregateCharacteristics(
@@ -252,10 +246,10 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       setIsLoading(false);
 
       if (!response.ok) {
+        loadingToast.dismiss();
         const responseData = await response.json();
         const responseMessage: string = responseData.message;
         console.error("Something went wrong! ", responseMessage);
-        toast.dismiss(toastId);
         const messageWithButton = (
           <div className="flex flex-col gap-4">
             {responseMessage}
@@ -274,12 +268,11 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         return;
       }
 
-      // Show step 3
-      toast({
-        id: toastId,
+      // Update toast to step 3
+      loadingToast.update({
+        id: loadingToast.id,
         title: "✓ Model queued for training!",
         description: "You'll receive an email when your headshots are ready (usually ~30 mins). Redirecting...",
-        duration: 3000,
       });
 
       // Clean up preview URLs before navigating away
@@ -288,11 +281,12 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       });
 
       setTimeout(() => {
+        loadingToast.dismiss();
         router.push("/overview");
       }, 2000);
     } catch (error) {
       setIsLoading(false);
-      toast.dismiss(toastId);
+      loadingToast.dismiss();
       const message = error instanceof Error ? error.message : "Upload failed";
       toast({
         title: "Upload failed",
