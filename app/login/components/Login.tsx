@@ -122,18 +122,70 @@ export const Login = ({
   };
 
   const signInWithGoogle = async () => {
-    // Google OAuth - 移动端适配
-    // 使用 skipBrowserRedirect 来避免强制跳转网页登录
-    const { data, error } = await oAuthClient.auth.signInWithOAuth({
+    // 检测是否在 PWA standalone 模式或移动端
+    const isStandalone =
+      typeof window !== 'undefined' &&
+      (window.matchMedia('(display-mode: standalone)').matches ||
+        (window.navigator as any).standalone === true);
+    const isMobile =
+      typeof navigator !== 'undefined' &&
+      /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
+
+    // 移动端/PWA 场景：使用 skipBrowserRedirect 获取 URL 后手动跳转
+    // 原因：PWA 的 WebView 与系统浏览器 Cookie 隔离，Google 无法识别登录态
+    // 手动用 window.location.href 跳转，让系统浏览器处理 OAuth，能读取到 Google Cookie
+    if (isMobile || isStandalone) {
+      const { data, error } = await oAuthClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${protocol}://${host}/auth/callback`,
+          queryParams: {
+            prompt: 'select_account',
+            access_type: 'online',
+          },
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (error) {
+        toast({
+          title: 'Google Login Error',
+          variant: 'destructive',
+          description: error.message,
+          duration: 5000,
+        });
+        return;
+      }
+
+      if (data?.url) {
+        // 强制在系统浏览器中打开 OAuth 链接（而非 PWA WebView）
+        window.location.href = data.url;
+      }
+      return;
+    }
+
+    // 桌面端：正常使用 Supabase 自动重定向
+    const { error } = await oAuthClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: `${protocol}://${host}/auth/callback`,
         queryParams: {
-          // 移动端使用 prompt=select_account 来唤起账号选择器
           prompt: 'select_account',
+          access_type: 'online',
         },
       },
     });
+
+    if (error) {
+      toast({
+        title: 'Google Login Error',
+        variant: 'destructive',
+        description: error.message,
+        duration: 5000,
+      });
+    }
   };
 
   if (isMagicLinkSent) {
