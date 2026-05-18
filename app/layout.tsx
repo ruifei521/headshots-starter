@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/hero.jpg",
+        url: "/hero.png",
         width: 1200,
         height: 630,
         alt: "SnapProHead - Professional AI Headshot Generator",
