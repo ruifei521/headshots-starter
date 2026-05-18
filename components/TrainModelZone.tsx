@@ -190,6 +190,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
     const loadingToast = toast({
       title: "Step 1/3: Uploading images...",
       description: "Please wait while we upload your photos.",
+      duration: Infinity, // keep showing until we dismiss
     });
 
     try {
@@ -220,6 +221,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         id: loadingToast.id,
         title: "Step 2/3: Starting AI training...",
         description: "This usually takes about 30 minutes. You can close this page and we'll email you when ready!",
+        duration: Infinity, // keep showing until we dismiss
       });
 
       const aggregatedCharacteristics = aggregateCharacteristics(
@@ -273,6 +275,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         id: loadingToast.id,
         title: "✓ Model queued for training!",
         description: "You'll receive an email when your headshots are ready (usually ~30 mins). Redirecting...",
+        duration: 3000, // Show for 3 seconds before redirect
       });
 
       // Clean up preview URLs before navigating away
