@@ -61,17 +61,25 @@ export const Login = ({
     formState: { errors, isSubmitted },
   } = useForm<Inputs>();
 
+  const protocol = host?.includes('localhost') ? 'http' : 'https';
+
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setIsSubmitting(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: data.email,
         options: {
-          // ⚠️ 重要：不要用 /auth/callback 路径！
-          // Supabase Magic Link 使用 implicit flow，token 在 URL hash (#) 中
-          // hash fragment 不会发送到服务器，所以 /auth/callback 的服务端路由看不到 token
-          // 必须指向根 URL，让客户端的 HashAuthHandler 组件处理 hash 中的 token
-          emailRedirectTo: `${host?.includes('localhost') ? 'http' : 'https'}://${host}`,
+          // emailRedirectTo 指向根 URL，不要带 /auth/callback 路径
+          // 原因：Supabase Magic Link 有两种流程：
+          // 1. PKCE 流程：邮件链接带 ?code=xxx，需要 code_verifier cookie
+          //    - 如果用户在同一个浏览器中点击链接，code_verifier cookie 存在，PKCE 可工作
+          //    - 但如果用户在邮件 App 内嵌浏览器中点击，cookie 不共享，PKCE 会失败
+          // 2. Implicit 流程：邮件验证后重定向到根 URL，token 在 URL hash (#) 中
+          //    - 由客户端 HashAuthHandler 组件处理
+          // 指向根 URL 可以确保两种流程都能工作：
+          // - PKCE：HashAuthHandler 会检测 ?code= 参数并用 exchangeCodeForSession 交换
+          // - Implicit：HashAuthHandler 会检测 #access_token 并用 setSession 建立 session
+          emailRedirectTo: `${protocol}://${host}`,
         },
       });
 
@@ -105,14 +113,12 @@ export const Login = ({
     }
   };
 
-  const protocol = host?.includes('localhost') ? 'http' : 'https';
-  const redirectUrl = `${protocol}://${host}/auth/callback`;
-
   const signInWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: redirectUrl,
+        // Google OAuth 使用 PKCE 流程，回调到 /auth/callback 服务端路由处理
+        redirectTo: `${protocol}://${host}/auth/callback`,
       },
     });
   };
