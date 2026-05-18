@@ -187,8 +187,17 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
     }
 
     setIsLoading(true);
+    const toastId = "training-toast";
 
     try {
+      // Show initial loading toast
+      toast({
+        id: toastId,
+        title: "Step 1/3: Uploading images...",
+        description: "Please wait while we upload your photos.",
+        duration: Infinity, // keep showing until we dismiss
+      });
+
       // Upload all files in PARALLEL
       const uploadPromises = currentFileObjects.map(async (fileObj) => {
         const formData = new FormData();
@@ -210,6 +219,14 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       });
 
       const storageUrls = await Promise.all(uploadPromises);
+
+      // Show step 2
+      toast({
+        id: toastId,
+        title: "Step 2/3: Starting AI training...",
+        description: "This usually takes about 30 minutes. You can close this page and we'll email you when ready!",
+        duration: Infinity,
+      });
 
       const aggregatedCharacteristics = aggregateCharacteristics(
         Array.from(characteristicsMapRef.current.values())
@@ -238,6 +255,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         const responseData = await response.json();
         const responseMessage: string = responseData.message;
         console.error("Something went wrong! ", responseMessage);
+        toast.dismiss(toastId);
         const messageWithButton = (
           <div className="flex flex-col gap-4">
             {responseMessage}
@@ -256,10 +274,12 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         return;
       }
 
+      // Show step 3
       toast({
-        title: "Model queued for training",
-        description: "Your headshots are being generated. This usually takes about 30 minutes.",
-        duration: 5000,
+        id: toastId,
+        title: "✓ Model queued for training!",
+        description: "You'll receive an email when your headshots are ready (usually ~30 mins). Redirecting...",
+        duration: 3000,
       });
 
       // Clean up preview URLs before navigating away
@@ -267,9 +287,12 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         try { URL.revokeObjectURL(fo.previewUrl); } catch {}
       });
 
-      router.push("/overview");
+      setTimeout(() => {
+        router.push("/overview");
+      }, 2000);
     } catch (error) {
       setIsLoading(false);
+      toast.dismiss(toastId);
       const message = error instanceof Error ? error.message : "Upload failed";
       toast({
         title: "Upload failed",
