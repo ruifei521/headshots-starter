@@ -6,10 +6,18 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 /**
- * Handles Supabase auth hash fragments that land on the root URL.
- * When Supabase verifies a magic link, it redirects to the Site URL
- * (e.g. http://localhost:3000/) with the auth tokens in the URL hash.
- * This component detects those tokens, establishes a session, and redirects.
+ * Handles Supabase auth redirects that land on the root URL.
+ *
+ * Supports two auth flows:
+ * 1. Implicit flow: tokens in URL hash (#access_token=...&refresh_token=...)
+ *    - Used by Supabase Magic Link (signInWithOtp)
+ * 2. PKCE flow: code in query params (?code=xxx)
+ *    - Used by Supabase OAuth and newer PKCE-based magic links
+ *
+ * IMPORTANT: emailRedirectTo for Magic Link must point to the ROOT URL (e.g. https://snapprohead.com),
+ * NOT /auth/callback. This is because hash fragments (#) are not sent to the server,
+ * so server-side route handlers cannot read them. The HashAuthHandler is a client component
+ * that can access both hash fragments and query parameters.
  */
 export function HashAuthHandler() {
   const router = useRouter();
@@ -23,30 +31,69 @@ export function HashAuthHandler() {
   }, []);
 
   useEffect(() => {
-    const hash = window.location.hash.substring(1);
-    if (!hash) return;
-
-    const params = new URLSearchParams(hash);
-
-    // Check for error in hash
-    const error = params.get("error");
-    const errorDescription = params.get("error_description");
-    if (error) {
-      console.error("[HashAuthHandler] Auth error:", error, errorDescription);
-      // Clear the hash so we don't keep retrying
-      window.location.hash = "";
-      return;
-    }
-
-    const accessToken = params.get("access_token");
-    const refreshToken = params.get("refresh_token");
-
-    if (!accessToken || !refreshToken) return;
-
-    // Found auth tokens in hash - process them
-    setProcessing(true);
-
     const handleAuth = async () => {
+      // ====== Flow 1: Check for PKCE code in query params ======
+      const searchParams = new URLSearchParams(window.location.search);
+      const code = searchParams.get("code");
+
+      if (code) {
+        console.log("[HashAuthHandler] PKCE code found, exchanging for session...");
+        setProcessing(true);
+        try {
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeError) {
+            console.error("[HashAuthHandler] PKCE exchange error:", exchangeError.message);
+            // Redirect to login with error
+            window.location.href = `/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`;
+            return;
+          }
+
+          console.log("[HashAuthHandler] PKCE exchange success");
+          // Clean up URL
+          searchParams.delete("code");
+          searchParams.delete("next");
+          searchParams.delete("type");
+          const cleanUrl = `${window.location.origin}${window.location.pathname}${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+          window.history.replaceState({}, '', cleanUrl);
+
+          router.push("/overview");
+          return;
+        } catch (err) {
+          console.error("[HashAuthHandler] PKCE exchange unexpected error:", err);
+          window.location.href = `/login?error=${encodeURIComponent('Login failed. Please try again.')}`;
+          return;
+        } finally {
+          setProcessing(false);
+        }
+      }
+
+      // ====== Flow 2: Check for implicit flow tokens in hash ======
+      const hash = window.location.hash.substring(1);
+      if (!hash) return;
+
+      const hashParams = new URLSearchParams(hash);
+
+      // Check for error in hash
+      const error = hashParams.get("error");
+      const errorDescription = hashParams.get("error_description");
+      if (error) {
+        console.error("[HashAuthHandler] Auth error:", error, errorDescription);
+        // Clear the hash so we don't keep retrying
+        window.location.hash = "";
+        // Redirect to login with error message
+        router.push(`/login?error=${encodeURIComponent(errorDescription || error)}`);
+        return;
+      }
+
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
+
+      if (!accessToken || !refreshToken) return;
+
+      // Found auth tokens in hash - process them
+      console.log("[HashAuthHandler] Implicit flow tokens found, establishing session...");
+      setProcessing(true);
+
       try {
         const { error: sessionError } = await supabase.auth.setSession({
           access_token: accessToken,
@@ -55,9 +102,11 @@ export function HashAuthHandler() {
 
         if (sessionError) {
           console.error("[HashAuthHandler] Set session error:", sessionError);
+          window.location.href = `/login?error=${encodeURIComponent('Login failed. Please try again.')}`;
           return;
         }
 
+        console.log("[HashAuthHandler] Session established successfully");
         // Clear the hash
         window.location.hash = "";
 
@@ -65,6 +114,8 @@ export function HashAuthHandler() {
         router.push("/overview");
       } catch (err) {
         console.error("[HashAuthHandler] Unexpected error:", err);
+        window.location.href = `/login?error=${encodeURIComponent('Login failed. Please try again.')}`;
+        return;
       } finally {
         setProcessing(false);
       }

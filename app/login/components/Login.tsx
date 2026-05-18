@@ -67,7 +67,11 @@ export const Login = ({
       const { error } = await supabase.auth.signInWithOtp({
         email: data.email,
         options: {
-          emailRedirectTo: `${host?.includes('localhost') ? 'http' : 'https'}://${host}/auth/callback`,
+          // ⚠️ 重要：不要用 /auth/callback 路径！
+          // Supabase Magic Link 使用 implicit flow，token 在 URL hash (#) 中
+          // hash fragment 不会发送到服务器，所以 /auth/callback 的服务端路由看不到 token
+          // 必须指向根 URL，让客户端的 HashAuthHandler 组件处理 hash 中的 token
+          emailRedirectTo: `${host?.includes('localhost') ? 'http' : 'https'}://${host}`,
         },
       });
 
