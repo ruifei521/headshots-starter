@@ -274,8 +274,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       loadingToast.update({
         id: loadingToast.id,
         title: "✓ Model queued for training!",
-        description: "You'll receive an email when your headshots are ready (usually ~30 mins). Redirecting...",
-        duration: 3000, // Show for 3 seconds before redirect
+        description: "You can close this page now. We'll email you when your headshots are ready (~30 mins). Redirecting...",
       });
 
       // Clean up preview URLs before navigating away
@@ -286,7 +285,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       setTimeout(() => {
         loadingToast.dismiss();
         router.push("/overview");
-      }, 2000);
+      }, 1000);
     } catch (error) {
       setIsLoading(false);
       loadingToast.dismiss();
