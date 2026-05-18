@@ -122,16 +122,15 @@ export const Login = ({
   };
 
   const signInWithGoogle = async () => {
-    // Google OAuth - 不指定 redirectTo，让 Supabase 使用默认流程
-    // 这样可以适配移动端，唤起原生 Google 授权弹窗
+    // Google OAuth - 移动端适配
+    // 使用 skipBrowserRedirect 来避免强制跳转网页登录
     const { data, error } = await oAuthClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // 不指定 redirectTo，使用 Supabase 默认配置
-        // 移动端会自动唤起原生 Google 授权弹窗
+        redirectTo: `${protocol}://${host}/auth/callback`,
         queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
+          // 移动端使用 prompt=select_account 来唤起账号选择器
+          prompt: 'select_account',
         },
       },
     });
