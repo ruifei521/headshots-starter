@@ -1,4 +1,4 @@
-import { createServerClient, parseCookieHeader } from "@supabase/ssr";
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -8,10 +8,15 @@ export async function GET(req: NextRequest) {
   // 判断是否为 localhost 环境
   const isLocalhost = requestUrl.hostname === 'localhost' || requestUrl.hostname === '127.0.0.1';
 
+  // 读取请求中的所有 cookie，用于诊断
+  const requestCookies = parseCookieHeader(req.headers.get("Cookie") ?? "");
+  const cookieNames = requestCookies.map(c => c.name);
+
   // 详细日志
   console.log("========== AUTH CALLBACK ==========");
   console.log("Full URL:", req.url);
   console.log("All params:", JSON.stringify(params, null, 2));
+  console.log("Cookie names in request:", cookieNames);
   console.log("Is localhost:", isLocalhost);
   console.log("===================================");
 
@@ -67,12 +72,32 @@ export async function GET(req: NextRequest) {
   // 方法 1: PKCE 流程 - 使用 code 交换 session (新版 Supabase 默认)
   if (code) {
     console.log("Flow: PKCE (code exchange)");
+
+    // 诊断：检查 code_verifier cookie 是否存在
+    const hasCodeVerifier = cookieNames.some(name =>
+      name.includes('code-verifier') || name.includes('code_verifier')
+    );
+    console.log("PKCE code_verifier cookie present:", hasCodeVerifier);
+    if (!hasCodeVerifier) {
+      console.warn("⚠️ code_verifier cookie NOT found! This will likely cause PKCE exchange to fail.");
+      console.warn("Possible causes:");
+      console.warn("  - Link opened in a different browser/in-app browser");
+      console.warn("  - Browser cookies were cleared");
+      console.warn("  - Incognito/private window");
+      console.warn("  - Middleware cleared the cookie (should be fixed by skipping /auth/ in middleware)");
+    }
+
     const { supabase, res } = createSupabaseClient();
 
     const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
     if (exchangeError) {
       console.error("PKCE exchange failed:", exchangeError.message);
+      console.error("Error details:", JSON.stringify({
+        message: exchangeError.message,
+        status: exchangeError.status,
+        name: exchangeError.name,
+      }));
 
       // PKCE 失败的友好错误提示
       let userMessage = 'Login link expired or invalid. Please try again.';
@@ -90,7 +115,13 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log("PKCE success, user:", data.user?.email);
+    console.log("PKCE success! User:", data.user?.email);
+    console.log("Session established, redirecting to:", next);
+
+    // 确保所有 auth cookie 都被正确设置
+    const setCookies = res.cookies.getAll();
+    console.log("Cookies being set:", setCookies.map(c => c.name));
+
     return res;
   }
 
@@ -106,7 +137,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (verifyError) {
-      console.error("verifyOtp failed:", verifyError.message);
+      console.error("verifyOtp (email+token) failed:", verifyError.message);
       return NextResponse.redirect(
         `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
       );

@@ -6,6 +6,20 @@ export async function middleware(request: NextRequest) {
   // 判断是否为 localhost 环境
   const isLocalhost = request.nextUrl.hostname === 'localhost' || request.nextUrl.hostname === '127.0.0.1';
 
+  // ⚠️ 关键修复：跳过 /auth/ 路由，避免 middleware 干扰 PKCE 认证流程
+  // middleware 中的 getSession() 会读取并可能清除 code_verifier cookie，
+  // 导致 /auth/callback 中的 exchangeCodeForSession() 找不到 verifier 而失败
+  // 这是 Supabase SSR + Next.js 的已知问题
+  if (request.nextUrl.pathname.startsWith('/auth/')) {
+    const response = NextResponse.next({
+      request: {
+        headers: request.headers,
+      },
+    });
+    response.headers.set('Cache-Control', 'private, no-store');
+    return response;
+  }
+
   const response = NextResponse.next({
     request: {
       headers: request.headers,
