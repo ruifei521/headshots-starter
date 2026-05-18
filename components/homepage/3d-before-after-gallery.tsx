@@ -22,43 +22,43 @@ export default function ThreeDBeforeAfterGallery() {
   // Real headshot examples
   const galleryItems: GalleryItem[] = [
     {
-      before: "/homepage/before0001.jpg",
-      after: "/homepage/example0001.jpg",
+      before: "/homepage/before0001.png",
+      after: "/homepage/example0001.png",
       label: "Professional Corporate",
     },
     {
-      before: "/homepage/before0002.jpg",
-      after: "/homepage/example0002.jpg",
+      before: "/homepage/before0002.png",
+      after: "/homepage/example0002.png",
       label: "Executive Style",
     },
     {
-      before: "/homepage/before0001.jpg",
-      after: "/homepage/example0004.jpg",
+      before: "/homepage/before0001.png",
+      after: "/homepage/example0004.png",
       label: "Professional Pattern",
     },
     {
-      before: "/homepage/before0001.jpg",
-      after: "/homepage/example0005.jpg",
+      before: "/homepage/before0001.png",
+      after: "/homepage/example0005.png",
       label: "Urban Professional",
     },
     {
-      before: "/homepage/before0002.jpg",
-      after: "/homepage/example0006.jpg",
+      before: "/homepage/before0002.png",
+      after: "/homepage/example0006.png",
       label: "Formal Business",
     },
     {
-      before: "/homepage/before0002.jpg",
-      after: "/homepage/example0007.jpg",
+      before: "/homepage/before0002.png",
+      after: "/homepage/example0007.png",
       label: "Executive Portrait",
     },
     {
-      before: "/homepage/before0001.jpg",
-      after: "/homepage/example0008.jpg",
+      before: "/homepage/before0001.png",
+      after: "/homepage/example0008.png",
       label: "Modern Business",
     },
     {
-      before: "/homepage/before0002.jpg",
-      after: "/homepage/example0009.jpg",
+      before: "/homepage/before0002.png",
+      after: "/homepage/example0009.png",
       label: "Formal Event",
     },
   ]
