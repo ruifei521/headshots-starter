@@ -32,7 +32,9 @@ export function HashAuthHandler() {
 
   useEffect(() => {
     const handleAuth = async () => {
-      // ====== Flow 1: Check for PKCE code in query params ======
+      console.log("[HashAuthHandler] Starting auth handling...");
+
+      // ===== Flow 1: Check for PKCE code in query params =====
       const searchParams = new URLSearchParams(window.location.search);
       const code = searchParams.get("code");
 
@@ -42,20 +44,13 @@ export function HashAuthHandler() {
         try {
           const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) {
-            console.error("[HashAuthHandler] PKCE exchange error:", exchangeError.message);
-            // Redirect to login with error
+            console.error("[HashAuthHandler] PKCE exchange error:", exchangeError);
             window.location.href = `/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`;
             return;
           }
 
-          console.log("[HashAuthHandler] PKCE exchange success");
-          // Clean up URL
-          searchParams.delete("code");
-          searchParams.delete("next");
-          searchParams.delete("type");
-          const cleanUrl = `${window.location.origin}${window.location.pathname}${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
-          window.history.replaceState({}, '', cleanUrl);
-
+          console.log("[HashAuthHandler] PKCE exchange success, redirecting to /overview");
+          window.history.replaceState({}, '', window.location.pathname);
           router.push("/overview");
           return;
         } catch (err) {
@@ -67,20 +62,22 @@ export function HashAuthHandler() {
         }
       }
 
-      // ====== Flow 2: Check for implicit flow tokens in hash ======
+      // ===== Flow 2: Check for implicit flow tokens in hash =====
       const hash = window.location.hash.substring(1);
-      if (!hash) return;
+      if (!hash) {
+        console.log("[HashAuthHandler] No hash found, skipping implicit flow check");
+        return;
+      }
 
+      console.log("[HashAuthHandler] Hash found, parsing...");
       const hashParams = new URLSearchParams(hash);
 
       // Check for error in hash
       const error = hashParams.get("error");
       const errorDescription = hashParams.get("error_description");
       if (error) {
-        console.error("[HashAuthHandler] Auth error:", error, errorDescription);
-        // Clear the hash so we don't keep retrying
+        console.error("[HashAuthHandler] Auth error in hash:", error, errorDescription);
         window.location.hash = "";
-        // Redirect to login with error message
         router.push(`/login?error=${encodeURIComponent(errorDescription || error)}`);
         return;
       }
@@ -88,7 +85,10 @@ export function HashAuthHandler() {
       const accessToken = hashParams.get("access_token");
       const refreshToken = hashParams.get("refresh_token");
 
-      if (!accessToken || !refreshToken) return;
+      if (!accessToken || !refreshToken) {
+        console.log("[HashAuthHandler] No access_token or refresh_token in hash, skipping");
+        return;
+      }
 
       // Found auth tokens in hash - process them
       console.log("[HashAuthHandler] Implicit flow tokens found, establishing session...");
@@ -106,11 +106,8 @@ export function HashAuthHandler() {
           return;
         }
 
-        console.log("[HashAuthHandler] Session established successfully");
-        // Clear the hash
+        console.log("[HashAuthHandler] Session established successfully, redirecting to /overview");
         window.location.hash = "";
-
-        // Redirect to overview
         router.push("/overview");
       } catch (err) {
         console.error("[HashAuthHandler] Unexpected error:", err);
