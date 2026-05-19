@@ -29,9 +29,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     
     // Debug: Log all form fields
     console.log("FormData entries:");
-    for (const [key, value] of formData.entries()) {
-      console.log(`  ${key}: ${value instanceof File ? `File: ${value.name} (${value.size} bytes)` : value}`);
-    }
+    const entries = Array.from(formData.entries());
+    entries.forEach(([key, value]) => {
+      console.log(`  ${key}: ${value instanceof File ? `File: ${(value as File).name} (${(value as File).size} bytes)` : value}`);
+    });
     
     const file = formData.get("file") as File;
     const fileName = formData.get("fileName") as string;
