@@ -123,48 +123,17 @@ export const Login = ({
   };
 
   const signInWithGoogle = async () => {
-    // 移动端/PWA 场景：使用 skipBrowserRedirect 获取 URL 后手动跳转
-    // 原因：PWA 的 WebView 与系统浏览器 Cookie 隔离，Google 无法识别登录态
-    // 手动用 window.location.href 跳转，让系统浏览器处理 OAuth，能读取到 Google Cookie
-    const isMobile =
-      typeof navigator !== 'undefined' &&
-      /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
-      );
-
-    if (isMobile) {
-      const { error } = await oAuthClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${protocol}://${host}/auth/callback`,
-          queryParams: {
-            access_type: 'online',
-          },
-          // 移除 skipBrowserRedirect，让 Supabase 自动处理重定向
-          // iOS 系统浏览器能正确处理 OAuth 回调
-        },
-      });
-
-      if (error) {
-        toast({
-          title: 'Google Login Error',
-          variant: 'destructive',
-          description: error.message,
-          duration: 5000,
-        });
-      }
-      return;
-    }
-
-    // 桌面端：正常使用 Supabase 自动重定向
+    // 统一使用 Supabase 默认 OAuth 流程，不区分移动端/桌面端
+    // 移除自定义 redirectTo，让 Supabase 自动处理回调 URL
+    // 这样可以避免 iOS 上 "让输入有效目标" 的错误
     const { error } = await oAuthClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${protocol}://${host}/auth/callback`,
         queryParams: {
-          // 移除 select_account，让 Google 自动识别已登录账号
           access_type: 'online',
         },
+        // 不设置 redirectTo，使用 Supabase 默认回调 URL
+        // Supabase 会自动处理重定向到正确的 URL
       },
     });
 
