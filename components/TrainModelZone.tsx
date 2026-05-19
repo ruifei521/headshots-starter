@@ -250,22 +250,31 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       if (!response.ok) {
         loadingToast.dismiss();
         const responseData = await response.json();
-        const responseMessage: string = responseData.message;
+        const responseMessage: string = responseData.message || `HTTP error! status: ${response.status}`;
         console.error("Something went wrong! ", responseMessage);
-        const messageWithButton = (
+        console.error("Full response:", responseData);
+        
+        // 显示详细错误信息
+        const detailedMessage = (
           <div className="flex flex-col gap-4">
-            {responseMessage}
-            <a href="/get-credits">
-              <Button size="sm">Get Credits</Button>
-            </a>
+            <div>{responseMessage}</div>
+            {responseData.details && (
+              <div className="text-sm text-gray-500">
+                Details: {responseData.details}
+              </div>
+            )}
+            {responseMessage.includes("Not enough credits") && (
+              <a href="/get-credits">
+                <Button size="sm">Get Credits</Button>
+              </a>
+            )}
           </div>
         );
+        
         toast({
-          title: "Something went wrong!",
-          description: responseMessage.includes("Not enough credits")
-            ? messageWithButton
-            : responseMessage,
-          duration: 5000,
+          title: "Error",
+          description: detailedMessage,
+          duration: 8000,
         });
         return;
       }
