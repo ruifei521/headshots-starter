@@ -123,27 +123,23 @@ export const Login = ({
   };
 
   const signInWithGoogle = async () => {
-    // 检测是否在 PWA standalone 模式或移动端
-    const isStandalone =
-      typeof window !== 'undefined' &&
-      (window.matchMedia('(display-mode: standalone)').matches ||
-        (window.navigator as any).standalone === true);
+    // 移动端/PWA 场景：使用 skipBrowserRedirect 获取 URL 后手动跳转
+    // 原因：PWA 的 WebView 与系统浏览器 Cookie 隔离，Google 无法识别登录态
+    // 手动用 window.location.href 跳转，让系统浏览器处理 OAuth，能读取到 Google Cookie
     const isMobile =
       typeof navigator !== 'undefined' &&
       /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
       );
 
-    // 移动端/PWA 场景：使用 skipBrowserRedirect 获取 URL 后手动跳转
-    // 原因：PWA 的 WebView 与系统浏览器 Cookie 隔离，Google 无法识别登录态
-    // 手动用 window.location.href 跳转，让系统浏览器处理 OAuth，能读取到 Google Cookie
-    if (isMobile || isStandalone) {
+    if (isMobile) {
       const { data, error } = await oAuthClient.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${protocol}://${host}/auth/callback`,
           queryParams: {
-            prompt: 'select_account',
+            // 移除 select_account，让 Google 自动识别已登录账号
+            // 只有在用户未登录 Google 时才显示登录页面
             access_type: 'online',
           },
           skipBrowserRedirect: true,
@@ -173,7 +169,7 @@ export const Login = ({
       options: {
         redirectTo: `${protocol}://${host}/auth/callback`,
         queryParams: {
-          prompt: 'select_account',
+          // 移除 select_account，让 Google 自动识别已登录账号
           access_type: 'online',
         },
       },
