@@ -22,6 +22,7 @@ import { useEffect, useMemo, useState } from "react";
 export function HashAuthHandler() {
   const router = useRouter();
   const [processing, setProcessing] = useState(false);
+  const [hasRun, setHasRun] = useState(false);
 
   const supabase = useMemo(() => {
     return createBrowserClient<Database>(
@@ -31,8 +32,15 @@ export function HashAuthHandler() {
   }, []);
 
   useEffect(() => {
+    // Prevent running multiple times
+    if (hasRun) {
+      console.log("[HashAuthHandler] Already ran, skipping");
+      return;
+    }
+
     const handleAuth = async () => {
-      console.log("[HashAuthHandler] Starting auth handling...");
+      console.log("[HashAuthHandler] ★★★ Starting auth handling ★★★");
+      setHasRun(true);
 
       // ===== Flow 1: Check for PKCE code in query params =====
       const searchParams = new URLSearchParams(window.location.search);
@@ -42,19 +50,19 @@ export function HashAuthHandler() {
         console.log("[HashAuthHandler] PKCE code found, exchanging for session...");
         setProcessing(true);
         try {
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) {
-            console.error("[HashAuthHandler] PKCE exchange error:", exchangeError);
+            console.error("[HashAuthHandler] ✗ PKCE exchange error:", exchangeError);
             window.location.href = `/login?error=${encodeURIComponent("Login link expired or invalid. Please try again.")}`;
             return;
           }
 
-          console.log("[HashAuthHandler] PKCE exchange success, redirecting to /overview");
+          console.log("[HashAuthHandler] ✓ PKCE exchange success, redirecting to /overview", data);
           window.history.replaceState({}, '', window.location.pathname);
           router.push("/overview");
           return;
         } catch (err) {
-          console.error("[HashAuthHandler] PKCE exchange unexpected error:", err);
+          console.error("[HashAuthHandler] ✗ PKCE exchange unexpected error:", err);
           window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
           return;
         } finally {
@@ -69,14 +77,14 @@ export function HashAuthHandler() {
         return;
       }
 
-      console.log("[HashAuthHandler] Hash found, parsing...");
+      console.log("[HashAuthHandler] Hash found, parsing...", hash.substring(0, 50) + "...");
       const hashParams = new URLSearchParams(hash);
 
       // Check for error in hash
       const error = hashParams.get("error");
       const errorDescription = hashParams.get("error_description");
       if (error) {
-        console.error("[HashAuthHandler] Auth error in hash:", error, errorDescription);
+        console.error("[HashAuthHandler] ✗ Auth error in hash:", error, errorDescription);
         window.location.hash = "";
         router.push(`/login?error=${encodeURIComponent(errorDescription || error)}`);
         return;
@@ -95,22 +103,22 @@ export function HashAuthHandler() {
       setProcessing(true);
 
       try {
-        const { error: sessionError } = await supabase.auth.setSession({
+        const { data, error: sessionError } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
         });
 
         if (sessionError) {
-          console.error("[HashAuthHandler] Set session error:", sessionError);
+          console.error("[HashAuthHandler] ✗ Set session error:", sessionError);
           window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
           return;
         }
 
-        console.log("[HashAuthHandler] Session established successfully, redirecting to /overview");
+        console.log("[HashAuthHandler] ✓ Session established successfully, redirecting to /overview", data);
         window.location.hash = "";
         router.push("/overview");
       } catch (err) {
-        console.error("[HashAuthHandler] Unexpected error:", err);
+        console.error("[HashAuthHandler] ✗ Unexpected error:", err);
         window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
         return;
       } finally {
