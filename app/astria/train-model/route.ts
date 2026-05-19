@@ -248,31 +248,22 @@ export async function POST(request: Request) {
       }
     );
 
-    const { status } = response;
+    const { status, data } = response;
 
     if (status !== 201) {
-      console.error({ status });
+      console.error("Astria API error - status:", status, "response:", data);
       // Rollback: Delete the created model if something goes wrong
       if (modelId) {
         await supabase.from("models").delete().eq("id", modelId);
       }
 
-      if (status === 400) {
-        return NextResponse.json(
-          {
-            message: "webhookUrl must be a URL address",
-          },
-          { status }
-        );
-      }
-      if (status === 402) {
-        return NextResponse.json(
-          {
-            message: "Training models is only available on paid plans.",
-          },
-          { status }
-        );
-      }
+      const errorMessage = (data as any)?.message || (data as any)?.error || `Astria API returned status ${status}`;
+      return NextResponse.json(
+        {
+          message: errorMessage,
+        },
+        { status }
+      );
     }
 
     const { error: samplesError } = await supabase.from("samples").insert(
@@ -286,7 +277,7 @@ export async function POST(request: Request) {
       console.error("samplesError: ", samplesError);
       return NextResponse.json(
         {
-          message: "Something went wrong!",
+          message: samplesError.message || "Failed to save image samples.",
         },
         { status: 500 }
       );
@@ -307,23 +298,24 @@ export async function POST(request: Request) {
         console.error({ updateCreditError });
         return NextResponse.json(
           {
-            message: "Something went wrong!",
+            message: updateCreditError.message || "Failed to update credits.",
           },
           { status: 500 }
         );
       }
     }
-  } catch (e) {
-    console.error(e);
+  } catch (e: any) {
+    console.error("Train model error:", e);
     // Rollback: Delete the created model if something goes wrong
     if (modelId) {
       await supabase.from("models").delete().eq("id", modelId);
     }
+    const message = e?.response?.data?.message || e?.message || "Something went wrong!";
     return NextResponse.json(
       {
-        message: "Something went wrong!",
+        message,
       },
-      { status: 500 }
+      { status: e?.response?.status || 500 }
     );
   }
 
