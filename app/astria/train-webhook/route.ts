@@ -52,31 +52,31 @@ export async function POST(request: Request) {
   const webhook_secret = urlObj.searchParams.get("webhook_secret");
 
   if (!model_id) {
-    return NextResponse.json(
-      {
-        message: "Malformed URL, no model_id detected!",
-      },
-      { status: 500 }
-    );
+   return NextResponse.json(
+     {
+       message: "Malformed URL, no model_id detected!",
+     },
+     { status: 500 }
+   );
   }
-  
+ 
 
-  if (!webhook_secret) {
-    return NextResponse.json(
-      {
-        message: "Malformed URL, no webhook_secret detected!",
-      },
-      { status: 500 }
-    );
+  if (appWebhookSecret && !webhook_secret) {
+   return NextResponse.json(
+     {
+       message: "Malformed URL, no webhook_secret detected!",
+     },
+     { status: 500 }
+   );
   }
 
-  if (webhook_secret.toLowerCase() !== appWebhookSecret?.toLowerCase()) {
-    return NextResponse.json(
-      {
-        message: "Unauthorized!",
-      },
-      { status: 401 }
-    );
+  if (appWebhookSecret && webhook_secret && webhook_secret.toLowerCase() !== appWebhookSecret?.toLowerCase()) {
+   return NextResponse.json(
+     {
+       message: "Unauthorized!",
+     },
+     { status: 401 }
+   );
   }
 
   if (!user_id) {

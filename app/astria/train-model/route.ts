@@ -181,11 +181,15 @@ export async function POST(request: Request) {
       ? deploymentUrl 
       : `https://${deploymentUrl}`;
 
-    const trainWebhook = `${baseUrl}/astria/train-webhook`;
-    const trainWebhookWithParams = `${trainWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_secret=${appWebhookSecret}`;
+  const trainWebhook = `${baseUrl}/astria/train-webhook`;
+    const trainWebhookWithParams = appWebhookSecret
+      ? `${trainWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_secret=${appWebhookSecret}`
+      : `${trainWebhook}?user_id=${user.id}&model_id=${modelId}`;
 
     const promptWebhook = `${baseUrl}/astria/prompt-webhook`;
-    const promptWebhookWithParams = `${promptWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_secret=${appWebhookSecret}`;
+    const promptWebhookWithParams = appWebhookSecret
+      ? `${promptWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_secret=${appWebhookSecret}`
+      : `${promptWebhook}?user_id=${user.id}&model_id=${modelId}`;
 
     console.log({ trainWebhookWithParams, promptWebhookWithParams });
     const API_KEY = astriaApiKey;
