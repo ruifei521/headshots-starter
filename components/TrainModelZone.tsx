@@ -295,14 +295,25 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         loadingToast.dismiss();
         router.push("/overview");
       }, 1000);
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false);
       loadingToast.dismiss();
-      const message = error instanceof Error ? error.message : "Upload failed";
+      // 显示尽可能详细的错误信息
+      const message = error?.response?.data?.message 
+        || error?.response?.data?.error 
+        || error?.message 
+        || "Upload failed";
+      // 在控制台打印完整错误对象，方便 Vercel 日志排查
+      console.error("=== TRAIN MODEL CATCH ===");
+      console.error("Error message:", error?.message);
+      console.error("Error response status:", error?.response?.status);
+      console.error("Error response data:", error?.response?.data);
+      console.error("Full error object:", error);
+      
       toast({
-        title: "Upload failed",
-        description: message,
-        duration: 5000,
+        title: "训练失败 / Train Failed",
+        description: String(message).substring(0, 200),
+        duration: 8000,
       });
     }
   }, [form, packSlug, toast, router]);

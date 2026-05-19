@@ -19,6 +19,7 @@ if (!appWebhookSecret) {
 }
 
 export async function POST(request: Request) {
+  console.log("=== TRAIN MODEL ROUTE CALLED ===", new Date().toISOString());
   const payload = await request.json();
   const images = payload.urls;
   const type = payload.type;
