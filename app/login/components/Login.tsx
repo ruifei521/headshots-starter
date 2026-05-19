@@ -82,12 +82,14 @@ export const Login = ({
     setIsSubmitting(true);
     try {
       // 使用 implicit flow 客户端发送 Magic Link
-      // implicit flow：邮件链接重定向到根 URL，token 在 URL hash (#access_token=xxx) 中
+      // implicit flow：邮件链接重定向到 /login#access_token=xxx，token 在 URL hash 中
       // 由客户端 HashAuthHandler 组件读取 hash 并建立 session，不依赖 code_verifier cookie
       const { error } = await magicLinkClient.auth.signInWithOtp({
         email: data.email,
         options: {
-          emailRedirectTo: `${protocol}://${host}`,
+          // 重定向到 /login 路径，HashAuthHandler 在此处理 token
+          // 不要重定向到根路径，因为根路径是首页，没有 HashAuthHandler
+          emailRedirectTo: `${protocol}://${host}/login`,
         },
       });
 
