@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 // Upload images to Supabase Storage - use service_role_key to bypass RLS
 
 // Allowed MIME types
-const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png"];
+const ALLOWED_TYPES = ["image/jpeg", "image/png"];
 // Maximum file size (10MB)
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
