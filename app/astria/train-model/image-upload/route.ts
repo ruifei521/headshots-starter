@@ -26,8 +26,18 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   try {
     const formData = await request.formData();
+    
+    // Debug: Log all form fields
+    console.log("FormData entries:");
+    for (const [key, value] of formData.entries()) {
+      console.log(`  ${key}: ${value instanceof File ? `File: ${value.name} (${value.size} bytes)` : value}`);
+    }
+    
     const file = formData.get("file") as File;
     const fileName = formData.get("fileName") as string;
+
+    console.log("Parsed file:", file?.name, file?.size, file?.type);
+    console.log("Parsed fileName:", fileName);
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
