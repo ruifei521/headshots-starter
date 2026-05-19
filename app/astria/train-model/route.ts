@@ -166,7 +166,7 @@ export async function POST(request: Request) {
     console.error("modelError: ", modelError);
     return NextResponse.json(
       {
-        message: "Something went wrong!",
+        message: modelError.message || "Failed to create model record.",
       },
       { status: 500 }
     );
