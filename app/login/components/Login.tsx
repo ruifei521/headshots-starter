@@ -133,16 +133,15 @@ export const Login = ({
       );
 
     if (isMobile) {
-      const { data, error } = await oAuthClient.auth.signInWithOAuth({
+      const { error } = await oAuthClient.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${protocol}://${host}/auth/callback`,
           queryParams: {
-            // 移除 select_account，让 Google 自动识别已登录账号
-            // 只有在用户未登录 Google 时才显示登录页面
             access_type: 'online',
           },
-          skipBrowserRedirect: true,
+          // 移除 skipBrowserRedirect，让 Supabase 自动处理重定向
+          // iOS 系统浏览器能正确处理 OAuth 回调
         },
       });
 
@@ -153,12 +152,6 @@ export const Login = ({
           description: error.message,
           duration: 5000,
         });
-        return;
-      }
-
-      if (data?.url) {
-        // 强制在系统浏览器中打开 OAuth 链接（而非 PWA WebView）
-        window.location.href = data.url;
       }
       return;
     }
