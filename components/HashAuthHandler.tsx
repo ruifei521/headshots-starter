@@ -45,7 +45,7 @@ export function HashAuthHandler() {
           const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) {
             console.error("[HashAuthHandler] PKCE exchange error:", exchangeError);
-            window.location.href = `/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`;
+            window.location.href = `/login?error=${encodeURIComponent("Login link expired or invalid. Please try again.")}`;
             return;
           }
 
@@ -55,7 +55,7 @@ export function HashAuthHandler() {
           return;
         } catch (err) {
           console.error("[HashAuthHandler] PKCE exchange unexpected error:", err);
-          window.location.href = `/login?error=${encodeURIComponent('Login failed. Please try again.')}`;
+          window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
           return;
         } finally {
           setProcessing(false);
@@ -102,7 +102,7 @@ export function HashAuthHandler() {
 
         if (sessionError) {
           console.error("[HashAuthHandler] Set session error:", sessionError);
-          window.location.href = `/login?error=${encodeURIComponent('Login failed. Please try again.')}`;
+          window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
           return;
         }
 
@@ -111,7 +111,7 @@ export function HashAuthHandler() {
         router.push("/overview");
       } catch (err) {
         console.error("[HashAuthHandler] Unexpected error:", err);
-        window.location.href = `/login?error=${encodeURIComponent('Login failed. Please try again.')}`;
+        window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
         return;
       } finally {
         setProcessing(false);
