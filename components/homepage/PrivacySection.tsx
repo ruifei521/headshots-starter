@@ -15,8 +15,8 @@ const privacyItems = [
   },
   {
     icon: <Trash2 className="h-6 w-6" />,
-    title: "Auto-Delete After 30 Days",
-    description: "We don't hoard your data. Uploaded photos are automatically purged after 30 days.",
+    title: "Automatic Data Deletion",
+    description: "We don't hoard your data. Original photos are deleted within 7 days, generated headshots within 30 days.",
   },
   {
     icon: <Eye className="h-6 w-6" />,

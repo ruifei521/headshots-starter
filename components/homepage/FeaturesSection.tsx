@@ -1,4 +1,4 @@
-import { Camera, Clock, Shield, Star } from "lucide-react"
+import { Camera, Clock, Shield, Star, Image } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 const features = [
@@ -10,7 +10,7 @@ const features = [
   {
     title: "High Resolution",
     description: "Get high-resolution images suitable for print and digital use",
-    icon: <Camera className="h-6 w-6" />
+    icon: <Image className="h-6 w-6" />
   },
   {
     title: "Fast Delivery",

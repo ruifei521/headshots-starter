@@ -4,12 +4,13 @@ import { Badge } from "@/components/ui/badge"
 import { Check, X, Camera, Clock, DollarSign, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { PRICING } from "@/lib/pricing"
 
 const comparisons = [
   {
     feature: "Cost",
     traditional: "$200 – $500 per session",
-    ours: "$29 – $89",
+    ours: `$${PRICING.starter.price} – $${PRICING.executive.price}`,
     icon: <DollarSign className="h-4 w-4" />,
   },
   {
@@ -45,7 +46,7 @@ const comparisons = [
   {
     feature: "Privacy & Security",
     traditional: "Photos stored by studio",
-    ours: "Auto-deleted after 30 days",
+    ours: "Auto-deleted after use",
     icon: <Check className="h-4 w-4" />,
   },
   {
