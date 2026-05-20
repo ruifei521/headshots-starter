@@ -14,7 +14,8 @@ export default function NavbarClient() {
   const [credits, setCredits] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
+  const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
+const stripeIsConfigured = creemIsConfigured || process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
   const packsIsEnabled = process.env.NEXT_PUBLIC_TUNE_TYPE === "packs";
 
   useEffect(() => {

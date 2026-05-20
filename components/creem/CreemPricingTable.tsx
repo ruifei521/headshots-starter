@@ -1,9 +1,10 @@
 'use client'
 import { User } from '@supabase/supabase-js';
-import React, { useState } from 'react';
+import React from 'react';
+import { CreemCheckout } from '@creem_io/nextjs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check, Loader2 } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 type Props = {
   user: User;
@@ -59,40 +60,6 @@ const PRODUCTS = [
 ];
 
 const CreemPricingTable = ({ user }: Props) => {
-  const [loadingId, setLoadingId] = useState<string | null>(null);
-
-  const handleCheckout = async (productId: string) => {
-    setLoadingId(productId);
-    try {
-      // Create a checkout session via our API
-      const resp = await fetch('/api/creem/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId,
-          userId: user.id,
-          email: user.email,
-          name: user.user_metadata?.full_name || user.email,
-        }),
-      });
-      
-      const data = await resp.json();
-      
-      if (data.url) {
-        // Redirect to CREEM checkout page
-        window.location.href = data.url;
-      } else {
-        console.error('No checkout URL returned:', data);
-        alert('Failed to create checkout session. Please try again.');
-      }
-    } catch (err) {
-      console.error('Checkout error:', err);
-      alert('Failed to start checkout. Please try again.');
-    } finally {
-      setLoadingId(null);
-    }
-  };
-
   return (
     <div className="w-full max-w-6xl mx-auto py-12 px-4">
       <div className="text-center mb-12">
@@ -140,21 +107,22 @@ const CreemPricingTable = ({ user }: Props) => {
             </CardContent>
             
             <CardFooter>
-              <Button 
-                className="w-full" 
-                variant={product.popular ? 'default' : 'outline'}
-                onClick={() => handleCheckout(product.id)}
-                disabled={loadingId !== null}
+              <CreemCheckout
+                productId={product.id}
+                successUrl="/get-credits?success=true"
+                metadata={{
+                  source: 'web',
+                }}
+                referenceId={user.id}
+                customer={{
+                  email: user.email || '',
+                  name: user.user_metadata?.full_name || user.email || '',
+                }}
               >
-                {loadingId === product.id ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Redirecting...
-                  </>
-                ) : (
-                  `Get ${product.credits}`
-                )}
-              </Button>
+                <Button className="w-full" variant={product.popular ? 'default' : 'outline'}>
+                  Get {product.credits}
+                </Button>
+              </CreemCheckout>
             </CardFooter>
           </Card>
         ))}

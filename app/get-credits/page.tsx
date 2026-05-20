@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import StripePricingTable from "@/components/stripe/StripeTable";
+import CreemPricingTable from "@/components/creem/CreemPricingTable";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +36,6 @@ export default async function Index() {
   }
 
   return (
-    <StripePricingTable user={user} />
+    <CreemPricingTable user={user} />
   );
 }

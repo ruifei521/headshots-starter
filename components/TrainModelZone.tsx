@@ -28,6 +28,7 @@ import { ImageInspectionResult, aggregateCharacteristics } from "@/lib/imageInsp
 type FormInput = z.infer<typeof fileUploadFormSchema>;
 
 const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
+const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
 
 // Minimum and maximum number of images
 const MIN_IMAGES = 4;
@@ -517,7 +518,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
             className="w-full"
             disabled={isLoading || fileObjects.length < MIN_IMAGES}
           >
-            Train Model{stripeIsConfigured && <span className="ml-1">(1 Credit)</span>}
+            Train Model{(stripeIsConfigured || creemIsConfigured) && <span className="ml-1">(1 Credit)</span>}
             {fileObjects.length < MIN_IMAGES && (
               <span className="ml-2 text-sm">
                 ({fileObjects.length}/{MIN_IMAGES} images)
