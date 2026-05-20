@@ -18,7 +18,7 @@ export default function PrivacyPolicy() {
           <ul className="list-disc pl-6 space-y-2">
             <li><strong className="text-foreground">Account Information:</strong> Email address, name, and authentication data when you sign up or log in via Google OAuth.</li>
             <li><strong className="text-foreground">Photos You Upload:</strong> The photos you submit for AI headshot generation. These photos are processed by our AI provider to generate your headshots.</li>
-            <li><strong className="text-foreground">Payment Information:</strong> Billing details processed securely through our payment provider (Dodo Payments). We do not store your full credit card number.</li>
+            <li><strong className="text-foreground">Payment Information:</strong> Billing details processed securely through our payment provider (Creem). We do not store your full credit card number.</li>
             <li><strong className="text-foreground">Usage Data:</strong> Information about how you interact with our service, including pages visited, features used, and device information.</li>
           </ul>
         </div>
@@ -51,7 +51,7 @@ export default function PrivacyPolicy() {
           <p className="mb-3">We use the following third-party services that may have access to your data:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li><strong className="text-foreground">Supabase:</strong> Database and authentication services</li>
-            <li><strong className="text-foreground">Dodo Payments:</strong> Payment processing (acting as Merchant of Record)</li>
+            <li><strong className="text-foreground">Creem:</strong> Payment processing (acting as Merchant of Record)</li>
             <li><strong className="text-foreground">Vercel:</strong> Application hosting and file storage</li>
             <li><strong className="text-foreground">AI Processing Provider:</strong> For headshot generation (photos are sent to our AI provider for model training and image generation as part of the service)</li>
           </ul>

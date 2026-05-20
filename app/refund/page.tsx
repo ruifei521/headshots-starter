@@ -54,7 +54,7 @@ export default function RefundPolicy() {
           <h2 className="text-xl font-semibold text-foreground mb-3">4. Refund Processing</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>Approved refunds will be processed within 5-10 business days.</li>
-            <li>Refunds are processed through Dodo Payments, our Merchant of Record, and will be issued to the original payment method.</li>
+            <li>Refunds are processed through Creem, our Merchant of Record, and will be issued to the original payment method.</li>
             <li>Depending on your bank or credit card company, it may take additional time for the refund to appear on your statement.</li>
           </ul>
         </div>

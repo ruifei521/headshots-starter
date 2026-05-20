@@ -49,7 +49,7 @@ export default function TermsOfService() {
           <h2 className="text-xl font-semibold text-foreground mb-3">5. Credits and Payments</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>The Service operates on a credit-based system. You purchase credits to generate headshots.</li>
-            <li>All payments are processed securely through Dodo Payments, our Merchant of Record. Dodo Payments is the authorized reseller of our services and handles billing, tax collection, and compliance.</li>
+            <li>All payments are processed securely through Creem, our Merchant of Record. Creem is the authorized reseller of our services and handles billing, tax collection, and compliance.</li>
             <li>Prices are listed in USD and may change with notice.</li>
             <li>Credits are non-transferable and cannot be exchanged for cash.</li>
             <li>Credits do not expire unless otherwise stated at the time of purchase.</li>
