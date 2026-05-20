@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Error({
   error,
@@ -10,6 +10,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [showDetails, setShowDetails] = useState(false);
+
   useEffect(() => {
     console.error("Global error boundary caught:", error);
   }, [error]);
@@ -36,7 +38,22 @@ export default function Error({
         <p className="text-sm text-muted-foreground">
           An unexpected error occurred. Please try again or contact support if the problem persists.
         </p>
-        <div className="flex gap-4">
+        
+        {/* Debug: show error message toggle */}
+        <button
+          onClick={() => setShowDetails(!showDetails)}
+          className="text-xs text-muted-foreground underline"
+        >
+          {showDetails ? "Hide" : "Show"} details
+        </button>
+        {showDetails && (
+          <pre className="text-xs text-left bg-muted p-3 rounded-md max-w-full overflow-auto">
+            {error.message || "Unknown error"}
+            {error.digest && `\nDigest: ${error.digest}`}
+          </pre>
+        )}
+
+        <div className="flex gap-3 mt-2">
           <Button variant="outline" onClick={() => reset()}>
             Try Again
           </Button>

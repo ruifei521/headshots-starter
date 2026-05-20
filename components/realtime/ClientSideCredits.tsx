@@ -3,7 +3,7 @@
 import { Database } from "@/types/supabase";
 import { creditsRow } from "@/types/utils";
 import { createClient } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const revalidate = 0;
 
@@ -14,20 +14,25 @@ type ClientSideCreditsProps = {
 export default function ClientSideCredits({
   creditsRow,
 }: ClientSideCreditsProps) {
-  // Hooks must be called unconditionally at the top level
   const [credits, setCredits] = useState<creditsRow | null>(creditsRow);
-  
-  // Create Supabase client only once
-  const [supabase] = useState(() =>
-    createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-  );
+  const supabaseRef = useRef<ReturnType<typeof createClient<Database>> | null>(null);
 
   useEffect(() => {
     if (!creditsRow) return;
-    
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseAnonKey) return;
+
+    let supabase: ReturnType<typeof createClient<Database>>;
+    try {
+      supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+      supabaseRef.current = supabase;
+    } catch (e) {
+      console.error("Failed to create Supabase client for credits:", e);
+      return;
+    }
+
     const channel = supabase
       .channel("realtime credits")
       .on(
@@ -37,12 +42,20 @@ export default function ClientSideCredits({
           setCredits(payload.new);
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) {
+          console.error("Credits subscription error:", err);
+        }
+      });
 
     return () => {
-      supabase.removeChannel(channel);
+      try {
+        supabase.removeChannel(channel);
+      } catch (e) {
+        // ignore cleanup errors
+      }
     };
-  }, [supabase, creditsRow]);
+  }, [creditsRow]);
 
   if (!credits) return <p>Credits: 0</p>;
 

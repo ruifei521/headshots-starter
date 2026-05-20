@@ -19,42 +19,79 @@ type ClientSideModelsListProps = {
 export default function ClientSideModelsList({
   serverModels,
 }: ClientSideModelsListProps) {
-  const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-  );
   const [models, setModels] = useState<modelRowWithSamples[]>(serverModels);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseAnonKey) {
+      setError("Configuration error: missing Supabase credentials.");
+      return;
+    }
+
+    let supabase: ReturnType<typeof createClient<Database>>;
+    try {
+      supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+    } catch (e) {
+      console.error("Failed to create Supabase client:", e);
+      setError("Failed to connect to database. Please try again later.");
+      return;
+    }
+
     const channel = supabase
       .channel("realtime-models")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "models" },
         async (payload: any) => {
-          const samples = await supabase
-            .from("samples")
-            .select("*")
-            .eq("modelId", payload.new.id);
+          try {
+            const samples = await supabase
+              .from("samples")
+              .select("*")
+              .eq("modelId", payload.new.id);
 
-          const newModel: modelRowWithSamples = {
-            ...payload.new,
-            samples: samples.data,
-          };
+            const newModel: modelRowWithSamples = {
+              ...payload.new,
+              samples: samples.data,
+            };
 
-          const dedupedModels = models.filter(
-            (model) => model.id !== payload.old?.id
-          );
-
-          setModels([...dedupedModels, newModel]);
+            setModels((prev) => {
+              const dedupedModels = prev.filter(
+                (model) => model.id !== payload.old?.id
+              );
+              return [...dedupedModels, newModel];
+            });
+          } catch (e) {
+            console.error("Realtime update error:", e);
+          }
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) {
+          console.error("Realtime subscription error:", err);
+        }
+      });
 
     return () => {
-      supabase.removeChannel(channel);
+      try {
+        supabase.removeChannel(channel);
+      } catch (e) {
+        // ignore cleanup errors
+      }
     };
-  }, [supabase, models, setModels]);
+  }, []);
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 py-16">
+        <p className="text-destructive">{error}</p>
+        <Link href="/">
+          <Button variant="outline">Go Home</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div id="train-model-container" className="w-full">
