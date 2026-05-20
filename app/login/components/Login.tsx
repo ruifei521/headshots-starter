@@ -40,12 +40,16 @@ export const Login = ({
     );
   }, []);
 
-  // Google OAuth 专用客户端 - 使用 PKCE flow（默认）
-  // OAuth 在同一浏览器窗口内完成重定向，code_verifier cookie 可靠可用
+  // Google OAuth 专用客户端 - 使用 implicit flow
+  // ⚠️ 微信/WebView 浏览器会拦截第三方 cookie，PKCE flow 的 code_verifier cookie
+  // 无法在 supabase.co 域名上存活，导致 OAuth 回调失败报 "让输入有效目标"
+  // implicit flow 将 token 直接放在 URL hash 中，不依赖跨域 cookie，
+  // 在所有浏览器（包括微信内置浏览器）中都能可靠工作
   const oAuthClient = useMemo(() => {
     return createBrowserClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { auth: { flowType: 'implicit' } }
     );
   }, []);
 
@@ -123,16 +127,16 @@ export const Login = ({
   };
 
   const signInWithGoogle = async () => {
-    // 统一使用 Supabase 默认 OAuth 流程，不区分移动端/桌面端
-    // 移除自定义 redirectTo，让 Supabase 自动处理回调 URL
-    // 这样可以避免 iOS 上 "让输入有效目标" 的错误
-    const { error } = await oAuthClient.auth.signInWithOAuth({
+    // 使用 implicit flow：token 走 URL hash，不依赖跨域 cookie
+    // 微信等 WebView 浏览器中 PKCE 的 code_verifier cookie 会被拦截
+    // redirectTo 设为根路径，由 HashAuthHandler（全局布局组件）读取 hash 并建立 session
+    const { data, error } = await oAuthClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
         queryParams: {
           access_type: 'online',
         },
-        redirectTo: `${protocol}://${host}/auth/callback`,
+        redirectTo: `${protocol}://${host}`,
       },
     });
 
@@ -143,6 +147,12 @@ export const Login = ({
         description: error.message,
         duration: 5000,
       });
+      return;
+    }
+
+    // implicit flow 返回 URL，Supabase 不会自动跳转，需要手动跳转
+    if (data?.url) {
+      window.location.href = data.url;
     }
   };
 
