@@ -20,7 +20,10 @@ type Props = {
 }
 
 const StripePricingTable = ({ user }: Props) => {
+  const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+
   useEffect(() => {
+    if (!stripePublishableKey) return;
     const script = document.createElement('script');
     script.src = "https://js.stripe.com/v3/pricing-table.js";
     script.async = true;
@@ -30,13 +33,21 @@ const StripePricingTable = ({ user }: Props) => {
     return () => {
       document.body.removeChild(script);
     }
-  }, []);
+  }, [stripePublishableKey]);
+
+  if (!stripePublishableKey) {
+    return (
+      <div className='flex flex-1 flex-col w-full items-center justify-center py-12'>
+        <p className='text-muted-foreground'>Payment is currently processed by Creem. Please visit the <a href="/get-credits" className="text-primary hover:underline">Get Credits</a> page.</p>
+      </div>
+    );
+  }
 
   return (
     <div className='flex flex-1 flex-col w-full'>
       <stripe-pricing-table
           pricing-table-id="prctbl_1P0TL0C3ic5Sd20TGpWOU2Fi"
-          publishable-key="pk_live_51P0SikC3ic5Sd20T9QRaRKIkqy8l951LDgeOxcP24ZRXHnQzjnOFM7tfhsYdWksn1wNBdejJzvaxXGq0yRAxm14A00Py0XreGk"
+          publishable-key={stripePublishableKey}
           client-reference-id={user.id}
           customer-email={user.email}
       >

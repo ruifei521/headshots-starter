@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import TrustBadges from "@/components/homepage/trust-badges"
 import ThreeDBeforeAfterGallery from "@/components/homepage/3d-before-after-gallery"
+import { PRICING } from "@/lib/pricing"
 
 export default function HeroSection() {
   return (
@@ -17,12 +18,12 @@ export default function HeroSection() {
             Professional Headshots <span className="text-primary">Without the Studio</span>
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto">
-            Turn your selfies into professional headshots in ~30 minutes. Starting at <strong>$29</strong> — a fraction of traditional photography costs.
+            Turn your selfies into professional headshots in ~30 minutes. Starting at <strong>${PRICING.starter.price}</strong> — a fraction of traditional photography costs.
           </p>
           <div className="mt-4 flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/login" className="w-full sm:w-auto">
               <Button size="lg" className="group w-full sm:w-auto">
-                Get Professional Headshots — From $29
+                Get Professional Headshots — From ${PRICING.starter.price}
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
@@ -45,7 +46,7 @@ export default function HeroSection() {
             </span>
             <span className="flex items-center gap-1">
               <Lock className="h-4 w-4 text-primary" />
-              <strong className="text-foreground">Privacy-First</strong> — Auto-Delete After 30 Days
+              <strong className="text-foreground">Privacy-First</strong> — Photos Auto-Deleted
             </span>
           </div>
         </div>

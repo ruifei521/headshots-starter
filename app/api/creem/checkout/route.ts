@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PRICING, PRODUCT_IDS } from '@/lib/pricing';
 
 const CREEM_API_KEY = process.env.CREEM_API_KEY!;
 const CREEM_API_BASE = 'https://api.creem.io/v1';
 
-// Product IDs from CREEM
+// Product definitions from shared pricing
 const PRODUCTS = [
-  { id: 'prod_31zqeJaVi4nCiCLGPz0F2K', name: 'Starter Pack', credits: 1, price: 2900 },  // $29.00
-  { id: 'prod_198ewWuQouDaQfEOT6kTvj', name: 'Pro Pack', credits: 3, price: 4900 },      // $49.00
-  { id: 'prod_1pZIlgHsKVk5YOK1QupnPP', name: 'Executive Pack', credits: 5, price: 8900 }, // $89.00
+  { id: PRODUCT_IDS.starter, name: 'Starter Pack', credits: PRICING.starter.credits, price: PRICING.starter.price * 100 },
+  { id: PRODUCT_IDS.pro, name: 'Pro Pack', credits: PRICING.pro.credits, price: PRICING.pro.price * 100 },
+  { id: PRODUCT_IDS.executive, name: 'Executive Pack', credits: PRICING.executive.credits, price: PRICING.executive.price * 100 },
 ];
 
 export async function POST(req: NextRequest) {

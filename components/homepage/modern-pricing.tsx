@@ -2,9 +2,10 @@
 
 import Link from "next/link"
 import type React from "react"
-import { Check, Camera, Clock, Shield, RefreshCw } from "lucide-react"
+import { Check, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { PRICING } from "@/lib/pricing"
 
 interface PricingFeature {
   icon: React.ReactNode
@@ -29,42 +30,42 @@ export default function ModernPricing() {
   const tiers: PricingTier[] = [
     {
       title: "Starter",
-      price: "$29",
+      price: `$${PRICING.starter.price}`,
       description: "Perfect for individuals looking to enhance their LinkedIn or CV.",
       features: [
-        "5 Styles Included",
-        "40 AI-Generated Headshots",
+        `${PRICING.starter.styles} Styles Included`,
+        `${PRICING.starter.headshots} AI-Generated Headshots`,
         "Commercial License",
         "High-Resolution Download",
         "14-Day Money-Back Guarantee",
       ],
       buttonText: "Get Started",
-      credits: "1 Credit",
-      headshots: "40 Headshots",
+      credits: `${PRICING.starter.credits} Credit`,
+      headshots: `${PRICING.starter.headshots} Headshots`,
     },
     {
       title: "Pro",
-      price: "$49",
+      price: `$${PRICING.pro.price}`,
       description: "Ideal for professionals who want variety and different styles.",
       features: [
-        "10 Styles Included",
-        "100 AI-Generated Headshots",
+        `${PRICING.pro.styles} Styles Included`,
+        `${PRICING.pro.headshots} AI-Generated Headshots`,
         "Commercial License",
         "High-Resolution Download",
         "Priority Processing",
         "14-Day Money-Back Guarantee",
       ],
       buttonText: "Get Started",
-      credits: "3 Credits",
-      headshots: "100 Headshots",
+      credits: `${PRICING.pro.credits} Credits`,
+      headshots: `${PRICING.pro.headshots} Headshots`,
     },
     {
       title: "Executive",
-      price: "$89",
+      price: `$${PRICING.executive.price}`,
       description: "The complete package for maximum variety and professional use.",
       features: [
-        "20 Styles Included",
-        "200 AI-Generated Headshots",
+        `${PRICING.executive.styles} Styles Included`,
+        `${PRICING.executive.headshots} AI-Generated Headshots`,
         "All Backgrounds",
         "Commercial License",
         "High-Resolution Download",
@@ -72,13 +73,13 @@ export default function ModernPricing() {
         "14-Day Money-Back Guarantee",
       ],
       buttonText: "Get Started",
-      credits: "5 Credits",
-      headshots: "200 Headshots",
+      credits: `${PRICING.executive.credits} Credits`,
+      headshots: `${PRICING.executive.headshots} Headshots`,
     },
   ]
 
   const traditionalComparison = [
-    { feature: "Average Cost", traditional: "$200 – $500", ourPrice: "$29 – $89" },
+    { feature: "Average Cost", traditional: "$200 – $500", ourPrice: `$${PRICING.starter.price} – $${PRICING.executive.price}` },
     { feature: "Session Time", traditional: "1 – 3 hours", ourPrice: "6 selfies, 2 mins" },
     { feature: "Turnaround", traditional: "3 – 14 days", ourPrice: "~30 minutes" },
     { feature: "Style Options", traditional: "1 – 2 per session", ourPrice: "5 – 20 styles included" },

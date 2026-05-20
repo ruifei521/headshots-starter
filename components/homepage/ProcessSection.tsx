@@ -19,7 +19,7 @@ const processSteps = [
     title: "Our AI Gets to Work",
     description: "The AI magic takes ~20 minutes. You'll get an email when it's ready!",
     icon: <Sparkles className="h-5 w-5" />,
-    processingImage: "/blur.png"
+    processingImage: "/blur.jpg"
   },
   {
     number: 3,

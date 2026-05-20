@@ -132,8 +132,7 @@ export const Login = ({
         queryParams: {
           access_type: 'online',
         },
-        // 不设置 redirectTo，使用 Supabase 默认回调 URL
-        // Supabase 会自动处理重定向到正确的 URL
+        redirectTo: `${protocol}://${host}/auth/callback`,
       },
     });
 

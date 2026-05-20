@@ -4,52 +4,53 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Check, Loader2 } from 'lucide-react';
+import { PRICING, PRODUCT_IDS } from '@/lib/pricing';
 
 type Props = {
-  user: User;
+  user: User | null;
 }
 
 const PRODUCTS = [
   {
-    id: 'prod_31zqeJaVi4nCiCLGPz0F2K',
+    id: PRODUCT_IDS.starter,
     name: 'Starter',
-    price: '$29',
-    credits: '1 Credit',
-    headshots: '40 Headshots',
+    price: `$${PRICING.starter.price}`,
+    credits: `${PRICING.starter.credits} Credit`,
+    headshots: `${PRICING.starter.headshots} Headshots`,
     description: 'Perfect for individuals looking to enhance their LinkedIn or CV.',
     features: [
-      '5 Styles Included',
-      '40 AI-Generated Headshots',
+      `${PRICING.starter.styles} Styles Included`,
+      `${PRICING.starter.headshots} AI-Generated Headshots`,
       'Commercial License',
       'High-Resolution Download',
     ],
   },
   {
-    id: 'prod_198ewWuQouDaQfEOT6kTvj',
+    id: PRODUCT_IDS.pro,
     name: 'Pro',
-    price: '$49',
-    credits: '3 Credits',
-    headshots: '100 Headshots',
+    price: `$${PRICING.pro.price}`,
+    credits: `${PRICING.pro.credits} Credits`,
+    headshots: `${PRICING.pro.headshots} Headshots`,
     description: 'Ideal for professionals who want variety and different styles.',
     popular: true,
     features: [
-      '10 Styles Included',
-      '100 AI-Generated Headshots',
+      `${PRICING.pro.styles} Styles Included`,
+      `${PRICING.pro.headshots} AI-Generated Headshots`,
       'Commercial License',
       'High-Resolution Download',
       'Priority Processing',
     ],
   },
   {
-    id: 'prod_1pZIlgHsKVk5YOK1QupnPP',
+    id: PRODUCT_IDS.executive,
     name: 'Executive',
-    price: '$89',
-    credits: '5 Credits',
-    headshots: '200 Headshots',
+    price: `$${PRICING.executive.price}`,
+    credits: `${PRICING.executive.credits} Credits`,
+    headshots: `${PRICING.executive.headshots} Headshots`,
     description: 'The complete package for maximum variety.',
     features: [
-      '20 Styles Included',
-      '200 AI-Generated Headshots',
+      `${PRICING.executive.styles} Styles Included`,
+      `${PRICING.executive.headshots} AI-Generated Headshots`,
       'All Backgrounds',
       'Commercial License',
       'High-Resolution Download',
@@ -62,6 +63,10 @@ const CreemPricingTable = ({ user }: Props) => {
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
   const handleCheckout = async (productId: string) => {
+    if (!user) {
+      window.location.href = '/login';
+      return;
+    }
     setLoadingId(productId);
     try {
       // Create a checkout session via our API

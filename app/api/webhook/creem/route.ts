@@ -2,17 +2,12 @@ import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 import * as crypto from 'crypto';
+import { CREDITS_PER_PRODUCT } from '@/lib/pricing';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const webhookSecret = process.env.CREEM_WEBHOOK_SECRET!;
-
-// Map product IDs to credits count
-const CREDITS_PER_PRODUCT: Record<string, number> = {
-  'prod_31zqeJaVi4nCiCLGPz0F2K': 1,  // Starter - 1 Credit
-  'prod_198ewWuQouDaQfEOT6kTvj': 3,  // Pro - 3 Credits
-  'prod_1pZIlgHsKVk5YOK1QupnPP': 5,  // Executive - 5 Credits
-};
+// CREDITS_PER_PRODUCT imported from @/lib/pricing
 
 function verifySignature(payload: string, signature: string): boolean {
   if (!webhookSecret || !signature) return false;

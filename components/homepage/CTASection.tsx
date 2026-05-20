@@ -3,10 +3,10 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 const images = [
-  "/homepage/example0001.png",
-  "/homepage/example0002.png",
-  "/homepage/example0004.png",
-  "/homepage/example0006.png",
+  "/homepage/example0001.jpg",
+  "/homepage/example0002.jpg",
+  "/homepage/example0004.jpg",
+  "/homepage/example0006.jpg",
 ]
 
 export default function CTASection() {

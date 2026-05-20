@@ -11,7 +11,8 @@ import NavLinks from "./NavLinks";
 export const dynamic = "force-dynamic";
 
 const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
-const stripeIsConfigured = creemIsConfigured || process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
+const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
+const paymentIsConfigured = creemIsConfigured || stripeIsConfigured;
 const packsIsEnabled = process.env.NEXT_PUBLIC_TUNE_TYPE === "packs";
 
 export default async function Navbar() {
@@ -57,7 +58,7 @@ export default async function Navbar() {
         {user && (
           <NavLinks 
             packsIsEnabled={packsIsEnabled} 
-            stripeIsConfigured={stripeIsConfigured} 
+            paymentIsConfigured={paymentIsConfigured} 
           />
         )}
         
@@ -77,7 +78,7 @@ export default async function Navbar() {
 
           {user && (
             <div className="flex items-center gap-4">
-              {stripeIsConfigured && (
+              {paymentIsConfigured && (
                 <ClientSideCredits creditsRow={credits ? credits : null} />
               )}
               <UserDropdown user={user} />

@@ -13,6 +13,8 @@ const packsIsEnabled = process.env.NEXT_PUBLIC_TUNE_TYPE === "packs";
 
 const appWebhookSecret = process.env.APP_WEBHOOK_SECRET;
 const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
+const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
+const paymentIsConfigured = stripeIsConfigured || creemIsConfigured;
 
 if (!appWebhookSecret) {
   console.warn("MISSING APP_WEBHOOK_SECRET - train-model webhook will not function.");
@@ -96,8 +98,8 @@ export async function POST(request: Request) {
   }
   let _credits = null;
 
-  console.log({ stripeIsConfigured });
-  if (stripeIsConfigured) {
+  console.log({ paymentIsConfigured });
+  if (paymentIsConfigured) {
     const { error: creditError, data: credits } = await supabase
       .from("credits")
       .select("credits")
@@ -284,7 +286,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (stripeIsConfigured && _credits && _credits.length > 0) {
+    if (paymentIsConfigured && _credits && _credits.length > 0) {
       const subtractedCredits = _credits[0].credits - 1;
       const { error: updateCreditError, data } = await supabase
         .from("credits")

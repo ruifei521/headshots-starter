@@ -14,17 +14,17 @@ export default function HeroAnimation() {
   const transformations = [
     {
       before: "/placeholder.svg?height=400&width=400",
-      after: "/homepage/example0001.jpeg",
+      after: "/homepage/example0001.jpg",
       label: "Professional LinkedIn",
     },
     {
       before: "/placeholder.svg?height=400&width=400",
-      after: "/homepage/example0002.jpeg",
+      after: "/homepage/example0002.jpg",
       label: "Corporate Style",
     },
     {
       before: "/placeholder.svg?height=400&width=400",
-      after: "/homepage/example0003.jpeg",
+      after: "/homepage/example0003.jpg",
       label: "Creative Portfolio",
     },
   ]

@@ -87,6 +87,9 @@ export default function Footer() {
               Operated by Fei Rui (Individual Developer)
             </p>
             <p className="text-xs text-muted-foreground">
+              Payments processed securely by Creem (Merchant of Record)
+            </p>
+            <p className="text-xs text-muted-foreground">
               Contact: contact@snapprohead.com
             </p>
           </div>
