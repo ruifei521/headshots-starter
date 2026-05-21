@@ -119,7 +119,7 @@ export default function ModernPricing() {
                 ))}
               </ul>
               
-              <Link href="/login" className="mt-8 block w-full" aria-label={`Select ${tier.title} plan`}>
+              <Link href="/get-credits" className="mt-8 block w-full" aria-label={`Select ${tier.title} plan`}>
                 <Button
                   className="w-full min-h-[44px] bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                   aria-label={`Select ${tier.title} plan`}

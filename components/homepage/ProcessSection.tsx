@@ -10,14 +10,14 @@ const processSteps = [
   {
     number: 1,
     title: "Upload Your Photos",
-    description: "Upload 4+ high-quality selfies: front facing, 1 person in frame, no glasses or hats.",
+    description: "Upload 4-10 clear selfies: front-facing, good lighting, one person per photo. No sunglasses or hats.",
     icon: <Camera className="h-5 w-5" />,
     images: ["/example1.png", "/example2.png", "/example3.png"]
   },
   {
     number: 2,
     title: "Our AI Gets to Work",
-    description: "The AI magic takes ~20 minutes. You'll get an email when it's ready!",
+    description: "The AI trains on your photos in ~30 minutes. We'll email you when your headshots are ready!",
     icon: <Sparkles className="h-5 w-5" />,
     processingImage: "/blur.jpg"
   },

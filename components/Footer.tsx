@@ -33,6 +33,11 @@ export default function Footer() {
                   Pricing
                 </Link>
               </li>
+              <li>
+                <Link href="#faq" className="min-h-[44px] py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  FAQ
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="space-y-4">
@@ -73,6 +78,14 @@ export default function Footer() {
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   contact@snapprohead.com
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/refund"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Support & Refunds
                 </Link>
               </li>
             </ul>
