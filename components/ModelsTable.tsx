@@ -8,19 +8,51 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-
-import { Database } from "@/types/supabase";
+import { Progress } from "@/components/ui/progress";
 import { Icons } from "./icons";
 import { useRouter } from "next/navigation";
 import { modelRowWithSamples } from "@/types/utils";
+import { useEffect, useState } from "react";
 
 type ModelsTableProps = {
   models: modelRowWithSamples[];
 };
 
-export default async function ModelsTable({ models }: ModelsTableProps) {
+const ESTIMATED_TRAINING_MS = 30 * 60 * 1000; // 30 minutes
+
+function TrainingProgress({ model }: { model: modelRowWithSamples }) {
+  const [progress, setProgress] = useState(0);
+  const [elapsed, setElapsed] = useState("");
+
+  useEffect(() => {
+    const update = () => {
+      if (!model.created_at) return;
+      const start = new Date(model.created_at).getTime();
+      const now = Date.now();
+      const elapsedMs = now - start;
+      const pct = Math.min(Math.round((elapsedMs / ESTIMATED_TRAINING_MS) * 100), 95);
+      setProgress(pct);
+      const mins = Math.floor(elapsedMs / 60000);
+      setElapsed(mins < 1 ? "<1m" : `${mins}m`);
+    };
+    update();
+    const interval = setInterval(update, 5000);
+    return () => clearInterval(interval);
+  }, [model.created_at]);
+
+  return (
+    <div className="flex items-center gap-2 min-w-[120px]">
+      <Progress value={progress} className="h-2 w-20" />
+      <span className="text-xs text-muted-foreground whitespace-nowrap">
+        {elapsed} / ~30m
+      </span>
+    </div>
+  );
+}
+
+export default function ModelsTable({ models }: ModelsTableProps) {
   const router = useRouter();
   const handleRedirect = (id: number) => {
     router.push(`/overview/models/${id}`);
@@ -46,18 +78,19 @@ export default async function ModelsTable({ models }: ModelsTableProps) {
             >
               <TableCell className="font-medium">{model.name}</TableCell>
               <TableCell>
-                <div>
+                <div className="flex flex-col gap-1">
                   <Badge
                     className="flex gap-2 items-center w-min"
-                    variant={
-                      model.status === "finished" ? "default" : "secondary"
-                    }
+                    variant={model.status === "finished" ? "default" : "secondary"}
                   >
-                    {model.status === "processing" ? "training" : model.status }
+                    {model.status === "processing" ? "training" : model.status}
                     {model.status === "processing" && (
                       <Icons.spinner className="h-4 w-4 animate-spin" />
                     )}
                   </Badge>
+                  {model.status === "processing" && (
+                    <TrainingProgress model={model} />
+                  )}
                 </div>
               </TableCell>
               <TableCell>{model.type}</TableCell>
