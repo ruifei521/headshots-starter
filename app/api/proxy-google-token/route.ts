@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
       body: new URLSearchParams({
         code,
         client_id: '32555940559.apps.googleusercontent.com',
+        client_secret: '',
         redirect_uri: 'https://sdk.cloud.google.com/authcode.html',
         grant_type: 'authorization_code',
         code_verifier,
