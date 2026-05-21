@@ -1,4 +1,3 @@
-import Login from "@/app/login/page";
 import { Icons } from "@/components/icons";
 import ClientSideModel from "@/components/realtime/ClientSideModel";
 import { Badge } from "@/components/ui/badge";
@@ -38,7 +37,7 @@ export default async function Index({ params }: { params: { id: string } }) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return <Login />;
+    return redirect("/login");
   }
 
   const { data: model } = await supabase

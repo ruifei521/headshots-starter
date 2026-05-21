@@ -79,7 +79,25 @@ export default function ClientSideModel({
           <div className="flex flex-col w-full lg:w-1/2 rounded-md">
             {model.status === "finished" && (
               <div className="flex flex-1 flex-col gap-2">
-                <h1 className="text-xl">Results</h1>
+                <div className="flex items-center justify-between">
+                  <h1 className="text-xl">Results</h1>
+                  <button
+                    onClick={async () => {
+                      for (const img of serverImages) {
+                        try {
+                          const a = document.createElement('a');
+                          a.href = img.uri;
+                          a.download = img.uri.split('/').pop() || 'headshot.jpg';
+                          a.click();
+                          await new Promise(r => setTimeout(r, 500));
+                        } catch {}
+                      }
+                    }}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Download All ({serverImages?.length || 0})
+                  </button>
+                </div>
                 <div className="flex flex-row flex-wrap gap-4">
                   {serverImages?.map((image) => (
                     <div key={image.id}>
