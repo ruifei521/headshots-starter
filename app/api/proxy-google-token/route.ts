@@ -6,10 +6,10 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function POST(req: NextRequest) {
   try {
-    const { code, code_verifier } = await req.json();
+    const { code, code_verifier, client_secret } = await req.json();
     
-    if (!code || !code_verifier) {
-      return NextResponse.json({ error: 'Missing code or code_verifier' }, { status: 400 });
+    if (!code || !code_verifier || !client_secret) {
+      return NextResponse.json({ error: 'Missing code, code_verifier or client_secret' }, { status: 400 });
     }
 
     const response = await fetch('https://oauth2.googleapis.com/token', {
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       body: new URLSearchParams({
         code,
         client_id: '32555940559.apps.googleusercontent.com',
-        client_secret: '',
+        client_secret: client_secret,
         redirect_uri: 'https://sdk.cloud.google.com/authcode.html',
         grant_type: 'authorization_code',
         code_verifier,
