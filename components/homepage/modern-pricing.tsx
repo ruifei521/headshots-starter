@@ -162,7 +162,7 @@ export default function ModernPricing() {
         </div>
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          All plans include a <strong>14-day money-back guarantee</strong>. Refund applies if AI generation fails or technical errors prevent service delivery.
+          All plans include a <strong>14-day money-back guarantee</strong>. Prices exclude applicable taxes, which are calculated and collected at checkout by Creem, our Merchant of Record.
         </p>
       </div>
     </div>

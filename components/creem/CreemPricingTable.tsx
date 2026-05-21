@@ -61,10 +61,15 @@ const PRODUCTS = [
 
 const CreemPricingTable = ({ user }: Props) => {
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const handleCheckout = async (productId: string) => {
     if (!user) {
       window.location.href = '/login';
+      return;
+    }
+    if (!agreedToTerms) {
+      alert('Please agree to the Terms of Service and Refund Policy before purchasing.');
       return;
     }
     setLoadingId(productId);
@@ -163,6 +168,34 @@ const CreemPricingTable = ({ user }: Props) => {
             </CardFooter>
           </Card>
         ))}
+      </div>
+
+      {/* Compliance: Terms agreement + CREEM disclosure */}
+      <div className="mt-10 max-w-md mx-auto space-y-4">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={agreedToTerms}
+            onChange={(e) => setAgreedToTerms(e.target.checked)}
+            className="mt-1 h-5 w-5 accent-primary"
+          />
+          <span className="text-sm text-muted-foreground">
+            I agree to the{" "}
+            <a href="/terms" target="_blank" className="text-primary hover:underline">Terms of Service</a>
+            {" "}and{" "}
+            <a href="/refund" target="_blank" className="text-primary hover:underline">Refund Policy</a>.
+            I understand that payments are processed by Creem (Merchant of Record).
+          </span>
+        </label>
+        
+        <div className="text-center space-y-1">
+          <p className="text-xs text-muted-foreground">
+            🔒 Payments securely processed by <strong>Creem</strong> (Merchant of Record)
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Prices exclude applicable taxes. Tax will be calculated at checkout.
+          </p>
+        </div>
       </div>
     </div>
   );

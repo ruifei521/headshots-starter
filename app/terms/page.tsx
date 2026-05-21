@@ -13,6 +13,12 @@ export default function TermsOfService() {
 
       <section className="space-y-6 text-muted-foreground">
         <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">0. Payment Provider</h2>
+          <p>All payments on SnapProHead are processed by <strong>Creem</strong>, our Merchant of Record. Creem is the authorized reseller of SnapProHead credits and handles payment processing, tax collection, invoicing, and refund disbursement on our behalf.</p>
+          <p className="mt-2">For payment-related inquiries: <Link href="https://creem.io" className="text-primary hover:underline" target="_blank">creem.io</Link></p>
+        </div>
+
+        <div>
           <h2 className="text-xl font-semibold text-foreground mb-3">1. Acceptance of Terms</h2>
           <p>By accessing or using SnapProHead (&quot;the Service&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.</p>
         </div>
@@ -113,16 +119,26 @@ export default function TermsOfService() {
 
         <div>
           <h2 className="text-xl font-semibold text-foreground mb-3">12. Governing Law</h2>
-          <p>These Terms shall be governed by and construed in accordance with applicable laws. Any disputes arising from these Terms or the Service shall be resolved through good-faith negotiation or, if necessary, through binding arbitration.</p>
+          <p>These Terms shall be governed by and construed in accordance with the laws of Hong Kong SAR. Any disputes arising from these Terms or the Service shall be resolved through good-faith negotiation or, if necessary, through binding arbitration in Hong Kong.</p>
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold text-foreground mb-3">13. Changes to Terms</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">13. Payments, Disputes, and Chargebacks</h2>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>All payments are processed through Creem, our Merchant of Record. Creem&apos;s terms of service and privacy policy also apply to your purchase.</li>
+            <li>If you believe a payment was made in error or wish to dispute a charge, please contact us at <Link href="mailto:contact@snapprohead.com" className="text-primary hover:underline">contact@snapprohead.com</Link> before initiating a chargeback with your bank.</li>
+            <li>We will make reasonable efforts to resolve disputes within 5 business days.</li>
+            <li>Fraudulent chargebacks or payment disputes initiated without first contacting us may result in account termination.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-3">14. Changes to Terms</h2>
           <p>We may modify these Terms at any time. We will notify you of material changes by posting the updated Terms on our website. Your continued use of the Service after changes constitutes acceptance of the new Terms.</p>
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold text-foreground mb-3">14. Contact Us</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">15. Contact Us</h2>
           <p>If you have any questions about these Terms, please contact us at:</p>
           <p className="mt-2">
             <Link href="mailto:contact@snapprohead.com" className="text-primary hover:underline">
