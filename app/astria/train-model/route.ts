@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30; // Extend Vercel timeout for Astria API call
 
 const astriaApiKey = process.env.ASTRIA_API_KEY;
 const astriaTestModeIsOn = process.env.ASTRIA_TEST_MODE === "true";
@@ -22,7 +23,15 @@ if (!appWebhookSecret) {
 
 export async function POST(request: Request) {
   console.log("=== TRAIN MODEL ROUTE CALLED ===", new Date().toISOString());
-  const payload = await request.json();
+  
+  let payload;
+  try {
+    payload = await request.json();
+  } catch (e) {
+    console.error("Failed to parse request JSON:", e);
+    return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
+  }
+  
   const images = payload.urls;
   const type = payload.type;
   const pack = payload.pack;

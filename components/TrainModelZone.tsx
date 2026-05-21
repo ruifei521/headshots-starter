@@ -250,18 +250,23 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
 
       if (!response.ok) {
         loadingToast.dismiss();
-        const responseData = await response.json();
-        const responseMessage: string = responseData.message || `HTTP error! status: ${response.status}`;
-        console.error("Something went wrong! ", responseMessage);
-        console.error("Full response:", responseData);
+        let responseMessage = `HTTP error! status: ${response.status}`;
+        let responseDetails = '';
+        try {
+          const responseData = await response.json();
+          responseMessage = responseData.message || responseMessage;
+          responseDetails = responseData.details || '';
+        } catch {
+          responseMessage = 'Server timeout or error — please try again.';
+        }
         
         // 显示详细错误信息
         const detailedMessage = (
           <div className="flex flex-col gap-4">
             <div>{responseMessage}</div>
-            {responseData.details && (
+            {responseDetails && (
               <div className="text-sm text-gray-500">
-                Details: {responseData.details}
+                Details: {responseDetails}
               </div>
             )}
             {responseMessage.includes("Not enough credits") && (
