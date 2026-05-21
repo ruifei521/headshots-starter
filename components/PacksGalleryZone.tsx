@@ -72,6 +72,7 @@ export default function PacksGalleryZone() {
             src={pack.cover_url ?? "https://snapprohead.com/placeholder-logo.png"}
             alt={pack.title}
             className="w-full h-4/5 object-cover"
+            loading="lazy"
           />
           <div className="text-white w-full p-3 text-md font-bold text-center capitalize leading-tight">
             {pack.title}

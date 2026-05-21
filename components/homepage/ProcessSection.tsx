@@ -46,7 +46,7 @@ function ProcessStep({ step, isActive, index }: { step: typeof processSteps[0], 
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0.5, y: 10 }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
             >
-              <img src={img} alt="Upload example" className="w-full h-full object-cover" />
+              <img src={img} alt="Upload example" className="w-full h-full object-cover" loading="lazy" />
             </motion.div>
           ))}
         </div>
@@ -84,7 +84,7 @@ function ProcessStep({ step, isActive, index }: { step: typeof processSteps[0], 
             animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0.5, scale: 0.95 }}
             transition={{ duration: 0.4, delay: i * 0.1 }}
           >
-            <img src={img} alt="Result example" className="w-full h-full object-cover" />
+            <img src={img} alt="Result example" className="w-full h-full object-cover" loading="lazy" />
           </motion.div>
         ))}
       </div>

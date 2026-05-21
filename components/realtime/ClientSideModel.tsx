@@ -21,11 +21,23 @@ export default function ClientSideModel({
   serverImages,
   samples,
 }: ClientSideModelProps) {
-  const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-  );
   const [model, setModel] = useState<modelRow>(serverModel);
+  const [initError, setInitError] = useState<string | null>(null);
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return <div className="p-4 text-destructive">Missing Supabase configuration.</div>;
+  }
+
+  let supabase: ReturnType<typeof createClient<Database>>;
+  try {
+    supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+  } catch (e) {
+    console.error("ClientSideModel: Failed to create Supabase client:", e);
+    return <div className="p-4 text-destructive">Failed to connect.</div>;
+  }
 
   useEffect(() => {
     const channel = supabase
@@ -57,6 +69,8 @@ export default function ClientSideModel({
                     key={sample.id}
                     src={sample.uri}
                     className="rounded-md w-60 h-60 object-cover"
+                    alt="Training sample"
+                    loading="lazy"
                   />
                 ))}
               </div>
@@ -72,6 +86,8 @@ export default function ClientSideModel({
                       <img
                         src={image.uri}
                         className="rounded-md w-60 object-cover"
+                        alt="Generated headshot"
+                        loading="lazy"
                       />
                     </div>
                   ))}
