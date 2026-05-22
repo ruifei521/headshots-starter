@@ -1,14 +1,8 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import HeroSection from "@/components/homepage/HeroSection"
-import ProcessSection from "@/components/homepage/ProcessSection"
-import ComparisonSection from "@/components/homepage/ComparisonSection"
-import FeaturesSection from "@/components/homepage/FeaturesSection"
-import ExamplesSection from "@/components/homepage/ExamplesSection"
 import PricingSection from "@/components/homepage/PricingSection"
-import PacksShowcase from "@/components/homepage/PacksShowcase"
 import FAQSection from "@/components/homepage/FAQSection"
-import CTASection from "@/components/homepage/CTASection"
 import { PRICING } from "@/lib/pricing"
 
 const jsonLd = {
@@ -41,7 +35,7 @@ const jsonLd = {
           "name": "How does the AI headshot generation work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Upload 4-10 selfies, our AI trains a model on your face, then generates professional headshots in various styles. The whole process takes about 30 minutes."
+            "text": "Upload 4-10 selfies, choose a professional style pack (Corporate, Natural, Formal, etc.), then our AI trains on your face and generates studio-quality headshots in ~30 minutes. You get 40+ photos per pack with different backgrounds and outfits."
           }
         },
         {
@@ -49,7 +43,7 @@ const jsonLd = {
           "name": "How much does it cost?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": `Plans start at $${PRICING.starter.price} for ${PRICING.starter.headshots} headshots up to $${PRICING.executive.price} for ${PRICING.executive.headshots} headshots with ${PRICING.executive.styles} styles. All plans include a 14-day money-back guarantee.`
+            "text": `Plans start at $${PRICING.starter.price} for ${PRICING.starter.headshots} headshots up to $${PRICING.executive.price} for ${PRICING.executive.headshots} headshots. Each plan includes a professional style pack. All plans include a 14-day money-back guarantee.`
           }
         },
         {
@@ -65,7 +59,7 @@ const jsonLd = {
           "name": "How long does it take to get my headshots?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The AI model training takes about 30 minutes. Once trained, generating headshots is nearly instant."
+            "text": "The AI model training takes about 30 minutes. Once trained, your headshots are ready to download."
           }
         },
         {
@@ -82,14 +76,6 @@ const jsonLd = {
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "We offer a 14-day money-back guarantee. If you're not satisfied, we'll refund your purchase in full."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is my data private?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes, your privacy is our priority. All uploaded photos are automatically deleted after 30 days."
           }
         }
       ]
@@ -127,7 +113,6 @@ export default async function Index() {
 
   if (user) {
     // Logged-in users can still view the landing page
-    // Home button and logo now correctly navigate to /
   }
 
   return (
@@ -138,14 +123,8 @@ export default async function Index() {
       />
       <div>
         <HeroSection />
-        <ProcessSection />
-        <ComparisonSection />
-        <FeaturesSection />
-        <ExamplesSection />
-        <PacksShowcase />
         <PricingSection />
         <FAQSection />
-        <CTASection />
       </div>
     </>
   )
