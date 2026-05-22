@@ -16,15 +16,15 @@ const processSteps = [
   },
   {
     number: 2,
-    title: "Our AI Gets to Work",
-    description: "The AI trains on your photos in ~30 minutes. We'll email you when your headshots are ready!",
+    title: "Pick Your Style Pack",
+    description: "Choose from 6 professional packs: Corporate, Partner's, Natural, Speaker, Realtor, or J.Crew.",
     icon: <Sparkles className="h-5 w-5" />,
     processingImage: "/blur.jpg"
   },
   {
     number: 3,
-    title: "Get Amazing Headshots",
-    description: "Once your model is trained, we'll give you amazing headshots!",
+    title: "Get Your Headshots",
+    description: "Once trained, you'll receive 40+ HD headshots in your chosen styles. Download and use anywhere!",
     icon: <Download className="h-5 w-5" />,
     resultImages: ["/result1.png", "/result2.png", "/result3.png"]
   }

@@ -1,9 +1,9 @@
-import { Shield, Clock, CreditCard } from "lucide-react"
+import { Shield, Clock, CreditCard, Users, Sparkles, Camera } from "lucide-react"
 
 export default function TrustBadges() {
   return (
     <div className="flex flex-col items-center space-y-6">
-      <div className="flex flex-wrap items-center justify-center gap-8">
+      <div className="flex flex-wrap items-center justify-center gap-6">
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-green-500" />
           <span className="font-medium">14-Day Money-Back Guarantee</span>
@@ -13,8 +13,16 @@ export default function TrustBadges() {
           <span className="font-medium">Delivery in ~30 Minutes</span>
         </div>
         <div className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-yellow-500" />
+          <span className="font-medium">6 Professional Style Packs</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Camera className="h-5 w-5 text-purple-500" />
+          <span className="font-medium">40–200+ HD Headshots</span>
+        </div>
+        <div className="flex items-center gap-2">
           <CreditCard className="h-5 w-5 text-primary" />
-          <span className="font-medium">Secure Payment Processing</span>
+          <span className="font-medium">Secure Payment via Creem</span>
         </div>
       </div>
 
