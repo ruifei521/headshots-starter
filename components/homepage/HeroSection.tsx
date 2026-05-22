@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, Shield, Clock, Lock, Sparkles } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import TrustBadges from "@/components/homepage/trust-badges"
@@ -46,25 +46,7 @@ export default function HeroSection() {
             </Link>
           </div>
 
-          {/* Trust Metrics */}
-          <div className="mt-6 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Shield className="h-4 w-4 text-green-500" />
-              <strong className="text-foreground">14-Day Money-Back</strong> Guarantee
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="h-4 w-4 text-blue-500" />
-              <strong className="text-foreground">~30-Minute</strong> Delivery
-            </span>
-            <span className="flex items-center gap-1">
-              <Sparkles className="h-4 w-4 text-yellow-500" />
-              <strong className="text-foreground">6</strong> Professional Style Packs
-            </span>
-            <span className="flex items-center gap-1">
-              <Lock className="h-4 w-4 text-primary" />
-              <strong className="text-foreground">Privacy-First</strong> — Photos Auto-Deleted
-            </span>
-          </div>
+
         </div>
 
         {/* Trust Badges */}
