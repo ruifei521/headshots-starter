@@ -1,6 +1,5 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
 import HeroSection from "@/components/homepage/HeroSection"
 import ProcessSection from "@/components/homepage/ProcessSection"
 import ComparisonSection from "@/components/homepage/ComparisonSection"
@@ -127,7 +126,8 @@ export default async function Index() {
   } = await supabase.auth.getUser()
 
   if (user) {
-    return redirect("/overview")
+    // Logged-in users can still view the landing page
+    // Home button and logo now correctly navigate to /
   }
 
   return (
