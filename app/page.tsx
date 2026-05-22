@@ -7,6 +7,7 @@ import ComparisonSection from "@/components/homepage/ComparisonSection"
 import FeaturesSection from "@/components/homepage/FeaturesSection"
 import ExamplesSection from "@/components/homepage/ExamplesSection"
 import PricingSection from "@/components/homepage/PricingSection"
+import PacksShowcase from "@/components/homepage/PacksShowcase"
 import FAQSection from "@/components/homepage/FAQSection"
 import CTASection from "@/components/homepage/CTASection"
 import { PRICING } from "@/lib/pricing"
@@ -141,6 +142,7 @@ export default async function Index() {
         <ComparisonSection />
         <FeaturesSection />
         <ExamplesSection />
+        <PacksShowcase />
         <PricingSection />
         <FAQSection />
         <CTASection />

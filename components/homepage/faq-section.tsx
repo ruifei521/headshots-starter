@@ -51,32 +51,42 @@ export default function FAQSection() {
     {
       question: "How does AI headshot generation work?",
       answer:
-        "Our AI technology analyzes your uploaded selfies to understand your facial features, expressions, and style. It then generates professional headshots that maintain your likeness while enhancing quality, lighting, and background. The entire process takes about 30 minutes from upload to delivery.",
+        "Upload 4-10 selfies, choose a professional style pack (Corporate, Natural, Formal, etc.), then our AI trains on your face and generates studio-quality headshots in ~30 minutes. You get 40+ photos per pack with different backgrounds and outfits.",
+    },
+    {
+      question: "What style packs are available?",
+      answer:
+        "We currently offer 6 professional packs: Corporate Headshots (executive/business), Partner's Headshots (legal/formal), Natural Looks (casual professional), Speaker (commanding portraits), Realtor (polished agent style), and J.Crew (classic American style). Each pack contains 10-56 pre-designed styles.",
+    },
+    {
+      question: "Can I buy additional packs later?",
+      answer:
+        "Yes! You can add more style packs anytime. Additional packs start at $9.99 each. You don't need to upload new photos — we use your existing trained model to generate new styles.",
     },
     {
       question: "What kind of photos should I upload?",
       answer:
-        "For best results, upload at least 4 high-quality selfies with good lighting. Photos should be front-facing with only one person in the frame. Avoid wearing glasses or hats, and try to capture different expressions and angles for more variety in your results.",
+        "At least 4 high-quality selfies with good lighting. Front-facing, one person per frame, no sunglasses or hats. Different angles and expressions give better variety. Avoid heavily filtered or group photos.",
+    },
+    {
+      question: "How many headshots do I get per pack?",
+      answer:
+        "Each pack generates 40-56 professional headshots, depending on the pack you choose. Larger packs like Corporate Headshots produce 56 images (women) or 52 images (men) with diverse backgrounds and outfits.",
     },
     {
       question: "Can I use these headshots professionally?",
       answer:
-        "All our plans include commercial usage rights. You can use your AI-generated headshots for LinkedIn profiles, company websites, social media, resumes, portfolios, and any other professional purpose.",
-    },
-    {
-      question: "How many different styles can I get?",
-      answer:
-        "The number of styles depends on your plan. Starter includes 5 styles, Pro includes 10 styles, and Executive includes all 20 styles. You can preview all available styles before making your final selection.",
-    },
-    {
-      question: "What if I'm not satisfied with the results?",
-      answer:
-        "We stand behind our AI technology and want you to be completely satisfied. If you're not happy with your headshots, contact our support team within 14 days of delivery, and we'll work with you to improve the results or provide a full refund.",
+        "Absolutely. All plans include full commercial rights. Use them on LinkedIn, company websites, resumes, social media, email signatures — anywhere you need a professional look.",
     },
     {
       question: "How quickly will I receive my headshots?",
       answer:
-        "Standard processing time is ~30 minutes. Executive plan users receive priority processing. Once your headshots are ready, you'll receive an email notification with a link to view and download your images.",
+        "Standard processing is ~30 minutes. Pro and Executive plans get priority processing. You'll receive an email when your headshots are ready.",
+    },
+    {
+      question: "What if I'm not satisfied with the results?",
+      answer:
+        "We offer a 14-day money-back guarantee. If you're not happy, contact our support team and we'll refund your purchase in full. No questions asked.",
     },
   ]
 
@@ -95,4 +105,3 @@ export default function FAQSection() {
     </div>
   )
 }
-
