@@ -78,8 +78,28 @@ export async function GET(request: Request) {
     // Combine the data from both responses
     const combinedData = responses.flatMap((response) => response.data);
     
-    // Return the combined data as JSON
-    return NextResponse.json(combinedData);
+    // Filter to only show selected professional packs
+    const PROFESSIONAL_PACKS = [
+      'corporate-headshots',
+      'partners-headshots',
+      'natural-headshots',
+      'speaker',
+    ];
+    
+    const filteredPacks = combinedData.filter(
+      (pack: any) => PROFESSIONAL_PACKS.includes(pack.slug)
+    );
+    
+    // Return filtered packs with additional info
+    return NextResponse.json(filteredPacks.map((pack: any) => ({
+      id: pack.id,
+      title: pack.title,
+      slug: pack.slug,
+      subtitle: pack.subtitle || '',
+      cover_url: pack.cover_url,
+      costs: pack.costs || {},
+      tag: pack.tag_category || '',
+    })));
   } catch (error) {
     console.error("Error fetching packs:", error);
 

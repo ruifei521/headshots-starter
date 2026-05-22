@@ -4,13 +4,21 @@ import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import Link from "next/link";
 import { Progress } from "./ui/progress";
-import { Loader2 } from "lucide-react";
+import { Loader2, Users, ImageIcon } from "lucide-react";
+
+interface PackCost {
+  cost: number;
+  num_images: number;
+}
 
 interface Pack {
   id: string;
   title: string;
-  cover_url: string;
   slug: string;
+  subtitle: string;
+  cover_url: string;
+  costs: Record<string, PackCost>;
+  tag: string;
 }
 
 export default function PacksGalleryZone() {
@@ -65,20 +73,56 @@ export default function PacksGalleryZone() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {packs.map((pack) => (
-        <Link href={`/overview/models/train/${pack.slug}`} key={pack.id} className="w-full h-70 bg-black rounded-md overflow-hidden transition-transform duration-300 hover:scale-105">
-          <img
-            src={pack.cover_url ?? "https://snapprohead.com/placeholder-logo.png"}
-            alt={pack.title}
-            className="w-full h-4/5 object-cover"
-            loading="lazy"
-          />
-          <div className="text-white w-full p-3 text-md font-bold text-center capitalize leading-tight">
-            {pack.title}
-          </div>
-        </Link>
-      ))}
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      {packs.map((pack) => {
+        const hasWomen = !!pack.costs?.woman;
+        const hasMen = !!pack.costs?.man;
+        const totalImages = hasWomen && hasMen
+          ? `${pack.costs.woman.num_images} (W) / ${pack.costs.man.num_images} (M)`
+          : hasWomen
+            ? `${pack.costs.woman.num_images} images`
+            : `${pack.costs.man.num_images} images`;
+
+        return (
+          <Link
+            href={`/overview/models/train/${pack.slug}`}
+            key={pack.id}
+            className="group flex flex-col rounded-xl border bg-card overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1"
+          >
+            <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+              <img
+                src={pack.cover_url ?? "https://snapprohead.com/placeholder-logo.png"}
+                alt={pack.title}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+              {pack.tag && (
+                <span className="absolute top-2 left-2 px-2 py-1 text-xs font-medium rounded-full bg-primary/80 text-primary-foreground backdrop-blur-sm">
+                  {pack.tag}
+                </span>
+              )}
+            </div>
+            <div className="p-4 space-y-2">
+              <h3 className="text-lg font-bold leading-tight">{pack.title}</h3>
+              {pack.subtitle && (
+                <p className="text-sm text-muted-foreground line-clamp-2">{pack.subtitle}</p>
+              )}
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <ImageIcon className="w-3.5 h-3.5" />
+                  {totalImages}
+                </span>
+                {hasWomen && hasMen && (
+                  <span className="flex items-center gap-1">
+                    <Users className="w-3.5 h-3.5" />
+                    Men & Women
+                  </span>
+                )}
+              </div>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }
