@@ -181,12 +181,7 @@ export default function ModernPricing() {
                 <span>14-Day Money-Back Guarantee</span>
               </div>
 
-              {/* Additional pack upsell note */}
-              <div className="mt-2 text-center">
-                <span className="text-xs text-muted-foreground">
-                  🎯 Need more styles? <strong>Additional packs from $9.99</strong>
-                </span>
-              </div>
+
             </div>
           ))}
         </div>
@@ -239,18 +234,7 @@ export default function ModernPricing() {
           </div>
         </div>
 
-        {/* Upsell Section */}
-        <div className="mt-8 w-full max-w-3xl p-6 rounded-xl border bg-muted/30">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div>
-              <h4 className="font-semibold text-lg">Need more styles?</h4>
-              <p className="text-sm text-muted-foreground">Add additional professional packs to any plan for just <strong>$9.99 each</strong>.</p>
-            </div>
-            <Link href="/login">
-              <Button variant="outline">Browse All 6 Packs →</Button>
-            </Link>
-          </div>
-        </div>
+
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
           All plans include a <strong>14-day money-back guarantee</strong>. Prices exclude applicable taxes, which are calculated and collected at checkout by Creem, our Merchant of Record.
