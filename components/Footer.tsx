@@ -16,6 +16,31 @@ export default function Footer() {
             </p>
           </div>
           <div className="space-y-4">
+            <h3 className="text-sm font-medium">Headshots</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/headshots/linkedin" className="min-h-[44px] py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  LinkedIn Headshots
+                </Link>
+              </li>
+              <li>
+                <Link href="/headshots/lawyer" className="min-h-[44px] py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Lawyer Headshots
+                </Link>
+              </li>
+              <li>
+                <Link href="/headshots/realtor" className="min-h-[44px] py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Realtor Headshots
+                </Link>
+              </li>
+              <li>
+                <Link href="#pricing" className="min-h-[44px] py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Pricing
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div className="space-y-4">
             <h3 className="text-sm font-medium">Product</h3>
             <ul className="space-y-2">
               <li>
@@ -24,13 +49,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#examples" className="min-h-[44px] py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Examples
-                </Link>
-              </li>
-              <li>
-                <Link href="#pricing" className="min-h-[44px] py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Pricing
+                <Link href="/login" className="min-h-[44px] py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Create Headshots
                 </Link>
               </li>
               <li>
