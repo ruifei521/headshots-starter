@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { FaImages } from "react-icons/fa";
 import ModelsTable from "../ModelsTable";
 
-const packsIsEnabled = process.env.NEXT_PUBLIC_TUNE_TYPE === "packs";
+const packsIsEnabled = true;
 
 export const revalidate = 0;
 

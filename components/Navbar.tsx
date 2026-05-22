@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
 const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
 const paymentIsConfigured = creemIsConfigured || stripeIsConfigured;
-const packsIsEnabled = process.env.NEXT_PUBLIC_TUNE_TYPE === "packs";
+const packsIsEnabled = true;
 
 export default async function Navbar() {
   const supabase = createServerClient(

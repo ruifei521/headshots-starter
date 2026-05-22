@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
 
-const packsIsEnabled = process.env.NEXT_PUBLIC_TUNE_TYPE === "packs";
+const packsIsEnabled = true;
 
 export default async function Index({ params }: { params: { pack : string } }) {
   
