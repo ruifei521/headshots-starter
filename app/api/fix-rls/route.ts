@@ -1,132 +1,63 @@
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
 
 export async function GET() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  
-  if (!supabaseUrl || !serviceKey) {
-    return NextResponse.json({ error: 'Missing Supabase env vars' });
-  }
+  // Output SQL that needs to be run in Supabase Dashboard
+  const sql = `-- ==========================================
+-- SnapProHead RLS 修复 SQL
+-- 在 Supabase Dashboard -> SQL Editor 中执行
+-- ==========================================
 
-  const results: any[] = [];
+-- 1. 启用所有公开表的行级安全
+ALTER TABLE IF EXISTS public.models ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.samples ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.credits ENABLE ROW LEVEL SECURITY;
 
-  // Try approach: Direct REST query to check RLS status
-  // Supabase pg_tables is not exposed via REST, so we need SQL
-  
-  // Try approach: Use the Supabase client to run SQL via a custom RPC
-  // Create the exec_sql function if it doesn't exist, then call it
-  
-  // Step 1: Try to create exec_sql via raw SQL endpoint
-  const createFuncResp = await fetch(`${supabaseUrl}/rest/v1/`, {
-    method: 'POST',
-    headers: {
-      'apikey': serviceKey!,
-      'Authorization': 'Bearer ' + serviceKey,
-      'Content-Type': 'application/json',
-      'Prefer': 'params=single-object'
-    },
-    body: JSON.stringify({
-      query: `CREATE OR REPLACE FUNCTION public.exec_sql(query_text text) RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$ BEGIN EXECUTE query_text; END; $$;`
-    })
-  });
-  results.push({ createFunc: createFuncResp.status });
+-- 2. 删除旧策略（如果有）
+DROP POLICY IF EXISTS m_sel ON public.models;
+DROP POLICY IF EXISTS m_ins ON public.models;
+DROP POLICY IF EXISTS m_upd ON public.models;
+DROP POLICY IF EXISTS c_sel ON public.credits;
+DROP POLICY IF EXISTS c_upd ON public.credits;
+DROP POLICY IF EXISTS s_sel ON public.samples;
+DROP POLICY IF EXISTS s_ins ON public.samples;
+DROP POLICY IF EXISTS i_sel ON public.images;
+DROP POLICY IF EXISTS i_ins ON public.images;
 
-  // Step 2: If function created, try to call it to enable RLS
-  if (createFuncResp.ok || createFuncResp.status === 200) {
-    // ... actually this won't work because rest/v1/ can't run arbitrary SQL
-  }
+-- 3. 创建访问策略
 
-  // Fallback: Try the Supabase Management API  
-  // The correct endpoint for SQL queries
-  const ref = new URL(supabaseUrl!).hostname.split('.')[0];
-  const mgmtResp = await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + serviceKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      query: `SELECT tablename, relrowsecurity FROM pg_tables WHERE schemaname = 'public'`
-    })
-  });
-  
-  let rlsInfo = { status: mgmtResp.status };
-  try { rlsInfo = { ...rlsInfo, ...(await mgmtResp.json()) }; } catch {}
-  results.push({ mgmtQuery: rlsInfo });
+-- models: 用户只能读/改自己的模型
+CREATE POLICY m_sel ON public.models FOR SELECT USING (auth.uid()::text = user_id);
+CREATE POLICY m_ins ON public.models FOR INSERT WITH CHECK (auth.uid()::text = user_id);
+CREATE POLICY m_upd ON public.models FOR UPDATE USING (auth.uid()::text = user_id);
+
+-- credits: 用户只能读/改自己的积分
+CREATE POLICY c_sel ON public.credits FOR SELECT USING (auth.uid()::text = user_id);
+CREATE POLICY c_upd ON public.credits FOR UPDATE USING (auth.uid()::text = user_id);
+
+-- samples: 用户只能访问自己模型的样本
+CREATE POLICY s_sel ON public.samples FOR SELECT USING (auth.uid()::text = (SELECT user_id FROM public.models WHERE id = samples."modelId"));
+CREATE POLICY s_ins ON public.samples FOR INSERT WITH CHECK (auth.uid()::text = (SELECT user_id FROM public.models WHERE id = samples."modelId"));
+
+-- images: 用户只能访问自己模型生成的图片
+CREATE POLICY i_sel ON public.images FOR SELECT USING (auth.uid()::text = (SELECT user_id FROM public.models WHERE id = images."modelId"));
+CREATE POLICY i_ins ON public.images FOR INSERT WITH CHECK (auth.uid()::text = (SELECT user_id FROM public.models WHERE id = images."modelId"));
+
+-- 4. 验证 RLS 已启用
+SELECT tablename, relrowsecurity FROM pg_tables WHERE schemaname = 'public';
+`;
 
   return NextResponse.json({ 
-    message: '检查结果',
-    results,
-    note: '如需执行修复SQL，请使用 /api/fix-rls POST 方法',
+    message: '请将下方 SQL 复制到 Supabase Dashboard SQL Editor 中执行',
+    sql_editor_url: `https://supabase.com/dashboard/project/vgrqvwhkvnqsawlwywld/sql/new`,
+    sql,
+    steps: [
+      '1. 打开 Supabase Dashboard → SQL Editor',
+      '2. 粘贴上方 SQL',
+      '3. 点击 "Run" 执行',
+      '4. 完成后刷新 Advisors 页面确认'
+    ]
   });
-}
-
-export async function POST() {
-  const { Client } = await import('pg');
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  const dbPassword = process.env.SUPABASE_DB_PASSWORD;
-  
-  if (!dbPassword || !supabaseUrl) {
-    return NextResponse.json({ 
-      error: 'Missing database password. Set SUPABASE_DB_PASSWORD env var.',
-      hint: 'Get password from Supabase Dashboard > Project Settings > Database'
-    });
-  }
-
-  const ref = new URL(supabaseUrl).hostname.split('.')[0];
-  const poolerHost = 'aws-0-ap-southeast-1.pooler.supabase.com';
-  const results: any[] = [];
-
-  // Try transaction pooler (6543)
-  for (const port of [6543, 5432]) {
-    const client = new Client({
-      host: poolerHost,
-      port, database: 'postgres',
-      user: 'postgres.' + ref,
-      password: dbPassword,
-      ssl: { rejectUnauthorized: false },
-      connectionTimeoutMillis: 5000,
-    });
-
-    try {
-      await client.connect();
-      
-      // Enable RLS
-      const rlsStatements = [
-        `ALTER TABLE IF EXISTS public.models ENABLE ROW LEVEL SECURITY;`,
-        `ALTER TABLE IF EXISTS public.samples ENABLE ROW LEVEL SECURITY;`,
-        `ALTER TABLE IF EXISTS public.images ENABLE ROW LEVEL SECURITY;`,
-        `ALTER TABLE IF EXISTS public.credits ENABLE ROW LEVEL SECURITY;`,
-      ];
-      for (const sql of rlsStatements) {
-        try { await client.query(sql); results.push({ ok: sql.substring(0,30) }); }
-        catch(e: any) { results.push({ skip: sql.substring(0,30), reason: e.message }); }
-      }
-
-      // Create policies
-      const policies = [
-        `DROP POLICY IF EXISTS m_sel ON public.models; CREATE POLICY m_sel ON public.models FOR SELECT USING (auth.uid()::text = user_id)`,
-        `DROP POLICY IF EXISTS m_ins ON public.models; CREATE POLICY m_ins ON public.models FOR INSERT WITH CHECK (auth.uid()::text = user_id)`,
-        `DROP POLICY IF EXISTS c_sel ON public.credits; CREATE POLICY c_sel ON public.credits FOR SELECT USING (auth.uid()::text = user_id)`,
-        `DROP POLICY IF EXISTS c_upd ON public.credits; CREATE POLICY c_upd ON public.credits FOR UPDATE USING (auth.uid()::text = user_id)`,
-        `DROP POLICY IF EXISTS s_sel ON public.samples; CREATE POLICY s_sel ON public.samples FOR SELECT USING (auth.uid()::text = (SELECT user_id FROM public.models WHERE id = samples."modelId"))`,
-        `DROP POLICY IF EXISTS i_sel ON public.images; CREATE POLICY i_sel ON public.images FOR SELECT USING (auth.uid()::text = (SELECT user_id FROM public.models WHERE id = images."modelId"))`,
-      ];
-      for (const sql of policies) {
-        try { await client.query(sql); results.push({ ok: sql.substring(0,30) }); }
-        catch(e: any) { results.push({ ok: sql.substring(0,30), warning: e.message }); }
-      }
-
-      await client.end();
-      return NextResponse.json({ success: true, port, results });
-    } catch(e: any) {
-      results.push({ port, error: e.message });
-    }
-  }
-
-  return NextResponse.json({ success: false, results });
 }
