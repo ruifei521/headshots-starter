@@ -11,7 +11,7 @@ export default function NavLinks({ packsIsEnabled, paymentIsConfigured }: NavLin
   return (
     <nav className="hidden md:flex gap-6 items-center">
       <Link 
-        href="/overview" 
+        href="/" 
         className="px-3 py-2 inline-flex items-center text-sm font-medium hover:text-primary transition-colors cursor-pointer"
       >
         Home
