@@ -6,7 +6,7 @@ export default function TrustBadges() {
       <div className="flex flex-wrap items-center justify-center gap-6">
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-green-500" />
-          <span className="font-medium">14-Day Money-Back Guarantee</span>
+          <span className="font-medium">Unconditional Refund Guarantee</span>
         </div>
         <div className="flex items-center gap-2">
           <Clock className="h-5 w-5 text-blue-500" />

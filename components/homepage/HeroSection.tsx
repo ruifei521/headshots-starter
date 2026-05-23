@@ -56,7 +56,55 @@ export default function HeroSection() {
         <div className="mt-10">
           <TrustBadges />
         </div>
+
+        {/* Unconditional Refund Guarantee — inspired by HeadshotPro */}
+        <div className="mt-12 rounded-2xl border bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-8 text-center">
+          <div className="mx-auto max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 mb-4">
+              <ShieldIcon className="h-4 w-4" />
+              No-Risk Guarantee
+            </div>
+            <h3 className="text-2xl font-bold tracking-tight mb-3">
+              Love Your Headshots, or Get a Full Refund
+            </h3>
+            <p className="text-muted-foreground text-lg mb-6">
+              If you don&apos;t get a single headshot you&apos;re happy with, we&apos;ll refund your entire purchase. 
+              <strong className="text-foreground"> No questions asked.</strong>
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> 
+                14-day guarantee
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> 
+                Full refund
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> 
+                No conditions
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
+  )
+}
+
+function ShieldIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
   )
 }
