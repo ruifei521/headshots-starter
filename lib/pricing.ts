@@ -3,9 +3,9 @@
  * Update prices here — they propagate to all components.
  */
 export const PRICING = {
-  starter: { price: 29, credits: 1, headshots: 40, styles: 5 },
-  pro: { price: 49, credits: 3, headshots: 100, styles: 10 },
-  executive: { price: 89, credits: 5, headshots: 200, styles: 20 },
+  starter: { price: 29, credits: 1, headshots: 40, styles: 6 },
+  pro: { price: 49, credits: 3, headshots: 100, styles: 6 },
+  executive: { price: 89, credits: 5, headshots: 200, styles: 6 },
 } as const;
 
 export const PRODUCT_IDS = {

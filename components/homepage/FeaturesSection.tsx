@@ -1,10 +1,10 @@
-import { Camera, Clock, Shield, Star, Image } from "lucide-react"
+import { Camera, Clock, Shield, Star, Image, Palette } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 const features = [
   {
-    title: "Multiple Styles",
-    description: "Choose from up to 20 professional styles and backgrounds",
+    title: "Style Packs",
+    description: "6 professional style packs with 10-56 pre-designed styles each",
     icon: <Camera className="h-6 w-6" />
   },
   {
@@ -16,6 +16,11 @@ const features = [
     title: "Fast Delivery",
     description: "Receive your headshots in ~30 minutes",
     icon: <Clock className="h-6 w-6" />
+  },
+  {
+    title: "Packs Included",
+    description: "Corporate, Natural, Formal, Speaker, Realtor & J.Crew",
+    icon: <Palette className="h-6 w-6" />
   },
   {
     title: "Commercial License",

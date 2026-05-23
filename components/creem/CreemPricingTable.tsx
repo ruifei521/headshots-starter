@@ -19,7 +19,7 @@ const PRODUCTS = [
     headshots: `${PRICING.starter.headshots} Headshots`,
     description: 'Perfect for individuals looking to enhance their LinkedIn or CV.',
     features: [
-      `${PRICING.starter.styles} Styles Included`,
+      '6 Professional Style Packs',
       `${PRICING.starter.headshots} AI-Generated Headshots`,
       'Commercial License',
       'High-Resolution Download',
@@ -34,7 +34,7 @@ const PRODUCTS = [
     description: 'Ideal for professionals who want variety and different styles.',
     popular: true,
     features: [
-      `${PRICING.pro.styles} Styles Included`,
+      '6 Professional Style Packs',
       `${PRICING.pro.headshots} AI-Generated Headshots`,
       'Commercial License',
       'High-Resolution Download',
@@ -49,9 +49,8 @@ const PRODUCTS = [
     headshots: `${PRICING.executive.headshots} Headshots`,
     description: 'The complete package for maximum variety.',
     features: [
-      `${PRICING.executive.styles} Styles Included`,
+      '6 Professional Style Packs',
       `${PRICING.executive.headshots} AI-Generated Headshots`,
-      'All Backgrounds',
       'Commercial License',
       'High-Resolution Download',
       'Priority Processing',
