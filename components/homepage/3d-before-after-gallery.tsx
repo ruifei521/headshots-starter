@@ -5,303 +5,247 @@ import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
 
 interface GalleryItem {
   before: string
   after: string
   label: string
+  description: string
 }
 
 export default function ThreeDBeforeAfterGallery() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [isFlipping, setIsFlipping] = useState(false)
-  const [direction, setDirection] = useState(0) // -1 for left, 1 for right
+  const [direction, setDirection] = useState(0)
+  const [isHovered, setIsHovered] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Real headshot examples
   const galleryItems: GalleryItem[] = [
     {
       before: "/homepage/before0001.jpg",
       after: "/homepage/example0001.jpg",
-      label: "Professional Corporate",
-    },
-    {
-      before: "/homepage/before0002.jpg",
-      after: "/homepage/example0002.jpg",
-      label: "Executive Style",
-    },
-    {
-      before: "/homepage/before0001.jpg",
-      after: "/homepage/example0004.jpg",
-      label: "Professional Pattern",
-    },
-    {
-      before: "/homepage/before0001.jpg",
-      after: "/homepage/example0005.jpg",
-      label: "Urban Professional",
+      label: "Corporate",
+      description: "Selfie → Studio-quality corporate headshot",
     },
     {
       before: "/homepage/before0002.jpg",
       after: "/homepage/example0006.jpg",
-      label: "Formal Business",
+      label: "Professional",
+      description: "Selfie → Professional business portrait",
     },
     {
-      before: "/homepage/before0002.jpg",
-      after: "/homepage/example0007.jpg",
-      label: "Executive Portrait",
+      before: "/homepage/before0003.jpg",
+      after: "/homepage/example0003.jpg",
+      label: "Formal",
+      description: "Selfie → Formal executive headshot",
     },
     {
       before: "/homepage/before0001.jpg",
-      after: "/homepage/example0008.jpg",
-      label: "Modern Business",
+      after: "/homepage/example0007.jpg",
+      label: "Executive",
+      description: "Selfie → Executive portrait",
     },
     {
       before: "/homepage/before0002.jpg",
-      after: "/homepage/example0009.jpg",
-      label: "Formal Event",
+      after: "/homepage/example0004.jpg",
+      label: "Natural",
+      description: "Selfie → Natural polished look",
+    },
+    {
+      before: "/homepage/before0003.jpg",
+      after: "/homepage/example0005.jpg",
+      label: "Contemporary",
+      description: "Selfie → Contemporary professional style",
     },
   ]
 
-  const nextSlide = () => {
+  const goToSlide = (index: number) => {
     if (isFlipping) return
-    setDirection(1)
+    setDirection(index > activeIndex ? 1 : -1)
     setIsFlipping(true)
     setTimeout(() => {
-      setActiveIndex((prev) => (prev + 1) % galleryItems.length)
+      setActiveIndex(index)
       setIsFlipping(false)
-    }, 600)
+    }, 400)
   }
 
-  const prevSlide = () => {
-    if (isFlipping) return
-    setDirection(-1)
-    setIsFlipping(true)
-    setTimeout(() => {
-      setActiveIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length)
-      setIsFlipping(false)
-    }, 600)
-  }
+  const nextSlide = () => goToSlide((activeIndex + 1) % galleryItems.length)
+  const prevSlide = () => goToSlide((activeIndex - 1 + galleryItems.length) % galleryItems.length)
 
-  // 3D effect on mouse move
+  // Gentle parallax on mouse move (desktop only)
   useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current || isFlipping) return
-
-      const { left, top, width, height } = containerRef.current.getBoundingClientRect()
-      const x = (e.clientX - left) / width - 0.5
-      const y = (e.clientY - top) / height - 0.5
-
-      containerRef.current.style.transform = `
-        perspective(1000px) 
-        rotateY(${x * 5}deg) 
-        rotateX(${-y * 5}deg)
-      `
+      if (isFlipping || !isHovered) return
+      const { left, top, width, height } = container.getBoundingClientRect()
+      const x = ((e.clientX - left) / width - 0.5) * 3
+      const y = ((e.clientY - top) / height - 0.5) * 3
+      container.style.transform = `perspective(800px) rotateY(${x}deg) rotateX(${-y}deg)`
     }
 
     const handleMouseLeave = () => {
-      if (!containerRef.current) return
-      containerRef.current.style.transform = `
-        perspective(1000px) 
-        rotateY(0deg) 
-        rotateX(0deg)
-      `
+      container.style.transform = "perspective(800px) rotateY(0deg) rotateX(0deg)"
     }
 
-    const container = containerRef.current
-    if (container) {
-      container.addEventListener("mousemove", handleMouseMove)
-      container.addEventListener("mouseleave", handleMouseLeave)
-    }
-
+    container.addEventListener("mousemove", handleMouseMove)
+    container.addEventListener("mouseleave", handleMouseLeave)
     return () => {
-      if (container) {
-        container.removeEventListener("mousemove", handleMouseMove)
-        container.removeEventListener("mouseleave", handleMouseLeave)
-      }
+      container.removeEventListener("mousemove", handleMouseMove)
+      container.removeEventListener("mouseleave", handleMouseLeave)
     }
-  }, [isFlipping])
+  }, [isFlipping, isHovered])
 
   // Autoplay
   useEffect(() => {
     autoplayRef.current = setInterval(() => {
-      if (!isFlipping) {
-        nextSlide()
-      }
-    }, 5000)
-
+      if (!isFlipping) nextSlide()
+    }, 4000)
     return () => {
-      if (autoplayRef.current) {
-        clearInterval(autoplayRef.current)
-      }
+      if (autoplayRef.current) clearInterval(autoplayRef.current)
     }
   }, [isFlipping])
 
+  const current = galleryItems[activeIndex]
+
   return (
-    <div className="relative mx-auto max-w-4xl py-10">
-      <div
-        ref={containerRef}
-        className="relative h-[550px] w-full transition-transform duration-300 ease-out"
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative w-full max-w-3xl">
+    <div className="w-full">
+      {/* Section heading */}
+      <div className="text-center mb-8">
+        <Badge variant="outline" className="mb-3">See the Transformation</Badge>
+        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          From Selfie to <span className="text-primary">Studio Quality</span>
+        </h2>
+      </div>
 
-            {/* Main card container */}
-            <div className="relative flex h-[500px] md:h-[550px] rounded-xl bg-background/90 backdrop-blur-sm shadow-xl overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`container-${activeIndex}`}
-                  className="flex w-full"
-                  initial={{
-                    rotateY: direction * 90,
-                    opacity: 0,
-                  }}
-                  animate={{
-                    rotateY: 0,
-                    opacity: 1,
-                  }}
-                  exit={{
-                    rotateY: direction * -90,
-                    opacity: 0,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 30,
-                    opacity: { duration: 0.2 },
-                  }}
-                  style={{ transformStyle: "preserve-3d" }}
-                >
-                  {/* Before image */}
-                  <div className="w-1/2 relative">
-                    <div className="absolute top-2 left-2 z-10 bg-background/80 backdrop-blur-sm text-xs px-2 py-1 rounded-full">
-                      Before
-                    </div>
-                    <div className="h-full w-full overflow-hidden">
-                      <Image
-                        src={galleryItems[activeIndex].before || "/placeholder.svg"}
-                        alt={`Before ${galleryItems[activeIndex].label}`}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-
-                    {/* Overlay with arrow */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <motion.div
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 0.7 }}
-                        className="bg-primary/20 backdrop-blur-sm rounded-full p-3"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="text-primary-foreground"
-                        >
-                          <path d="M5 12h14"></path>
-                          <path d="m12 5 7 7-7 7"></path>
-                        </svg>
-                      </motion.div>
-                    </div>
+      <div className="relative mx-auto max-w-5xl">
+        <div
+          ref={containerRef}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="relative w-full transition-transform duration-200 ease-out"
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          <div className="relative overflow-hidden rounded-2xl bg-card shadow-xl border">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeIndex}
+                className="flex flex-col md:flex-row"
+                initial={{ opacity: 0, x: direction * 60 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: direction * -60 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+              >
+                {/* BEFORE */}
+                <div className="relative w-full md:w-1/2 aspect-[4/5] md:aspect-auto md:min-h-[500px]">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
+                  <Image
+                    src={current.before}
+                    alt={`Before: ${current.label}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority
+                  />
+                  {/* Before badge */}
+                  <div className="absolute top-4 left-4 z-20">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white">
+                      <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                      BEFORE — Selfie
+                    </span>
                   </div>
-
-                  {/* After image */}
-                  <div className="w-1/2 relative overflow-hidden">
-                    <div className="absolute top-2 right-2 z-10 bg-primary/80 text-primary-foreground backdrop-blur-sm text-xs px-2 py-1 rounded-full">
-                      After
-                    </div>
+                  {/* Arrow overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center z-10">
                     <motion.div
-                      initial={{ scale: 0.9 }}
+                      initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ duration: 0.5 }}
-                      className="h-full w-full"
+                      transition={{ delay: 0.3, type: "spring" }}
+                      className="hidden md:flex h-14 w-14 items-center justify-center rounded-full bg-primary/90 shadow-lg"
                     >
-                      <Image
-                        src={galleryItems[activeIndex].after || "/placeholder.svg"}
-                        alt={`After ${galleryItems[activeIndex].label}`}
-                        fill
-                        className="object-cover"
-                      />
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 12h14" />
+                        <path d="m12 5 7 7-7 7" />
+                      </svg>
                     </motion.div>
+                  </div>
+                </div>
 
-                    {/* AI Generated badge */}
-                    <div className="absolute bottom-2 right-2 rounded-full bg-primary px-3 py-1 text-xs text-white">
-                      <span className="flex items-center gap-1">
-                        <span className="h-2 w-2 rounded-full bg-white"></span>
-                        AI Generated
-                      </span>
+                {/* AFTER */}
+                <div className="relative w-full md:w-1/2 aspect-[4/5] md:aspect-auto md:min-h-[500px] overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10" />
+                  <motion.div
+                    initial={{ scale: 1.1 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="h-full w-full"
+                  >
+                    <Image
+                      src={current.after}
+                      alt={`After: ${current.label}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      priority
+                    />
+                  </motion.div>
+                  {/* After badge */}
+                  <div className="absolute top-4 right-4 z-20">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/80 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white shadow-lg">
+                      <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                      AFTER — AI Headshot
+                    </span>
+                  </div>
+                  {/* Download badge */}
+                  <div className="absolute bottom-4 left-4 right-4 z-20">
+                    <div className="rounded-xl bg-black/50 backdrop-blur-sm px-4 py-3 text-white">
+                      <p className="text-sm font-semibold">{current.label} Style</p>
+                      <p className="text-xs text-white/70">{current.description}</p>
                     </div>
                   </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Transformation label */}
-            <motion.div
-              key={`label-${activeIndex}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-lg"
-            >
-              {galleryItems[activeIndex].label}
-            </motion.div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
 
-      </div>
-
-      {/* Navigation buttons */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-3 shadow-md hover:bg-white transition-all hover:scale-110"
-        aria-label="Previous slide"
-        disabled={isFlipping}
-      >
-        <ChevronLeft className={cn("h-6 w-6", isFlipping && "opacity-50")} />
-      </button>
-
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-3 shadow-md hover:bg-white transition-all hover:scale-110"
-        aria-label="Next slide"
-        disabled={isFlipping}
-      >
-        <ChevronRight className={cn("h-6 w-6", isFlipping && "opacity-50")} />
-      </button>
-
-      {/* Indicators */}
-      <div className="mt-8 flex justify-center gap-2">
-        {galleryItems.map((_, index) => (
+        {/* Navigation */}
+        <div className="mt-6 flex items-center justify-center gap-4">
           <button
-            key={index}
-            onClick={() => {
-              if (isFlipping) return
-              setDirection(index > activeIndex ? 1 : -1)
-              setIsFlipping(true)
-              setTimeout(() => {
-                setActiveIndex(index)
-                setIsFlipping(false)
-              }, 600)
-            }}
-            className={`h-2 transition-all ${
-              index === activeIndex ? "w-8 bg-primary" : "w-2 bg-gray-300"
-            } rounded-full`}
-            aria-label={`Go to slide ${index + 1}`}
-            disabled={isFlipping}
-          />
-        ))}
+            onClick={prevSlide}
+            className="flex h-10 w-10 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition-all hover:scale-105"
+            aria-label="Previous"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          <div className="flex items-center gap-2">
+            {galleryItems.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={cn(
+                  "h-2 rounded-full transition-all duration-300",
+                  index === activeIndex
+                    ? "w-8 bg-primary"
+                    : "w-2 bg-gray-300 hover:bg-gray-400"
+                )}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={nextSlide}
+            className="flex h-10 w-10 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition-all hover:scale-105"
+            aria-label="Next"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
       </div>
     </div>
   )
 }
-

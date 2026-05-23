@@ -32,7 +32,7 @@ export default function HeroSection() {
             Choose from <strong>6 professional style packs</strong> — corporate, formal, natural, and more.
             Starting at <strong className="text-primary">${PRICING.starter.price}</strong>.
           </p>
-          <div className="mt-4 flex flex-col sm:flex-row justify-center gap-4">
+          <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/login" className="w-full sm:w-auto">
               <Button size="lg" className="group w-full sm:w-auto">
                 Create Your Headshots — From ${PRICING.starter.price}
@@ -45,17 +45,16 @@ export default function HeroSection() {
               </Button>
             </Link>
           </div>
+        </div>
 
-
+        {/* Before/After Gallery — 바로 CTA 아래에 위치 */}
+        <div className="mt-10">
+          <ThreeDBeforeAfterGallery />
         </div>
 
         {/* Trust Badges */}
-        <div className="mt-8">
+        <div className="mt-10">
           <TrustBadges />
-        </div>
-
-        <div className="mt-12">
-          <ThreeDBeforeAfterGallery />
         </div>
       </div>
     </section>

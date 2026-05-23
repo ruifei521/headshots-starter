@@ -1,6 +1,10 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import HeroSection from "@/components/homepage/HeroSection"
+import ProcessSection from "@/components/homepage/ProcessSection"
+import FeaturesSection from "@/components/homepage/FeaturesSection"
+import PacksShowcase from "@/components/homepage/PacksShowcase"
+import ExamplesSection from "@/components/homepage/ExamplesSection"
 import PricingSection from "@/components/homepage/PricingSection"
 import FAQSection from "@/components/homepage/FAQSection"
 import { PRICING } from "@/lib/pricing"
@@ -123,6 +127,10 @@ export default async function Index() {
       />
       <div>
         <HeroSection />
+        <ProcessSection />
+        <FeaturesSection />
+        <PacksShowcase />
+        <ExamplesSection />
         <PricingSection />
         <FAQSection />
       </div>
