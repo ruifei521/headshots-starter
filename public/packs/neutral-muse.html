@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neutral Muse - SnapProHead</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:-apple-system,system-ui,sans-serif;margin:0;padding:0;background:#f8f9fa}
+.top-bar{background:#fff;border-bottom:1px solid #eee;padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.top-bar a{color:#2563eb;text-decoration:none;font-size:14px}
+.top-bar h1{margin:0;font-size:18px;flex:1}
+.container{max-width:1000px;margin:0 auto;padding:20px}
+.gender-row{display:flex;gap:20px;justify-content:center;margin-bottom:30px}
+.gender-card{flex:1;max-width:350px;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);background:#fff}
+.gender-card img{width:100%;display:block;aspect-ratio:3/4;object-fit:cover}
+.gender-card-body{padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.gender-card-body h3{margin:0;font-size:16px}
+.gender-card-body .info{color:#666;font-size:13px}
+.gender-card-body .buy-btn{background:#2563eb;color:#fff;padding:6px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600}
+@media(max-width:600px){.gender-row{flex-direction:column;align-items:center}.gender-card{max-width:100%}}
+.preview-title{text-align:center;font-size:20px;font-weight:600;margin:30px 0 20px;color:#333}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.grid img{width:100%;height:auto;border-radius:8px;border:1px solid #eee;cursor:pointer;transition:transform .2s}
+.grid img:hover{transform:scale(1.05)}
+@media(max-width:600px){.grid{grid-template-columns:repeat(3,1fr);gap:8px}}
+#lb{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;cursor:pointer}
+#lb.show{display:block}
+#lb img{max-width:100%;max-height:100%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:10px;object-fit:contain}
+#lb .x{position:absolute;top:15px;right:20px;color:#fff;font-size:18px;background:rgba(255,255,255,0.15);padding:8px 16px;border-radius:8px;cursor:pointer;z-index:10000}
+</style>
+</head>
+<body>
+<div class="top-bar"><a href="/packs/">&larr; Back</a><h1>Neutral Muse</h1></div>
+<div class="container">
+<div class="gender-row">
+<div class="gender-card"><img src="/packs/neutral-muse_woman_cover.jpg" alt="Woman Neutral Muse">
+<div class="gender-card-body"><div><h3>Woman</h3><span class="info">Default</span></div><a href="/get-credits" class="buy-btn">Buy $29</a></div></div>
+<div class="gender-card"><img src="/packs/neutral-muse_man_cover.jpg" alt="Man Neutral Muse">
+<div class="gender-card-body"><div><h3>Man</h3><span class="info">Default</span></div><a href="/get-credits" class="buy-btn">Buy $29</a></div></div>
+</div>
+<div class="preview-title">All Preview Styles</div>
+<div class="grid">
+<img src="/packs/neutral-muse_1.jpg" alt="Neutral Muse style 1" loading="lazy">
+<img src="/packs/neutral-muse_2.jpg" alt="Neutral Muse style 2" loading="lazy">
+<img src="/packs/neutral-muse_3.jpg" alt="Neutral Muse style 3" loading="lazy">
+<img src="/packs/neutral-muse_4.jpg" alt="Neutral Muse style 4" loading="lazy">
+<img src="/packs/neutral-muse_5.jpg" alt="Neutral Muse style 5" loading="lazy">
+<img src="/packs/neutral-muse_6.jpg" alt="Neutral Muse style 6" loading="lazy">
+<img src="/packs/neutral-muse_7.jpg" alt="Neutral Muse style 7" loading="lazy">
+<img src="/packs/neutral-muse_8.jpg" alt="Neutral Muse style 8" loading="lazy">
+<img src="/packs/neutral-muse_9.jpg" alt="Neutral Muse style 9" loading="lazy">
+<img src="/packs/neutral-muse_10.jpg" alt="Neutral Muse style 10" loading="lazy">
+<img src="/packs/neutral-muse_11.jpg" alt="Neutral Muse style 11" loading="lazy">
+<img src="/packs/neutral-muse_12.jpg" alt="Neutral Muse style 12" loading="lazy">
+<img src="/packs/neutral-muse_13.jpg" alt="Neutral Muse style 13" loading="lazy">
+<img src="/packs/neutral-muse_14.jpg" alt="Neutral Muse style 14" loading="lazy">
+</div>
+</div>
+<div id="lb" onclick="this.classList.remove('show')"><span class="x">✕ Close</span><img id="lbimg"></div>
+<script>
+document.querySelectorAll('.grid img').forEach(function(img){img.onclick=function(){document.getElementById('lbimg').src=this.src;document.getElementById('lb').classList.add('show')}});
+</script>
+</body>
+</html>

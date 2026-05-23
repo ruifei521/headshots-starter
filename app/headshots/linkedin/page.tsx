@@ -33,7 +33,7 @@ export default function LinkedInHeadshotsPage() {
         <div className="mt-6 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
           <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> Recruiter-Approved</span>
           <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> Professional & Polished</span>
-          <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> 6 Style Packs to Choose</span>
+          <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> 6 Styles to Choose</span>
         </div>
       </div>
 

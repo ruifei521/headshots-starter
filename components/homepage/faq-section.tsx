@@ -51,17 +51,17 @@ export default function FAQSection() {
     {
       question: "How does AI headshot generation work?",
       answer:
-        "Upload 4-10 selfies, choose a professional style pack (Corporate, Natural, Formal, etc.), then our AI trains on your face and generates studio-quality headshots in ~30 minutes. You get 40+ photos per pack with different backgrounds and outfits.",
+        "Upload 4-10 selfies, choose a professional style (Corporate, Natural, Formal, etc.), then our AI trains on your face and generates studio-quality headshots in ~30 minutes. You get 40+ photos with different backgrounds and outfits.",
     },
     {
-      question: "What style packs are available?",
+      question: "What styles are available?",
       answer:
-        "We currently offer 6 professional packs: Corporate Headshots (executive/business), Partner's Headshots (legal/formal), Natural Looks (casual professional), Speaker (commanding portraits), Realtor (polished agent style), and J.Crew (classic American style). Each pack contains 10-56 pre-designed styles.",
+        "We currently offer 5 professional styles: Corporate Headshots (executive/business), Partner's Headshots (legal/formal), Natural Looks (casual professional), Speaker (commanding portraits), and Realtor (polished agent style). Each style contains 10-56 pre-designed styles.",
     },
     {
       question: "Can I buy additional packs later?",
       answer:
-        "Yes! You can add more style packs anytime. Additional packs start at $9.99 each. You don't need to upload new photos — we use your existing trained model to generate new styles.",
+        "Yes! You can add more styles anytime. Additional styles start at $9.99 each. You don't need to upload new photos — we use your existing trained model to generate new styles.",
     },
     {
       question: "What kind of photos should I upload?",
@@ -69,9 +69,9 @@ export default function FAQSection() {
         "At least 4 high-quality selfies with good lighting. Front-facing, one person per frame, no sunglasses or hats. Different angles and expressions give better variety. Avoid heavily filtered or group photos.",
     },
     {
-      question: "How many headshots do I get per pack?",
+      question: "How many headshots per style?",
       answer:
-        "Each pack generates 40-56 professional headshots, depending on the pack you choose. Larger packs like Corporate Headshots produce 56 images (women) or 52 images (men) with diverse backgrounds and outfits.",
+        "Each style generates 40-56 professional headshots, depending on the style you choose. Larger styles like Corporate Headshots produce 56 images (women) or 52 images (men) with diverse backgrounds and outfits.",
     },
     {
       question: "Can I use these headshots professionally?",
@@ -86,7 +86,7 @@ export default function FAQSection() {
     {
       question: "What if I'm not satisfied with the results?",
       answer:
-        "We offer a 14-day money-back guarantee. If you're not happy, contact our support team and we'll refund your purchase in full. No questions asked.",
+        "We stand behind our AI headshots. If you don't get a single headshot you're happy with, we'll refund your entire purchase — no questions asked. Just contact us within 14 days.",
     },
   ]
 

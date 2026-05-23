@@ -5,8 +5,10 @@ import ProcessSection from "@/components/homepage/ProcessSection"
 import FeaturesSection from "@/components/homepage/FeaturesSection"
 import PacksShowcase from "@/components/homepage/PacksShowcase"
 import ExamplesSection from "@/components/homepage/ExamplesSection"
+import TestimonialsSection from "@/components/homepage/TestimonialsSection"
 import PricingSection from "@/components/homepage/PricingSection"
 import FAQSection from "@/components/homepage/FAQSection"
+import PrivacySection from "@/components/homepage/PrivacySection"
 import { PRICING } from "@/lib/pricing"
 
 const jsonLd = {
@@ -39,7 +41,7 @@ const jsonLd = {
           "name": "How does the AI headshot generation work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Upload 4-10 selfies, choose a professional style pack (Corporate, Natural, Formal, etc.), then our AI trains on your face and generates studio-quality headshots in ~30 minutes. You get 40+ photos per pack with different backgrounds and outfits."
+            "text": "Upload 4-10 selfies, choose a professional style (Corporate, Natural, Formal, etc.), then our AI trains on your face and generates studio-quality headshots in ~30 minutes. You get 40+ photos with different backgrounds and outfits."
           }
         },
         {
@@ -47,7 +49,7 @@ const jsonLd = {
           "name": "How much does it cost?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": `Plans start at $${PRICING.starter.price} for ${PRICING.starter.headshots} headshots up to $${PRICING.executive.price} for ${PRICING.executive.headshots} headshots. Each plan includes a professional style pack. All plans include a 14-day money-back guarantee.`
+            "text": `Plans start at $${PRICING.starter.price} for ${PRICING.starter.headshots} headshots up to $${PRICING.executive.price} for ${PRICING.executive.headshots} headshots. Each plan includes a professional style. All plans include a no-questions-asked refund guarantee within 14 days.`
           }
         },
         {
@@ -79,7 +81,7 @@ const jsonLd = {
           "name": "What if I don't like the results?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "We offer a 14-day money-back guarantee. If you're not satisfied, we'll refund your purchase in full."
+            "text": "We stand behind our AI headshots. If you're not satisfied, we'll refund your entire purchase — no questions asked, within 14 days."
           }
         }
       ]
@@ -131,8 +133,10 @@ export default async function Index() {
         <FeaturesSection />
         <PacksShowcase />
         <ExamplesSection />
+        <TestimonialsSection />
         <PricingSection />
         <FAQSection />
+        <PrivacySection />
       </div>
     </>
   )

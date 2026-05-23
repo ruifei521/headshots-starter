@@ -11,7 +11,6 @@ interface GalleryItem {
   before: string
   after: string
   label: string
-  description: string
 }
 
 export default function ThreeDBeforeAfterGallery() {
@@ -22,43 +21,14 @@ export default function ThreeDBeforeAfterGallery() {
   const containerRef = useRef<HTMLDivElement>(null)
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
 
+  // 8 pairs matching getheadshots.ai image set
   const galleryItems: GalleryItem[] = [
-    {
-      before: "/homepage/before0001.jpg",
-      after: "/homepage/example0001.jpg",
-      label: "Corporate",
-      description: "Selfie → Studio-quality corporate headshot",
-    },
-    {
-      before: "/homepage/before0002.jpg",
-      after: "/homepage/example0006.jpg",
-      label: "Professional",
-      description: "Selfie → Professional business portrait",
-    },
-    {
-      before: "/homepage/before0003.jpg",
-      after: "/homepage/example0003.jpg",
-      label: "Formal",
-      description: "Selfie → Formal executive headshot",
-    },
-    {
-      before: "/homepage/before0001.jpg",
-      after: "/homepage/example0007.jpg",
-      label: "Executive",
-      description: "Selfie → Executive portrait",
-    },
-    {
-      before: "/homepage/before0002.jpg",
-      after: "/homepage/example0004.jpg",
-      label: "Natural",
-      description: "Selfie → Natural polished look",
-    },
-    {
-      before: "/homepage/before0003.jpg",
-      after: "/homepage/example0005.jpg",
-      label: "Contemporary",
-      description: "Selfie → Contemporary professional style",
-    },
+    { before: "/homepage/before0001.jpg", after: "/homepage/example0001.jpg", label: "① Corporate" },
+    { before: "/homepage/before0002.jpg", after: "/homepage/example0002.jpg", label: "② Executive" },
+    { before: "/homepage/before0001.jpg", after: "/homepage/example0004.jpg", label: "③ Natural" },
+    { before: "/homepage/before0002.jpg", after: "/homepage/example0006.jpg", label: "④ Contemporary" },
+    { before: "/homepage/before0001.jpg", after: "/homepage/example0005.jpg", label: "⑤ Professional" },
+    { before: "/homepage/before0002.jpg", after: "/homepage/example0007.jpg", label: "⑥ Modern" },
   ]
 
   const goToSlide = (index: number) => {
@@ -74,11 +44,10 @@ export default function ThreeDBeforeAfterGallery() {
   const nextSlide = () => goToSlide((activeIndex + 1) % galleryItems.length)
   const prevSlide = () => goToSlide((activeIndex - 1 + galleryItems.length) % galleryItems.length)
 
-  // Gentle parallax on mouse move (desktop only)
+  // Gentle parallax
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
-
     const handleMouseMove = (e: MouseEvent) => {
       if (isFlipping || !isHovered) return
       const { left, top, width, height } = container.getBoundingClientRect()
@@ -86,11 +55,9 @@ export default function ThreeDBeforeAfterGallery() {
       const y = ((e.clientY - top) / height - 0.5) * 3
       container.style.transform = `perspective(800px) rotateY(${x}deg) rotateX(${-y}deg)`
     }
-
     const handleMouseLeave = () => {
       container.style.transform = "perspective(800px) rotateY(0deg) rotateX(0deg)"
     }
-
     container.addEventListener("mousemove", handleMouseMove)
     container.addEventListener("mouseleave", handleMouseLeave)
     return () => {
@@ -104,16 +71,13 @@ export default function ThreeDBeforeAfterGallery() {
     autoplayRef.current = setInterval(() => {
       if (!isFlipping) nextSlide()
     }, 4000)
-    return () => {
-      if (autoplayRef.current) clearInterval(autoplayRef.current)
-    }
+    return () => { if (autoplayRef.current) clearInterval(autoplayRef.current) }
   }, [isFlipping])
 
   const current = galleryItems[activeIndex]
 
   return (
     <div className="w-full">
-      {/* Section heading */}
       <div className="text-center mb-8">
         <Badge variant="outline" className="mb-3">See the Transformation</Badge>
         <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -121,7 +85,7 @@ export default function ThreeDBeforeAfterGallery() {
         </h2>
       </div>
 
-      <div className="relative mx-auto max-w-5xl">
+      <div className="relative mx-auto max-w-4xl">
         <div
           ref={containerRef}
           onMouseEnter={() => setIsHovered(true)}
@@ -140,24 +104,22 @@ export default function ThreeDBeforeAfterGallery() {
                 transition={{ duration: 0.35, ease: "easeInOut" }}
               >
                 {/* BEFORE */}
-                <div className="relative w-full md:w-1/2 aspect-[4/5] md:aspect-auto md:min-h-[500px]">
+                <div className="relative w-full md:w-1/2 aspect-[3/4]">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
                   <Image
                     src={current.before}
-                    alt={`Before: ${current.label}`}
+                    alt="Before"
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
                     priority
                   />
-                  {/* Before badge */}
                   <div className="absolute top-4 left-4 z-20">
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white">
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                      BEFORE — Selfie
+                      BEFORE
                     </span>
                   </div>
-                  {/* Arrow overlay */}
                   <div className="absolute inset-0 flex items-center justify-center z-10">
                     <motion.div
                       initial={{ scale: 0 }}
@@ -165,16 +127,15 @@ export default function ThreeDBeforeAfterGallery() {
                       transition={{ delay: 0.3, type: "spring" }}
                       className="hidden md:flex h-14 w-14 items-center justify-center rounded-full bg-primary/90 shadow-lg"
                     >
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M5 12h14" />
-                        <path d="m12 5 7 7-7 7" />
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                        <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
                       </svg>
                     </motion.div>
                   </div>
                 </div>
 
                 {/* AFTER */}
-                <div className="relative w-full md:w-1/2 aspect-[4/5] md:aspect-auto md:min-h-[500px] overflow-hidden">
+                <div className="relative w-full md:w-1/2 aspect-[3/4] overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10" />
                   <motion.div
                     initial={{ scale: 1.1 }}
@@ -184,25 +145,23 @@ export default function ThreeDBeforeAfterGallery() {
                   >
                     <Image
                       src={current.after}
-                      alt={`After: ${current.label}`}
+                      alt="After"
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, 50vw"
                       priority
                     />
                   </motion.div>
-                  {/* After badge */}
                   <div className="absolute top-4 right-4 z-20">
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/80 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white shadow-lg">
                       <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-                      AFTER — AI Headshot
+                      AFTER
                     </span>
                   </div>
-                  {/* Download badge */}
                   <div className="absolute bottom-4 left-4 right-4 z-20">
                     <div className="rounded-xl bg-black/50 backdrop-blur-sm px-4 py-3 text-white">
-                      <p className="text-sm font-semibold">{current.label} Style</p>
-                      <p className="text-xs text-white/70">{current.description}</p>
+                      <p className="text-sm font-semibold">{current.label}</p>
+                      <p className="text-xs text-white/70">Same person, different style</p>
                     </div>
                   </div>
                 </div>
@@ -213,14 +172,9 @@ export default function ThreeDBeforeAfterGallery() {
 
         {/* Navigation */}
         <div className="mt-6 flex items-center justify-center gap-4">
-          <button
-            onClick={prevSlide}
-            className="flex h-10 w-10 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition-all hover:scale-105"
-            aria-label="Previous"
-          >
+          <button onClick={prevSlide} className="flex h-10 w-10 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition-all hover:scale-105" aria-label="Previous">
             <ChevronLeft className="h-5 w-5" />
           </button>
-
           <div className="flex items-center gap-2">
             {galleryItems.map((_, index) => (
               <button
@@ -228,20 +182,13 @@ export default function ThreeDBeforeAfterGallery() {
                 onClick={() => goToSlide(index)}
                 className={cn(
                   "h-2 rounded-full transition-all duration-300",
-                  index === activeIndex
-                    ? "w-8 bg-primary"
-                    : "w-2 bg-gray-300 hover:bg-gray-400"
+                  index === activeIndex ? "w-8 bg-primary" : "w-2 bg-gray-300 hover:bg-gray-400"
                 )}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
           </div>
-
-          <button
-            onClick={nextSlide}
-            className="flex h-10 w-10 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition-all hover:scale-105"
-            aria-label="Next"
-          >
+          <button onClick={nextSlide} className="flex h-10 w-10 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition-all hover:scale-105" aria-label="Next">
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>

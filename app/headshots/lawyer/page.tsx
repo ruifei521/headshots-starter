@@ -49,7 +49,7 @@ export default function LawyerHeadshotsPage() {
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Classic dark suits</div>
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Formal backgrounds</div>
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Professional framing</div>
-          <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 40-44 HD images per pack</div>
+          <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 40-44 HD images</div>
         </div>
         <Link href="/login">
           <Button className="w-full">Get Started — From ${PRICING.starter.price}</Button>
@@ -69,7 +69,7 @@ export default function LawyerHeadshotsPage() {
             { f: "Cost", t: "$200 – $500/session", o: `$${PRICING.starter.price} – $${PRICING.executive.price}` },
             { f: "Scheduling", t: "Must coordinate with photographer", o: "Upload selfies anytime" },
             { f: "Turnaround", t: "3 – 14 days", o: "~30 minutes" },
-            { f: "Outfits & Backgrounds", t: "Limited by studio setup", o: "6 professional packs" },
+            { f: "Outfits & Backgrounds", t: "Limited by studio setup", o: "5 professional styles" },
             { f: "Retakes", t: "$50 – $150 extra", o: "Free regenerations" },
           ].map((row, i) => (
             <div key={i} className="grid grid-cols-3 border-b last:border-0 text-sm">

@@ -85,7 +85,6 @@ export async function GET(request: Request) {
       'natural-headshots',
       'speaker',
       'realtor',
-      'j-crew',
     ];
     
     const filteredPacks = combinedData.filter(

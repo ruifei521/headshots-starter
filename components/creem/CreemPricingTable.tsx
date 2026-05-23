@@ -19,10 +19,8 @@ const PRODUCTS = [
     headshots: `${PRICING.starter.headshots} Headshots`,
     description: 'Perfect for individuals looking to enhance their LinkedIn or CV.',
     features: [
-      '6 Professional Style Packs',
+      '6 Professional Styles',
       `${PRICING.starter.headshots} AI-Generated Headshots`,
-      'Commercial License',
-      'High-Resolution Download',
     ],
   },
   {
@@ -34,10 +32,8 @@ const PRODUCTS = [
     description: 'Ideal for professionals who want variety and different styles.',
     popular: true,
     features: [
-      '6 Professional Style Packs',
+      '6 Professional Styles',
       `${PRICING.pro.headshots} AI-Generated Headshots`,
-      'Commercial License',
-      'High-Resolution Download',
       'Priority Processing',
     ],
   },
@@ -49,10 +45,8 @@ const PRODUCTS = [
     headshots: `${PRICING.executive.headshots} Headshots`,
     description: 'The complete package for maximum variety.',
     features: [
-      '6 Professional Style Packs',
+      '6 Professional Styles',
       `${PRICING.executive.headshots} AI-Generated Headshots`,
-      'Commercial License',
-      'High-Resolution Download',
       'Priority Processing',
     ],
   },
@@ -134,7 +128,7 @@ const CreemPricingTable = ({ user }: Props) => {
               <div className="mb-6">
                 <span className="text-4xl font-bold">{product.price}</span>
                 <div className="mt-2 space-y-1">
-                  <p className="text-sm font-medium text-primary">{product.credits} · {product.headshots}</p>
+                  <p className="text-sm font-medium text-primary">{product.headshots}</p>
                 </div>
               </div>
               
@@ -161,7 +155,7 @@ const CreemPricingTable = ({ user }: Props) => {
                     Redirecting...
                   </>
                 ) : (
-                  `Get ${product.credits}`
+                  'Get Started'
                 )}
               </Button>
             </CardFooter>

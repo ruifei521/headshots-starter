@@ -3,8 +3,8 @@ import { Badge } from "@/components/ui/badge"
 
 const features = [
   {
-    title: "Style Packs",
-    description: "6 professional style packs with 10-56 pre-designed styles each",
+    title: "Styles",
+    description: "5 professional styles with 10-56 pre-designed styles each",
     icon: <Camera className="h-6 w-6" />
   },
   {
@@ -19,7 +19,7 @@ const features = [
   },
   {
     title: "Packs Included",
-    description: "Corporate, Natural, Formal, Speaker, Realtor & J.Crew",
+    description: "Corporate, Natural, Formal, Speaker & Realtor",
     icon: <Palette className="h-6 w-6" />
   },
   {

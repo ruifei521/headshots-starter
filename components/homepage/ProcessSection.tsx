@@ -16,8 +16,8 @@ const processSteps = [
   },
   {
     number: 2,
-    title: "Pick Your Style Pack",
-    description: "Choose from 6 professional packs: Corporate, Partner's, Natural, Speaker, Realtor, or J.Crew.",
+    title: "Pick Your Pack",
+    description: "Choose from 5 professional styles: Corporate, Partner's, Natural, Speaker, or Realtor.",
     icon: <Sparkles className="h-5 w-5" />,
     processingImage: "/blur.jpg"
   },

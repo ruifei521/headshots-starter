@@ -28,12 +28,9 @@ export default function ModernPricing() {
       price: `$${PRICING.starter.price}`,
       description: "Perfect for individuals looking to enhance their LinkedIn or CV.",
       features: [
-        "6 Professional Style Packs",
+        "6 Professional Styles",
         `${PRICING.starter.headshots} AI-Generated Headshots`,
-        "10-56 pre-designed styles per pack",
-        "Commercial License Included",
-        "High-Resolution Download",
-        "14-Day Money-Back Guarantee",
+        "10-56 pre-designed styles",
       ],
       buttonText: "Get Started",
       credits: `${PRICING.starter.credits} Credit`,
@@ -46,14 +43,11 @@ export default function ModernPricing() {
       price: `$${PRICING.pro.price}`,
       description: "Ideal for professionals who want variety across styles.",
       features: [
-        "6 Professional Style Packs",
+        "6 Professional Styles",
         `${PRICING.pro.headshots} AI-Generated Headshots`,
-        "10-56 pre-designed styles per pack",
+        "10-56 pre-designed styles",
         "Corporate, Natural, Formal & more",
-        "Commercial License Included",
-        "High-Resolution Download",
         "Priority Processing",
-        "14-Day Money-Back Guarantee",
       ],
       buttonText: "Get Started",
       credits: `${PRICING.pro.credits} Credits`,
@@ -67,14 +61,11 @@ export default function ModernPricing() {
       price: `$${PRICING.executive.price}`,
       description: "The complete package for maximum variety.",
       features: [
-        "6 Professional Style Packs",
+        "6 Professional Styles",
         `${PRICING.executive.headshots} AI-Generated Headshots`,
-        "10-56 pre-designed styles per pack",
+        "10-56 pre-designed styles",
         "Full access: all packs included",
-        "Commercial License Included",
-        "High-Resolution Download",
         "Priority Processing",
-        "14-Day Money-Back Guarantee",
       ],
       buttonText: "Get Started",
       credits: `${PRICING.executive.credits} Credits`,
@@ -97,7 +88,7 @@ export default function ModernPricing() {
             Professional Headshots, <span className="text-primary">Affordable Price</span>
           </h2>
           <p className="max-w-[600px] text-muted-foreground text-lg mx-auto">
-            Choose from 6 professional style packs. Pay once, own your photos forever.
+            Choose from 5 professional styles. Pay once, own your photos forever.
           </p>
         </div>
 
@@ -136,8 +127,8 @@ export default function ModernPricing() {
                 <span className="text-5xl font-extrabold">{tier.price}</span>
               </div>
               <div className="flex items-center gap-3 mt-1">
-                {tier.credits && (
-                  <p className="text-sm font-medium text-primary">{tier.credits} · {tier.headshots}</p>
+                {tier.headshots && (
+                  <p className="text-sm font-medium text-primary">{tier.headshots}</p>
                 )}
                 {tier.perPhoto && (
                   <span className="text-xs text-muted-foreground">
@@ -145,6 +136,7 @@ export default function ModernPricing() {
                   </span>
                 )}
               </div>
+
 
               {/* Delivery time badge */}
               <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
@@ -177,11 +169,7 @@ export default function ModernPricing() {
                 </Button>
               </Link>
 
-              {/* Money-back guarantee badge */}
-              <div className="mt-3 flex items-center justify-center gap-1 text-sm text-green-600">
-                <Shield className="h-4 w-4" />
-                <span>14-Day Money-Back Guarantee</span>
-              </div>
+
 
 
             </div>
@@ -219,7 +207,7 @@ export default function ModernPricing() {
                 <tr className="border-b">
                   <td className="px-4 py-3 font-medium">Style Options</td>
                   <td className="px-4 py-3 text-center text-muted-foreground">1 – 2 per session</td>
-                  <td className="px-4 py-3 text-center font-medium text-primary">6 professional packs</td>
+                  <td className="px-4 py-3 text-center font-medium text-primary">5 professional styles</td>
                 </tr>
                 <tr className="border-b">
                   <td className="px-4 py-3 font-medium">Photo Count</td>
@@ -239,7 +227,7 @@ export default function ModernPricing() {
 
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          All plans include a <strong>14-day money-back guarantee</strong>. Prices exclude applicable taxes, which are calculated and collected at checkout by Creem, our Merchant of Record.
+          All plans include a <strong>no-questions-asked refund guarantee</strong>. Prices exclude applicable taxes, which are calculated and collected at checkout by Creem, our Merchant of Record.
         </p>
       </div>
     </div>

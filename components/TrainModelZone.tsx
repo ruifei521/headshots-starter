@@ -317,7 +317,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       console.error("Full error object:", error);
       
       toast({
-        title: "训练失败 / Train Failed",
+        title: "Train Failed",
         description: String(message).substring(0, 200),
         duration: 8000,
       });

@@ -32,13 +32,13 @@ export default function PacksShowcase() {
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center gap-4 text-center md:gap-8">
           <Badge variant="outline" className="mb-2">
-            6 Professional Style Packs
+            6 Professional Styles
           </Badge>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            Choose Your <span className="text-primary">Style Pack</span>
+            Choose Your <span className="text-primary">Style</span>
           </h2>
           <p className="max-w-[700px] text-muted-foreground text-lg">
-            Each pack contains 10–56 professionally designed headshot styles. Pick the look that fits your industry.
+            Each style contains 10–56 professionally designed headshot styles. Pick the look that fits your industry.
           </p>
         </div>
 
@@ -69,7 +69,7 @@ export default function PacksShowcase() {
 
         <div className="mt-10 text-center">
           <p className="text-sm text-muted-foreground">
-            More packs being added regularly. Each pack = different backgrounds, outfits, and styles.
+            More styles being added regularly. Each style = different backgrounds, outfits, and styles.
           </p>
         </div>
       </div>
