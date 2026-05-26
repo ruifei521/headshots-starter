@@ -1,7 +1,16 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Check, ArrowRight, Shield } from "lucide-react"
-import { PRICING } from "@/lib/pricing"
+import { Check, ArrowRight, Shield, Sparkles, Clock, Camera } from "lucide-react"
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'LinkedIn Headshots - Professional AI Photos for Your Profile',
+  description: 'Get a professional LinkedIn headshot in ~30 minutes. AI-generated photos that get you noticed by recruiters. 40+ HD headshots, just $29. 14-day refund guarantee.',
+  openGraph: {
+    title: 'AI LinkedIn Headshots - Stand Out to Recruiters',
+    description: 'Professional LinkedIn photos in ~30 minutes. Just $29 for 40+ HD headshots.',
+  },
+}
 
 export default function LinkedInHeadshotsPage() {
   return (
@@ -46,12 +55,15 @@ export default function LinkedInHeadshotsPage() {
         <div className="grid grid-cols-2 gap-4 text-sm mb-6">
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> LinkedIn-optimized sizing</div>
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Corporate & casual styles</div>
-          <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 40-200+ HD headshots</div>
+          <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 40+ HD headshots</div>
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Multiple backgrounds</div>
         </div>
         <Link href="/login">
-          <Button className="w-full">Get Started — From ${PRICING.starter.price}</Button>
+          <Button className="w-full">Get Started — $29</Button>
         </Link>
+        <p className="text-center mt-4">
+          <Link href="/templates" className="text-sm text-primary hover:underline">Not sure which style? Browse all 12 →</Link>
+        </p>
       </div>
 
       <div className="mx-auto max-w-3xl mb-16">
@@ -74,12 +86,42 @@ export default function LinkedInHeadshotsPage() {
         <Shield className="h-12 w-12 mx-auto text-green-500 mb-4" />
         <h2 className="text-2xl font-bold mb-4">Upgrade Your LinkedIn Today</h2>
         <p className="text-muted-foreground mb-6">
-          From ${PRICING.starter.price}. 14-day money-back guarantee. Delivered in ~30 minutes.
+          $29. 14-day money-back guarantee. Delivered in ~30 minutes.
         </p>
-        <Link href="/login">
-          <Button size="lg">Create Your LinkedIn Headshots Now</Button>
-        </Link>
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Link href="/login">
+            <Button size="lg">Create Your LinkedIn Headshots Now</Button>
+          </Link>
+          <Link href="/templates">
+            <Button size="lg" variant="outline">Browse All Styles</Button>
+          </Link>
+        </div>
       </div>
+
+      {/* FAQ Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question', name: 'How long does it take to get LinkedIn headshots?',
+                acceptedAnswer: { '@type': 'Answer', text: 'About 30 minutes. Upload 4-10 selfies and our AI generates 40+ professional headshots.' },
+              },
+              {
+                '@type': 'Question', name: 'What size should a LinkedIn profile picture be?',
+                acceptedAnswer: { '@type': 'Answer', text: 'LinkedIn recommends 400×400px. Our AI generates high-resolution headshots perfectly sized for LinkedIn.' },
+              },
+              {
+                '@type': 'Question', name: 'How much do LinkedIn headshots cost?',
+                acceptedAnswer: { '@type': 'Answer', text: 'Just $29 for 40+ HD professional headshots in your chosen style. 14-day money-back guarantee.' },
+              },
+            ],
+          }),
+        }}
+      />
     </div>
   )
 }

@@ -1,7 +1,16 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Check, ArrowRight, Shield, Clock } from "lucide-react"
-import { PRICING } from "@/lib/pricing"
+import { Check, ArrowRight, Shield } from "lucide-react"
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Lawyer Headshots - Professional AI Photos for Attorneys',
+  description: 'Get partner-quality AI headshots for lawyers and attorneys. Professional, trustworthy photos for law firm websites, LinkedIn, and court directories. Just $29 with 14-day guarantee.',
+  openGraph: {
+    title: 'Professional AI Headshots for Lawyers & Attorneys',
+    description: 'Partner-quality headshots for legal professionals. Just $29 — delivered in ~30 minutes.',
+  },
+}
 
 export default function LawyerHeadshotsPage() {
   return (
@@ -52,8 +61,11 @@ export default function LawyerHeadshotsPage() {
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 40-44 HD images</div>
         </div>
         <Link href="/login">
-          <Button className="w-full">Get Started — From ${PRICING.starter.price}</Button>
+          <Button className="w-full">Get Started — $29</Button>
         </Link>
+        <p className="text-center mt-4">
+          <Link href="/templates" className="text-sm text-primary hover:underline">Browse all professional styles →</Link>
+        </p>
       </div>
 
       {/* Comparison */}
@@ -66,10 +78,10 @@ export default function LawyerHeadshotsPage() {
             <div className="p-4 text-center text-primary">SnapProHead</div>
           </div>
           {[
-            { f: "Cost", t: "$200 – $500/session", o: `$${PRICING.starter.price} – $${PRICING.executive.price}` },
+            { f: "Cost", t: "$200 – $500/session", o: `$29` },
             { f: "Scheduling", t: "Must coordinate with photographer", o: "Upload selfies anytime" },
             { f: "Turnaround", t: "3 – 14 days", o: "~30 minutes" },
-            { f: "Outfits & Backgrounds", t: "Limited by studio setup", o: "5 professional styles" },
+            { f: "Outfits & Backgrounds", t: "Limited by studio setup", o: "6 professional styles" },
             { f: "Retakes", t: "$50 – $150 extra", o: "Free regenerations" },
           ].map((row, i) => (
             <div key={i} className="grid grid-cols-3 border-b last:border-0 text-sm">
@@ -84,14 +96,34 @@ export default function LawyerHeadshotsPage() {
       {/* CTA */}
       <div className="mx-auto max-w-2xl text-center">
         <Shield className="h-12 w-12 mx-auto text-green-500 mb-4" />
-        <h2 className="text-2xl font-bold mb-4">Join 1,000+ Legal Professionals</h2>
+        <h2 className="text-2xl font-bold mb-4">Professional Headshots for Legal Professionals</h2>
         <p className="text-muted-foreground mb-6">
-          Trusted by law firms nationwide. 14-day money-back guarantee.
+          14-day money-back guarantee.
         </p>
-        <Link href="/login">
-          <Button size="lg">Create Your Headshots Now</Button>
-        </Link>
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Link href="/login">
+            <Button size="lg">Create Your Headshots Now</Button>
+          </Link>
+          <Link href="/templates">
+            <Button size="lg" variant="outline">Browse All Styles</Button>
+          </Link>
+        </div>
       </div>
+
+      {/* FAQ Schema */}
+      <script type="application/ld+json"
+        dangerouslySetInnerHTML={{__html: JSON.stringify({
+          '@context': 'https://schema.org','@type': 'FAQPage',
+          mainEntity: [
+            {'@type':'Question', name:'How much do lawyer headshots cost?',
+             acceptedAnswer:{'@type':'Answer', text:'Just $29 for 40+ HD professional headshots. No hidden fees.'}},
+            {'@type':'Question', name:'What style is best for attorney headshots?',
+             acceptedAnswer:{'@type':'Answer', text:'Our Partner\'s Headshots and Corporate styles are most popular for legal professionals. Both feature formal backgrounds and professional attire.'}},
+            {'@type':'Question', name:'How long does AI headshot generation take?',
+             acceptedAnswer:{'@type':'Answer', text:'About 30 minutes. Upload 4-10 selfies and our AI generates your professional headshots.'}},
+          ]}
+        )}}
+      />
     </div>
   )
 }
