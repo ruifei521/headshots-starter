@@ -17,8 +17,14 @@ const AnnouncementBar = dynamic(
   { ssr: false }
 );
 
-// Validate configuration at app initialization
-validateConfig();
+// 仅在运行时验证配置（构建时环境变量可能不存在）
+if (typeof window !== 'undefined' || process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  try {
+    validateConfig();
+  } catch (e) {
+    console.warn('Config validation warning:', e);
+  }
+}
 
 export const viewport = {
   width: 'device-width',
@@ -31,6 +37,7 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://snapprohead.com'),
   title: {
     default: `SnapProHead - AI Professional Headshots in ~30 Minutes | From $${PRICING.starter.price}`,
     template: "%s | SnapProHead",

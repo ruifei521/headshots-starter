@@ -24,14 +24,19 @@ export function HashAuthHandler() {
   const [processing, setProcessing] = useState(false);
   const [hasRun, setHasRun] = useState(false);
 
+  // 构建时环境变量可能不存在，跳过 Supabase 客户端创建
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
   const supabase = useMemo(() => {
-    return createBrowserClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-  }, []);
+    if (!supabaseUrl || !supabaseAnonKey) return null;
+    return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+  }, [supabaseUrl, supabaseAnonKey]);
 
   useEffect(() => {
+    // 无 Supabase 客户端时跳过（构建时环境变量缺失）
+    if (!supabase) return;
+
     // Prevent running multiple times
     if (hasRun) {
       console.log("[HashAuthHandler] Already ran, skipping");

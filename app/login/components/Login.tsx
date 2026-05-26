@@ -27,25 +27,11 @@ export const Login = ({
   host: string | null;
   searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
-  // Magic Link 专用客户端 - 使用 implicit flow
-  // 关键修复：PKCE flow 依赖 code_verifier cookie，当用户在邮箱 App 内嵌浏览器
-  // 或不同浏览器中点击 Magic Link 时，cookie 不可用，导致 exchangeCodeForSession 失败
-  // implicit flow 将 token 直接放在 URL hash (#access_token=xxx) 中，由 HashAuthHandler 处理
-  // 不依赖 cookie，在任何浏览器上下文中都能可靠工作
-  const magicLinkClient = useMemo(() => {
-    return createBrowserClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { auth: { flowType: 'implicit' } }
-    );
-  }, []);
-
-  // Google OAuth 专用客户端 - 使用 implicit flow
-  // ⚠️ 微信/WebView 浏览器会拦截第三方 cookie，PKCE flow 的 code_verifier cookie
-  // 无法在 supabase.co 域名上存活，导致 OAuth 回调失败报 "让输入有效目标"
-  // implicit flow 将 token 直接放在 URL hash 中，不依赖跨域 cookie，
-  // 在所有浏览器（包括微信内置浏览器）中都能可靠工作
-  const oAuthClient = useMemo(() => {
+  // 统一 Supabase 客户端 - 使用 implicit flow
+  // Magic Link 和 Google OAuth 共用同一个客户端，配置完全相同
+  // implicit flow 将 token 放在 URL hash (#access_token=xxx) 中，由 HashAuthHandler 处理
+  // 不依赖跨域 cookie，在微信/WebView/邮箱 App 内嵌浏览器中都能可靠工作
+  const supabase = useMemo(() => {
     return createBrowserClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -89,7 +75,7 @@ export const Login = ({
       // implicit flow：邮件链接重定向到根 URL，token 在 URL hash (#access_token=xxx) 中
       // 由客户端 HashAuthHandler 组件（在 layout.tsx 中全局加载）读取 hash 并建立 session
       // HashAuthHandler 在所有页面都运行，所以重定向到根路径 / 也能正确处理 token
-      const { error } = await magicLinkClient.auth.signInWithOtp({
+      const { error } = await supabase.auth.signInWithOtp({
         email: data.email,
         options: {
           emailRedirectTo: `${protocol}://${host}`,
@@ -130,7 +116,7 @@ export const Login = ({
     // 使用 implicit flow：token 走 URL hash，不依赖跨域 cookie
     // 微信等 WebView 浏览器中 PKCE 的 code_verifier cookie 会被拦截
     // redirectTo 设为根路径，由 HashAuthHandler（全局布局组件）读取 hash 并建立 session
-    const { data, error } = await oAuthClient.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         queryParams: {
@@ -187,7 +173,7 @@ export const Login = ({
                         /^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) ||
                         'Please enter a valid email',
                       emailDoesntHavePlus: (value: string) =>
-                        /^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) ||
+                        !value.includes('+') ||
                         'Email addresses with a + are not allowed',
                       emailIsntDisposable: (value: string) => {
                         const domain = value.split('@')[1];

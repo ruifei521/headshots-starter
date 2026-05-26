@@ -89,7 +89,8 @@ const jsonLd = {
   ]
 }
 
-export const revalidate = 3600
+// 构建时环境变量可能不存在，使用 force-dynamic 避免预渲染时创建 Supabase 客户端失败
+export const dynamic = "force-dynamic"
 
 export default async function Index() {
   const supabase = createServerClient(

@@ -16,10 +16,15 @@ const paymentIsConfigured = creemIsConfigured || stripeIsConfigured;
 const packsIsEnabled = true;
 
 export default async function Navbar() {
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+  // 构建时环境变量可能不存在，此时跳过 Supabase 查询
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  let user = null;
+  let credits = null;
+
+  if (supabaseUrl && supabaseAnonKey) {
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
           return cookies().getAll();
@@ -34,18 +39,20 @@ export default async function Navbar() {
           });
         },
       },
+    });
+
+    const { data: userData } = await supabase.auth.getUser();
+    user = userData.user;
+
+    if (user) {
+      const { data: creditsData } = await supabase
+        .from("credits")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+      credits = creditsData;
     }
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: credits } = await supabase
-    .from("credits")
-    .select("*")
-    .eq("user_id", user?.id ?? "")
-    .single();
+  }
 
   return (
     <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
