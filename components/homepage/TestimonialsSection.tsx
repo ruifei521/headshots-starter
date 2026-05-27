@@ -9,27 +9,27 @@ const testimonials = [
       "The quality of these AI headshots is incredible. I've updated all my professional profiles and received so many compliments.",
     author: "Sarah Johnson",
     role: "Marketing Director",
-    avatar: "/homepage/example0001.jpg",
+    avatar: "/homepage/example001.jpg",
   },
   {
     quote:
       "As a freelancer, having professional headshots was a game-changer for my personal brand. The process was so quick and easy!",
     author: "Michael Chen",
     role: "UX Designer",
-    avatar: "/homepage/example0002.jpg",
+    avatar: "/homepage/example002.jpg",
   },
   {
     quote:
       "I was skeptical at first, but the results blew me away. These look better than the professional photos I paid hundreds for.",
     author: "Mark Williams",
     role: "Software Engineer",
-    avatar: "/homepage/example0003.jpg",
+    avatar: "/homepage/example003.jpg",
   },
 ]
 
 export default function TestimonialsSection() {
   return (
-    <section className="py-20 md:py-32 bg-muted/30">
+    <section className="py-10 md:py-16 bg-muted/30">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center gap-4 text-center md:gap-8">
           <Badge variant="outline" className="mb-2">Testimonials</Badge>
@@ -41,7 +41,7 @@ export default function TestimonialsSection() {
           </p>
         </div>
 
-        <div className="mt-16 grid gap-8 md:grid-cols-3">
+        <div className="mt-6 grid gap-8 md:grid-cols-3">
           {testimonials.map((t, i) => (
             <div
               key={i}

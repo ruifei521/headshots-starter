@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, lazy } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
@@ -113,6 +113,7 @@ export default function ThreeDBeforeAfterGallery() {
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
                     priority
+                    quality={70}
                   />
                   <div className="absolute top-4 left-4 z-20">
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white">
@@ -150,6 +151,7 @@ export default function ThreeDBeforeAfterGallery() {
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, 50vw"
                       priority
+                      quality={70}
                     />
                   </motion.div>
                   <div className="absolute top-4 right-4 z-20">

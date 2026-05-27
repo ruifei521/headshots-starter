@@ -10,6 +10,7 @@ const CREDITS_PER_PRODUCT: Record<string, number> = {
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const webhookSecret = process.env.CREEM_WEBHOOK_SECRET!;
+// CREDITS_PER_PRODUCT imported from @/lib/pricing
 
 function verifySignature(payload: string, signature: string): boolean {
   if (!webhookSecret || !signature) return false;

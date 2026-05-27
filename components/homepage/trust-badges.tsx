@@ -18,11 +18,11 @@ export default function TrustBadges() {
         </div>
         <div className="flex items-center gap-2">
           <Camera className="h-5 w-5 text-purple-500" />
-          <span className="font-medium">40–200+ HD Headshots</span>
+          <span className="font-medium">40+ HD Headshots</span>
         </div>
         <div className="flex items-center gap-2">
           <CreditCard className="h-5 w-5 text-primary" />
-          <span className="font-medium">Secure Payment via Creem</span>
+          <span className="font-medium">Secure Payment</span>
         </div>
       </div>
 

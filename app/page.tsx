@@ -1,38 +1,34 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { cookies } from "next/headers"
-import nextDynamic from "next/dynamic"
+import dynamic from "next/dynamic"
 import HeroSection from "@/components/homepage/HeroSection"
 
-const ProcessSection = nextDynamic(
+const ProcessSection = dynamic(
   () => import("@/components/homepage/ProcessSection"),
   { ssr: false }
 )
-const PacksShowcase = nextDynamic(
+const PacksShowcase = dynamic(
   () => import("@/components/homepage/PacksShowcase"),
   { ssr: false }
 )
-const ExamplesSection = nextDynamic(
+const ExamplesSection = dynamic(
   () => import("@/components/homepage/ExamplesSection"),
   { ssr: false }
 )
-const TestimonialsSection = nextDynamic(
+const TestimonialsSection = dynamic(
   () => import("@/components/homepage/TestimonialsSection"),
   { ssr: false }
 )
-const PricingSection = nextDynamic(
+const PricingSection = dynamic(
   () => import("@/components/homepage/PricingSection"),
   { ssr: false }
 )
-const FAQSection = nextDynamic(
+const FAQSection = dynamic(
   () => import("@/components/homepage/FAQSection"),
   { ssr: false }
 )
-const PrivacySection = nextDynamic(
+const PrivacySection = dynamic(
   () => import("@/components/homepage/PrivacySection"),
-  { ssr: false }
-)
-const StartNowCTA = nextDynamic(
-  () => import("@/components/homepage/StartNowCTA"),
   { ssr: false }
 )
 
@@ -44,7 +40,7 @@ const jsonLd = {
       "name": "SnapProHead - AI Professional Headshot Generator",
       "description": `Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. Just $29 with a 14-day money-back guarantee.`,
       "url": "https://snapprohead.com",
-      "image": "https://snapprohead.com/hero.webp",
+      "image": "https://snapprohead.com/hero.png",
       "brand": {
         "@type": "Brand",
         "name": "SnapProHead"
@@ -114,8 +110,7 @@ const jsonLd = {
   ]
 }
 
-// 构建时环境变量可能不存在，使用 force-dynamic 避免预渲染时创建 Supabase 客户端失败
-export const dynamic = "force-dynamic"
+export const revalidate = 3600
 
 export default async function Index() {
   const supabase = createServerClient(
@@ -160,7 +155,6 @@ export default async function Index() {
         <ExamplesSection />
         <TestimonialsSection />
         <PricingSection />
-        <StartNowCTA />
         <FAQSection />
         <PrivacySection />
       </div>

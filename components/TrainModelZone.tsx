@@ -269,11 +269,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
                 Details: {responseDetails}
               </div>
             )}
-            {responseMessage.includes("Not enough credits") && (
-              <a href="/get-credits">
-                <Button size="sm">Get Credits</Button>
-              </a>
-            )}
+
           </div>
         );
         

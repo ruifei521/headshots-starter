@@ -2,24 +2,25 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import dynamic from "next/dynamic"
 import TrustBadges from "@/components/homepage/trust-badges"
-import ThreeDBeforeAfterGallery from "@/components/homepage/3d-before-after-gallery"
-import { PRICING } from "@/lib/pricing"
+
+const ThreeDBeforeAfterGallery = dynamic(
+  () => import("@/components/homepage/3d-before-after-gallery"),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full aspect-[3/2] bg-muted/30 rounded-2xl flex items-center justify-center">
+        <div className="h-8 w-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    )
+  }
+)
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden py-16 md:py-24">
-      {/* Social Proof Banner */}
-      <div className="absolute top-0 left-0 right-0 bg-primary/5 border-b border-primary/10">
-        <div className="container px-4 md:px-6 py-2">
-          <p className="text-center text-sm text-muted-foreground">
-            <span className="font-semibold text-primary">⭐ Trusted by professionals worldwide</span> 
-            {" — "}5 professional styles to choose from
-          </p>
-        </div>
-      </div>
-
-      <div className="container px-4 md:px-6 pt-8">
+    <section className="relative overflow-hidden py-10 md:py-16">
+      <div className="container px-4 md:px-6 pt-2">
         <div className="mx-auto max-w-3xl text-center mb-8">
           <Badge className="mb-4" variant="outline">
             🚀 Professional AI Headshots in ~30 Minutes
@@ -29,33 +30,34 @@ export default function HeroSection() {
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto">
             Turn your selfies into studio-quality headshots in ~30 minutes. 
-            Choose from <strong>5 professional styles</strong> — corporate, formal, natural, and more.
-            Starting at <strong className="text-primary">${PRICING.starter.price}</strong>.
+            Choose from <strong>12 professional styles</strong> — corporate, lawyer, speaker, realtor, studio portraits, and more.
+            Just <strong className="text-primary">$29</strong>.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/login" className="w-full sm:w-auto">
+            <Link href="/templates" className="w-full sm:w-auto">
               <Button size="lg" className="group w-full sm:w-auto">
-                Create Your Headshots — From ${PRICING.starter.price}
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                Choose Your Style — $29
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="#pricing" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                View Pricing
+              <Button size="lg" variant="outline" className="w-full sm:w-auto border-muted-foreground/30 text-muted-foreground hover:text-foreground">
+                How It Works ↓
               </Button>
             </Link>
           </div>
         </div>
 
-        {/* Before/After Gallery — 바로 CTA 아래에 위치 */}
-        <div className="mt-10">
+        {/* Before/After Gallery — lazy loaded, only when visible */}
+        <div className="mt-6">
           <ThreeDBeforeAfterGallery />
         </div>
 
         {/* Trust Badges */}
-        <div className="mt-10">
+        <div className="mt-6">
           <TrustBadges />
         </div>
+
 
       </div>
     </section>

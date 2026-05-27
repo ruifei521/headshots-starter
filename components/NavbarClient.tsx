@@ -3,45 +3,23 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { Database } from "@/types/supabase";
 import { Button } from "./ui/button";
-import ClientSideCredits from "./realtime/ClientSideCredits";
 import { ThemeToggle } from "./homepage/theme-toggle";
 import UserDropdown from "./UserDropdown";
 
 export default function NavbarClient() {
   const [user, setUser] = useState<any>(null);
-  const [credits, setCredits] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
-const stripeIsConfigured = creemIsConfigured || process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
-  const packsIsEnabled = true;
-
   useEffect(() => {
-    const supabase = createBrowserClient<Database>(
+    const supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // Get user
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
-      
-      if (user) {
-        // Get credits
-        supabase
-          .from("credits")
-          .select("*")
-          .eq("user_id", user.id)
-          .single()
-          .then(({ data }) => {
-            setCredits(data);
-            setLoading(false);
-          });
-      } else {
-        setLoading(false);
-      }
+      setLoading(false);
     });
   }, []);
 
@@ -65,20 +43,13 @@ const stripeIsConfigured = creemIsConfigured || process.env.NEXT_PUBLIC_STRIPE_I
         </Link>
         
         {user && (
-          <nav className="hidden md:flex gap-6 items-center">
+          <nav className="flex gap-4 sm:gap-6 items-center text-sm sm:text-base">
             <Link href="/overview" className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors cursor-pointer">
               Home
             </Link>
-            {packsIsEnabled && (
-              <Link href="/overview/packs" className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors cursor-pointer">
-                Packs
-              </Link>
-            )}
-            {stripeIsConfigured && (
-              <Link href="/get-credits" className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors cursor-pointer">
-                Get Credits
-              </Link>
-            )}
+            <Link href="/packs" className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors cursor-pointer">
+              Styles
+            </Link>
           </nav>
         )}
         
@@ -98,9 +69,6 @@ const stripeIsConfigured = creemIsConfigured || process.env.NEXT_PUBLIC_STRIPE_I
 
           {user && (
             <div className="flex items-center gap-4">
-              {stripeIsConfigured && (
-                <ClientSideCredits creditsRow={credits ? credits : null} />
-              )}
               <UserDropdown user={user} />
             </div>
           )}

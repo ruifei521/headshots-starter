@@ -4,13 +4,12 @@ import { Badge } from "@/components/ui/badge"
 import { Check, X, Camera, Clock, DollarSign, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { PRICING } from "@/lib/pricing"
 
 const comparisons = [
   {
     feature: "Cost",
     traditional: "$200 – $500 per session",
-    ours: `$${PRICING.starter.price} – $${PRICING.executive.price}`,
+    ours: `$29`,
     icon: <DollarSign className="h-4 w-4" />,
   },
   {

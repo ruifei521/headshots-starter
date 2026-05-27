@@ -4,7 +4,7 @@ import { Shield, Star, Trash2 } from "lucide-react"
 
 export default function PrivacySection() {
   return (
-    <section className="py-20 md:py-32 bg-background border-t">
+    <section className="py-10 md:py-16 bg-background border-t">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center gap-4 text-center md:gap-8">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
@@ -15,7 +15,7 @@ export default function PrivacySection() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-8 max-w-3xl mx-auto">
+        <div className="mt-8 grid gap-8 max-w-3xl mx-auto">
           {/* Refund Guarantee */}
           <div className="flex flex-col gap-3 rounded-xl border p-8">
             <div className="flex items-center gap-3">

@@ -1,15 +1,6 @@
 import Link from "next/link";
 import { Camera } from "lucide-react";
 
-// 热门类别（最多 5 个，手动维护，新加的从这替换旧的）
-const featuredCategories = [
-  { name: "LinkedIn Headshots", slug: "linkedin" },
-  { name: "Lawyer Headshots", slug: "lawyer" },
-  { name: "Realtor Headshots", slug: "realtor" },
-  { name: "Executive Headshots", slug: "executive" },
-  { name: "Corporate Headshots", slug: "corporate" },
-];
-
 export default function Footer() {
   return (
     <footer className="border-t py-8 md:py-14">
@@ -30,22 +21,24 @@ export default function Footer() {
           <div className="space-y-3">
             <h3 className="text-sm font-medium">Headshots</h3>
             <ul className="space-y-1.5">
-              {featuredCategories.map((cat) => (
-                <li key={cat.slug}>
-                  <Link
-                    href={`/headshots/${cat.slug}`}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
               <li>
-                <Link
-                  href="/headshots"
-                  className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-                >
-                  View All Styles →
+                <Link href="/headshots/linkedin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  LinkedIn Headshots
+                </Link>
+              </li>
+              <li>
+                <Link href="/headshots/lawyer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Lawyer Headshots
+                </Link>
+              </li>
+              <li>
+                <Link href="/headshots/realtor" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Realtor Headshots
+                </Link>
+              </li>
+              <li>
+                <Link href="/templates" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  All Styles
                 </Link>
               </li>
             </ul>
@@ -66,11 +59,6 @@ export default function Footer() {
               <li>
                 <Link href="/templates" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Choose Your Style
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  About Us
                 </Link>
               </li>
               <li>
@@ -118,7 +106,7 @@ export default function Footer() {
         </div>
         <div className="mt-6 flex flex-col items-center justify-between gap-2 border-t pt-6 md:flex-row">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} SnapProHead. Secure payments.
+            © {new Date().getFullYear()} SnapProHead. Operated by Fei Rui. Secure payments.
           </p>
         </div>
       </div>

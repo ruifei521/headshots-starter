@@ -2,36 +2,21 @@
 
 import Link from "next/link";
 
-interface NavLinksProps {
-  packsIsEnabled: boolean;
-  paymentIsConfigured: boolean;
-}
-
-export default function NavLinks({ packsIsEnabled, paymentIsConfigured }: NavLinksProps) {
+export default function NavLinks() {
   return (
-    <nav className="hidden md:flex gap-6 items-center">
+    <nav className="flex gap-4 sm:gap-6 items-center text-sm sm:text-base">
       <Link 
-        href="/" 
-        className="px-3 py-2 inline-flex items-center text-sm font-medium hover:text-primary transition-colors cursor-pointer"
+        href="/templates"
+        className="px-3 py-2 inline-flex items-center text-base font-semibold hover:text-primary transition-colors cursor-pointer"
       >
-        Home
+        Templates
       </Link>
-      {packsIsEnabled && (
-        <Link 
-          href="/overview/packs"
-          className="px-3 py-2 inline-flex items-center text-sm font-medium hover:text-primary transition-colors cursor-pointer"
-        >
-          Packs
-        </Link>
-      )}
-      {paymentIsConfigured && (
-        <Link 
-          href="/get-credits"
-          className="px-3 py-2 inline-flex items-center text-sm font-medium hover:text-primary transition-colors cursor-pointer"
-        >
-          Get Credits
-        </Link>
-      )}
+      <Link 
+        href="/#pricing"
+        className="px-3 py-2 inline-flex items-center text-base font-semibold hover:text-primary transition-colors cursor-pointer"
+      >
+        Pricing
+      </Link>
     </nav>
   );
 }

@@ -1,67 +1,72 @@
 "use client"
-import { useEffect, useState } from "react"
 import { Badge } from "@/components/ui/badge"
-import { Loader2 } from "lucide-react"
 import Link from "next/link"
-import axios from "axios"
 
 interface PackPreview {
-  id: string
-  title: string
   slug: string
+  title: string
   subtitle: string
   cover_url: string
   tag: string
+  isPremium?: boolean
 }
 
+const allPacks: PackPreview[] = [
+  // Core Professional Styles
+  { slug: 'corporate-headshots', title: 'Corporate Headshots', subtitle: 'Formal Business', cover_url: '', tag: 'Professional', isPremium: false },
+  { slug: 'partners-headshots', title: "Partner's Headshots", subtitle: 'Legal Professional', cover_url: '', tag: 'Professional', isPremium: false },
+  { slug: 'speaker', title: 'Speaker', subtitle: 'Public Speaking', cover_url: '', tag: 'Professional', isPremium: false },
+  { slug: 'realtor', title: 'Realtor', subtitle: 'Real Estate', cover_url: '', tag: 'Professional', isPremium: false },
+  { slug: 'styled-for-success', title: 'Styled for Success', subtitle: 'Modern Professional', cover_url: '', tag: 'Professional', isPremium: false },
+  { slug: 'lawyer-il', title: 'Lawyer Headshots', subtitle: 'Legal Professional', cover_url: '', tag: 'Professional', isPremium: false },
+  // More Styles
+  { slug: 'talya-maor', title: 'Image shots - Talya Maor', subtitle: 'Branding Photography', cover_url: '', tag: 'Premium', isPremium: true },
+  { slug: 'natural-headshots', title: 'Natural Looks', subtitle: 'Natural & Approachable', cover_url: '', tag: 'Premium', isPremium: true },
+  { slug: 'business-profile-studio', title: 'Business Profile - Studio', subtitle: 'Studio Photography', cover_url: '', tag: 'Premium', isPremium: true },
+  { slug: 'effortless-professionalism', title: 'Effortless Professionalism', subtitle: 'Casual Professional', cover_url: '', tag: 'Premium', isPremium: true },
+  { slug: 'office-outfits', title: 'Office Outfits', subtitle: 'Office Fashion', cover_url: '', tag: 'Premium', isPremium: true },
+  { slug: 'stylish-studio-portraits', title: 'Stylish Studio Portraits', subtitle: 'Studio Portrait Photography', cover_url: '', tag: 'Premium', isPremium: true },
+];
+
 export default function PacksShowcase() {
-  const [packs, setPacks] = useState<PackPreview[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    axios.get<PackPreview[]>('/astria/packs')
-      .then(res => setPacks(res.data))
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
-
-  if (loading || packs.length === 0) return null
-
   return (
-    <section className="py-20 md:py-32 bg-muted/30">
+    <section className="py-10 md:py-16 bg-muted/30">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center gap-4 text-center md:gap-8">
           <Badge variant="outline" className="mb-2">
-            6 Professional Styles
+            12 Professional Styles
           </Badge>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
             Choose Your <span className="text-primary">Style</span>
           </h2>
           <p className="max-w-[700px] text-muted-foreground text-lg">
-            Each style contains 10–56 professionally designed headshot styles. Pick the look that fits your industry.
+            12 curated styles — from classic corporate to modern studio portraits. 
+            Each with 20–81 expertly designed headshot variations.
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {packs.map((pack) => (
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {allPacks.map((pack) => (
             <Link
-              key={pack.id}
-              href="/login"
+              key={pack.slug}
+              href={`/packs/${pack.slug}.html`}
               className="group flex flex-col rounded-xl border bg-card overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1"
             >
-              <div className="aspect-[4/3] overflow-hidden bg-muted">
+              <div className="aspect-[3/4] overflow-hidden bg-muted">
                 <img
-                  src={pack.cover_url}
+                  src={`/packs/${pack.slug}_cover.jpg`}
                   alt={pack.title}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
+                  onError={(e) => {
+                    // fallback to first image
+                    (e.target as HTMLImageElement).src = `/packs/${pack.slug}_1.jpg`;
+                  }}
                 />
               </div>
               <div className="p-3 text-center">
                 <p className="text-sm font-semibold leading-tight">{pack.title}</p>
-                {pack.tag && (
-                  <span className="text-xs text-muted-foreground">{pack.tag}</span>
-                )}
+                <p className="text-xs text-muted-foreground mt-0.5">{pack.subtitle}</p>
               </div>
             </Link>
           ))}
@@ -69,7 +74,7 @@ export default function PacksShowcase() {
 
         <div className="mt-10 text-center">
           <p className="text-sm text-muted-foreground">
-            More styles being added regularly. Each style = different backgrounds, outfits, and styles.
+            All styles <strong>$29 each</strong> — pick the ones you need, pay once.
           </p>
         </div>
       </div>

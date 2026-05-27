@@ -38,7 +38,7 @@ const StripePricingTable = ({ user }: Props) => {
   if (!stripePublishableKey) {
     return (
       <div className='flex flex-1 flex-col w-full items-center justify-center py-12'>
-        <p className='text-muted-foreground'>Payment is currently processed by Creem. Please visit the <a href="/get-credits" className="text-primary hover:underline">Get Credits</a> page.</p>
+        <p className='text-muted-foreground'>Payment is currently processed by Creem. Please visit the <a href="/packs" className="text-primary hover:underline">Get Credits</a> page.</p>
       </div>
     );
   }

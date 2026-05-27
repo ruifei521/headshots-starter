@@ -17,7 +17,7 @@ const processSteps = [
   {
     number: 2,
     title: "Pick Your Pack",
-    description: "Choose from 5 professional styles: Corporate, Partner's, Natural, Speaker, or Realtor.",
+    description: "Choose from 6 professional styles: Corporate, Partner's, Natural, Speaker, Realtor, and more.",
     icon: <Sparkles className="h-5 w-5" />,
     processingImage: "/blur.jpg"
   },
@@ -128,7 +128,7 @@ export default function ProcessSection() {
   const [activeStep, setActiveStep] = useState(0)
 
   return (
-    <section id="how-it-works" className="py-20 md:py-32">
+    <section id="how-it-works" className="scroll-mt-16 py-10 md:py-16">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center gap-4 text-center md:gap-8">
           <Badge variant="outline" className="mb-2">
@@ -139,7 +139,7 @@ export default function ProcessSection() {
             Our AI-powered platform transforms your selfies into professional headshots in just three simple steps.
           </p>
         </div>
-        <div className="mt-16 grid gap-8 md:grid-cols-3 md:gap-12">
+        <div className="mt-8 grid gap-8 md:grid-cols-3 md:gap-12">
           {processSteps.map((step, index) => (
             <ProcessStep
               key={step.number}

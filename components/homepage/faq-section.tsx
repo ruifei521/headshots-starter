@@ -56,12 +56,12 @@ export default function FAQSection() {
     {
       question: "What styles are available?",
       answer:
-        "We currently offer 5 professional styles: Corporate Headshots (executive/business), Partner's Headshots (legal/formal), Natural Looks (casual professional), Speaker (commanding portraits), and Realtor (polished agent style). Each style contains 10-56 pre-designed styles.",
+        "We currently offer 12 professional styles: Corporate Headshots, Partner's Headshots, Lawyer Headshots, Natural Looks, Speaker, Realtor, Styled for Success, Talya Maor, Business Profile Studio, Effortless Professionalism, Office Outfits, and Stylish Studio Portraits. Each style contains 20-81 pre-designed images.",
     },
     {
       question: "Can I buy additional packs later?",
       answer:
-        "Yes! You can add more styles anytime. Additional styles start at $9.99 each. You don't need to upload new photos — we use your existing trained model to generate new styles.",
+        "Yes! You can purchase additional packs anytime. Each pack is $29. You don't need to upload new photos — we use your existing trained model to generate new styles.",
     },
     {
       question: "What kind of photos should I upload?",
@@ -71,7 +71,7 @@ export default function FAQSection() {
     {
       question: "How many headshots per style?",
       answer:
-        "Each style generates 40-56 professional headshots, depending on the style you choose. Larger styles like Corporate Headshots produce 56 images (women) or 52 images (men) with diverse backgrounds and outfits.",
+        "Each style generates 20-81 professional headshots, depending on the style you choose. Larger styles like Lawyer Headshots produce 81 images (women) or 69 images (men) with diverse backgrounds and outfits.",
     },
     {
       question: "Can I use these headshots professionally?",
