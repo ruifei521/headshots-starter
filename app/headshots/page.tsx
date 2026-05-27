@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 
 export const metadata: Metadata = {
-  title: "All Headshot Styles – Professional AI Portraits by Industry | SnapProHead",
+  title: "All Headshot Styles – Professional AI Portraits by Industry",
   description:
     "Browse all professional AI headshot styles. LinkedIn, lawyer, realtor, executive, doctor, teacher, nurse, startup, and more. $29 for 40+ HD photos.",
   alternates: {

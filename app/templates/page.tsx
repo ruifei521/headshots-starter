@@ -3,10 +3,10 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Choose Your Style - AI Headshot Templates | SnapProHead',
+  title: 'Choose Your Style - AI Headshot Templates',
   description: 'Browse professional AI headshot styles including corporate, speaker, realtor, natural looks, and more. Just $29 per pack — 40+ HD headshots in ~30 minutes.',
   openGraph: {
-    title: 'AI Headshot Styles & Templates | SnapProHead',
+    title: 'AI Headshot Styles & Templates',
     description: 'Browse professional styles for your AI headshot. Corporate, speaker, realtor & more. Just $29.',
     url: 'https://snapprohead.com/templates',
   },
