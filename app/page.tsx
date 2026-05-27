@@ -1,37 +1,37 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { cookies } from "next/headers"
-import dynamic from "next/dynamic"
+import nextDynamic from "next/dynamic"
 import HeroSection from "@/components/homepage/HeroSection"
 
-const ProcessSection = dynamic(
+const ProcessSection = nextDynamic(
   () => import("@/components/homepage/ProcessSection"),
   { ssr: false }
 )
-const PacksShowcase = dynamic(
+const PacksShowcase = nextDynamic(
   () => import("@/components/homepage/PacksShowcase"),
   { ssr: false }
 )
-const ExamplesSection = dynamic(
+const ExamplesSection = nextDynamic(
   () => import("@/components/homepage/ExamplesSection"),
   { ssr: false }
 )
-const TestimonialsSection = dynamic(
+const TestimonialsSection = nextDynamic(
   () => import("@/components/homepage/TestimonialsSection"),
   { ssr: false }
 )
-const PricingSection = dynamic(
+const PricingSection = nextDynamic(
   () => import("@/components/homepage/PricingSection"),
   { ssr: false }
 )
-const FAQSection = dynamic(
+const FAQSection = nextDynamic(
   () => import("@/components/homepage/FAQSection"),
   { ssr: false }
 )
-const PrivacySection = dynamic(
+const PrivacySection = nextDynamic(
   () => import("@/components/homepage/PrivacySection"),
   { ssr: false }
 )
-const StartNowCTA = dynamic(
+const StartNowCTA = nextDynamic(
   () => import("@/components/homepage/StartNowCTA"),
   { ssr: false }
 )
