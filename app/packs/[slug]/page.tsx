@@ -1,9 +1,15 @@
 "use client";
 
 import Link from "next/link";
-// import PurchaseButton from "@/components/PurchaseButton";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export const runtime = 'nodejs';
 
@@ -98,6 +104,38 @@ const allPacks: Record<string, { title: string; desc: string; img: string; longD
 function GenderCard({ title, img, count, price, packSlug, gender }: {
   title: string; img: string; count: number; price: string; packSlug: string; gender: string;
 }) {
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handlePurchase = async () => {
+    setLoading(true);
+    try {
+      // Check if user is logged in first
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        // Redirect to auth page, then come back here
+        router.push(`/login?redirect=/packs/${packSlug}`);
+        return;
+      }
+
+      const res = await fetch('/api/creem/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pack: packSlug, gender }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Failed to create checkout: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="card shadow-sm max-w-xs overflow-hidden bg-white rounded-2xl">
       <figure>
@@ -115,7 +153,17 @@ function GenderCard({ title, img, count, price, packSlug, gender }: {
           <span className="text-lg font-bold">{price}</span>
         </div>
         <div className="mt-3">
-          {/* <PurchaseButton packSlug={packSlug} /> */}
+          <button
+            onClick={handlePurchase}
+            disabled={loading}
+            className="w-full py-2.5 px-4 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
+            ) : (
+              `Purchase - $29`
+            )}
+          </button>
         </div>
       </div>
     </div>
