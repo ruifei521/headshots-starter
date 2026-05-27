@@ -1,182 +1,69 @@
 "use client"
 
 import Link from "next/link"
-import type React from "react"
-import { Check, Shield, Clock, Star, Sparkles } from "lucide-react"
+import { Check, Clock, Shield, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { PRICING } from "@/lib/pricing"
-
-interface PricingTier {
-  title: string
-  price: string
-  description: string
-  features: string[]
-  buttonText: string
-  popular?: boolean
-  bestValue?: boolean
-  credits?: string
-  headshots?: string
-  perPhoto?: string
-  deliveryTime?: string
-}
 
 export default function ModernPricing() {
-  const tiers: PricingTier[] = [
-    {
-      title: "Starter",
-      price: `$${PRICING.starter.price}`,
-      description: "Perfect for individuals looking to enhance their LinkedIn or CV.",
-      features: [
-        "6 Professional Styles",
-        `${PRICING.starter.headshots} AI-Generated Headshots`,
-        "10-56 pre-designed styles",
-      ],
-      buttonText: "Get Started",
-      credits: `${PRICING.starter.credits} Credit`,
-      headshots: `${PRICING.starter.headshots} Headshots`,
-      perPhoto: `$${PRICING.starter.price / PRICING.starter.headshots}`,
-      deliveryTime: "~30 min",
-    },
-    {
-      title: "Pro",
-      price: `$${PRICING.pro.price}`,
-      description: "Ideal for professionals who want variety across styles.",
-      features: [
-        "6 Professional Styles",
-        `${PRICING.pro.headshots} AI-Generated Headshots`,
-        "10-56 pre-designed styles",
-        "Corporate, Natural, Formal & more",
-        "Priority Processing",
-      ],
-      buttonText: "Get Started",
-      credits: `${PRICING.pro.credits} Credits`,
-      headshots: `${PRICING.pro.headshots} Headshots`,
-      perPhoto: `$${Math.round(PRICING.pro.price / PRICING.pro.headshots * 100) / 100}`,
-      deliveryTime: "~30 min",
-      popular: true,
-    },
-    {
-      title: "Executive",
-      price: `$${PRICING.executive.price}`,
-      description: "The complete package for maximum variety.",
-      features: [
-        "6 Professional Styles",
-        `${PRICING.executive.headshots} AI-Generated Headshots`,
-        "10-56 pre-designed styles",
-        "Full access: all packs included",
-        "Priority Processing",
-      ],
-      buttonText: "Get Started",
-      credits: `${PRICING.executive.credits} Credits`,
-      headshots: `${PRICING.executive.headshots} Headshots`,
-      perPhoto: `$${Math.round(PRICING.executive.price / PRICING.executive.headshots * 100) / 100}`,
-      deliveryTime: "~30 min",
-      bestValue: true,
-    },
-  ]
-
   return (
     <div className="mx-auto max-w-5xl px-4">
       <div className="flex flex-col items-center justify-center space-y-8">
         {/* Section Header */}
         <div className="text-center space-y-4">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
-            Simple Pricing
-          </span>
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            Professional Headshots, <span className="text-primary">Affordable Price</span>
+<h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            Professional Headshots, <span className="text-primary">Just $29</span>
           </h2>
           <p className="max-w-[600px] text-muted-foreground text-lg mx-auto">
-            Choose from 5 professional styles. Pay once, own your photos forever.
+            Pick any style. Pay once. Own your headshots forever.
           </p>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="mt-8 grid gap-6 md:grid-cols-3 lg:gap-8">
-          {tiers.map((tier, index) => (
-            <div
-              key={index}
-              className={cn(
-                "relative flex flex-col rounded-xl border bg-card p-6 shadow-sm transition-all duration-200 hover:shadow-md",
-                tier.popular && "ring-2 ring-primary shadow-lg scale-[1.02]",
-                tier.bestValue && "ring-2 ring-amber-500 shadow-lg"
-              )}
-            >
-              {/* Popular / Best Value badges */}
-              {tier.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-primary text-primary-foreground shadow-sm">
-                    <Star className="h-3 w-3" />
-                    Most Popular — 84% Choose This
-                  </span>
-                </div>
-              )}
-              {tier.bestValue && !tier.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500 text-white shadow-sm">
-                    <Sparkles className="h-3 w-3" />
-                    Best Value
-                  </span>
-                </div>
-              )}
-
-              <h3 className="text-xl font-bold mt-2">{tier.title}</h3>
-
-              <div className="mt-4 flex items-baseline gap-2">
-                <span className="text-5xl font-extrabold">{tier.price}</span>
-              </div>
-              <div className="flex items-center gap-3 mt-1">
-                {tier.headshots && (
-                  <p className="text-sm font-medium text-primary">{tier.headshots}</p>
-                )}
-                {tier.perPhoto && (
-                  <span className="text-xs text-muted-foreground">
-                    (≈{tier.perPhoto}/photo)
-                  </span>
-                )}
-              </div>
-
-
-              {/* Delivery time badge */}
-              <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                <span>Delivery in ~30 minutes</span>
-              </div>
-
-              <p className="mt-3 text-sm text-muted-foreground">{tier.description}</p>
-
-              <ul className="my-6 space-y-3 flex-1">
-                {tier.features.map((feature, featureIndex) => (
-                  <li key={featureIndex} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <Link href="/get-credits" className="mt-auto block w-full" aria-label={`Select ${tier.title} plan`}>
-                <Button
-                  className={cn(
-                    "w-full min-h-[44px] font-semibold",
-                    tier.popular ? "bg-primary hover:bg-primary/90 text-primary-foreground" : "",
-                    tier.bestValue && !tier.popular ? "bg-amber-600 hover:bg-amber-700 text-white" : ""
-                  )}
-                  aria-label={`Select ${tier.title} plan`}
-                  variant={tier.popular || tier.bestValue ? "default" : "outline"}
-                >
-                  {tier.buttonText}
-                </Button>
-              </Link>
-
-
-
-
+        {/* Single Pricing Card */}
+        <div className="mt-8 w-full max-w-sm">
+          <div className="relative flex flex-col rounded-xl border bg-card p-8 shadow-sm transition-all duration-200 hover:shadow-md ring-2 ring-primary">
+            <div className="flex items-baseline justify-center gap-2">
+              <span className="text-6xl font-extrabold">$29</span>
+              <span className="text-lg text-muted-foreground">/ style</span>
             </div>
-          ))}
+
+            <div className="mt-4 flex items-center justify-center gap-1 text-sm text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              <span>Delivery in ~30 minutes</span>
+            </div>
+
+            <ul className="my-6 space-y-3">
+              <li className="flex items-start gap-2 text-sm">
+                <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <span>50+ AI-generated headshots per style</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm">
+                <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <span>12 professional styles to choose from</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm">
+                <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <span>Full commercial license included</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm">
+                <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <span>High-resolution, print-ready images</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm">
+                <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <span>30-day photo auto-delete for privacy</span>
+              </li>
+            </ul>
+
+            <Link href="/packs" className="mt-auto block w-full">
+              <Button className="w-full min-h-[48px] font-semibold text-base bg-primary hover:bg-primary/90">
+                Browse Styles
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        {/* Comparison Table: Traditional Photography vs SnapProHead */}
+        {/* Comparison Table */}
         <div className="mt-12 w-full max-w-3xl">
           <h3 className="text-center text-xl font-bold mb-6">Why Choose AI Headshots?</h3>
           <div className="overflow-x-auto rounded-lg border">
@@ -192,7 +79,7 @@ export default function ModernPricing() {
                 <tr className="border-b">
                   <td className="px-4 py-3 font-medium">Average Cost</td>
                   <td className="px-4 py-3 text-center text-muted-foreground">$200 – $500</td>
-                  <td className="px-4 py-3 text-center font-medium text-primary">${PRICING.starter.price} – ${PRICING.executive.price}</td>
+                  <td className="px-4 py-3 text-center font-medium text-primary">$29 / style</td>
                 </tr>
                 <tr className="border-b">
                   <td className="px-4 py-3 font-medium">Session Time</td>
@@ -207,12 +94,7 @@ export default function ModernPricing() {
                 <tr className="border-b">
                   <td className="px-4 py-3 font-medium">Style Options</td>
                   <td className="px-4 py-3 text-center text-muted-foreground">1 – 2 per session</td>
-                  <td className="px-4 py-3 text-center font-medium text-primary">5 professional styles</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="px-4 py-3 font-medium">Photo Count</td>
-                  <td className="px-4 py-3 text-center text-muted-foreground">10 – 20 shots</td>
-                  <td className="px-4 py-3 text-center font-medium text-primary">40 – 200+ headshots</td>
+                  <td className="px-4 py-3 text-center font-medium text-primary">12 professional styles</td>
                 </tr>
                 <tr>
                   <td className="px-4 py-3 font-medium">Privacy</td>
@@ -224,10 +106,8 @@ export default function ModernPricing() {
           </div>
         </div>
 
-
-
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          All plans include a <strong>no-questions-asked refund guarantee</strong>. Prices exclude applicable taxes, which are calculated and collected at checkout by Creem, our Merchant of Record.
+          100% satisfaction guaranteed. Prices exclude applicable taxes, collected at checkout.
         </p>
       </div>
     </div>
