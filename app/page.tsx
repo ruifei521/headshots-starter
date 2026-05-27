@@ -1,15 +1,40 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import dynamic from "next/dynamic"
 import HeroSection from "@/components/homepage/HeroSection"
-import ProcessSection from "@/components/homepage/ProcessSection"
-import FeaturesSection from "@/components/homepage/FeaturesSection"
-import PacksShowcase from "@/components/homepage/PacksShowcase"
-import ExamplesSection from "@/components/homepage/ExamplesSection"
-import TestimonialsSection from "@/components/homepage/TestimonialsSection"
-import PricingSection from "@/components/homepage/PricingSection"
-import FAQSection from "@/components/homepage/FAQSection"
-import PrivacySection from "@/components/homepage/PrivacySection"
-import { PRICING } from "@/lib/pricing"
+
+const ProcessSection = dynamic(
+  () => import("@/components/homepage/ProcessSection"),
+  { ssr: false }
+)
+const PacksShowcase = dynamic(
+  () => import("@/components/homepage/PacksShowcase"),
+  { ssr: false }
+)
+const ExamplesSection = dynamic(
+  () => import("@/components/homepage/ExamplesSection"),
+  { ssr: false }
+)
+const TestimonialsSection = dynamic(
+  () => import("@/components/homepage/TestimonialsSection"),
+  { ssr: false }
+)
+const PricingSection = dynamic(
+  () => import("@/components/homepage/PricingSection"),
+  { ssr: false }
+)
+const FAQSection = dynamic(
+  () => import("@/components/homepage/FAQSection"),
+  { ssr: false }
+)
+const PrivacySection = dynamic(
+  () => import("@/components/homepage/PrivacySection"),
+  { ssr: false }
+)
+const StartNowCTA = dynamic(
+  () => import("@/components/homepage/StartNowCTA"),
+  { ssr: false }
+)
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -17,9 +42,9 @@ const jsonLd = {
     {
       "@type": "Product",
       "name": "SnapProHead - AI Professional Headshot Generator",
-      "description": `Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. Starting at $${PRICING.starter.price} with a 14-day money-back guarantee.`,
+      "description": `Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. Just $29 with a 14-day money-back guarantee.`,
       "url": "https://snapprohead.com",
-      "image": "https://snapprohead.com/hero.png",
+      "image": "https://snapprohead.com/hero.webp",
       "brand": {
         "@type": "Brand",
         "name": "SnapProHead"
@@ -27,8 +52,8 @@ const jsonLd = {
       "offers": {
         "@type": "AggregateOffer",
         "priceCurrency": "USD",
-        "lowPrice": `${PRICING.starter.price}`,
-        "highPrice": `${PRICING.executive.price}`,
+        "lowPrice": `$29`,
+        "highPrice": `$29`,
         "offerCount": "3",
         "availability": "https://schema.org/InStock"
       }
@@ -49,7 +74,7 @@ const jsonLd = {
           "name": "How much does it cost?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": `Plans start at $${PRICING.starter.price} for ${PRICING.starter.headshots} headshots up to $${PRICING.executive.price} for ${PRICING.executive.headshots} headshots. Each plan includes a professional style. All plans include a no-questions-asked refund guarantee within 14 days.`
+            "text": `Just $29 for 40+ AI headshots in a professional style. All plans include a no-questions-asked refund guarantee within 14 days.`
           }
         },
         {
@@ -131,11 +156,11 @@ export default async function Index() {
       <div>
         <HeroSection />
         <ProcessSection />
-        <FeaturesSection />
         <PacksShowcase />
         <ExamplesSection />
         <TestimonialsSection />
         <PricingSection />
+        <StartNowCTA />
         <FAQSection />
         <PrivacySection />
       </div>

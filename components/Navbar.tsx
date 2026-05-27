@@ -1,57 +1,46 @@
+"use client";
+
 import { Camera } from "lucide-react"
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { useState, useEffect } from "react";
+import { createBrowserClient } from "@supabase/ssr";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import ClientSideCredits from "./realtime/ClientSideCredits";
+
 import { ThemeToggle } from "./homepage/theme-toggle";
 import UserDropdown from "./UserDropdown";
-import NavLinks from "./NavLinks";
 
-export const dynamic = "force-dynamic";
+export default function Navbar() {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
-const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
-const paymentIsConfigured = creemIsConfigured || stripeIsConfigured;
-const packsIsEnabled = true;
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
-export default async function Navbar() {
-  // 构建时环境变量可能不存在，此时跳过 Supabase 查询
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  let user = null;
-  let credits = null;
-
-  if (supabaseUrl && supabaseAnonKey) {
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() {
-          return cookies().getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            try {
-              cookies().set(name, value, options);
-            } catch {
-              // The `set` method was called from a Server Component.
-            }
-          });
-        },
-      },
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setLoading(false);
     });
 
-    const { data: userData } = await supabase.auth.getUser();
-    user = userData.user;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
 
-    if (user) {
-      const { data: creditsData } = await supabase
-        .from("credits")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
-      credits = creditsData;
-    }
+    return () => subscription?.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center gap-2 font-bold text-xl">
+            <span>Loading...</span>
+          </div>
+        </div>
+      </header>
+    );
   }
 
   return (
@@ -62,19 +51,26 @@ export default async function Navbar() {
           <span>SnapProHead</span>
         </Link>
         
-        {user && (
-          <NavLinks 
-            packsIsEnabled={packsIsEnabled} 
-            paymentIsConfigured={paymentIsConfigured} 
-          />
-        )}
+        <nav className="flex gap-4 sm:gap-6 items-center text-sm sm:text-base">
+          <Link href="/templates" className="px-3 py-2 inline-flex items-center text-base font-semibold hover:text-primary transition-colors">
+            Choose Style
+          </Link>
+          <Link href="/#pricing" className="px-3 py-2 inline-flex items-center text-base font-semibold hover:text-primary transition-colors">
+            Pricing
+          </Link>
+          {user && (
+            <Link href="/overview" className="px-3 py-2 inline-flex items-center text-base font-semibold hover:text-primary transition-colors">
+              My Models
+            </Link>
+          )}
+        </nav>
         
         <div className="flex items-center gap-4">
           <ThemeToggle />
           
           {!user && (
             <>
-              <Link href="/login" className="hidden sm:block text-sm font-medium hover:text-primary transition-colors py-2">
+              <Link href="/login" className="hidden sm:block text-base font-semibold hover:text-primary transition-colors py-2">
                 Login
               </Link>
               <Link href="/login">
@@ -85,9 +81,6 @@ export default async function Navbar() {
 
           {user && (
             <div className="flex items-center gap-4">
-              {paymentIsConfigured && (
-                <ClientSideCredits creditsRow={credits ? credits : null} />
-              )}
               <UserDropdown user={user} />
             </div>
           )}

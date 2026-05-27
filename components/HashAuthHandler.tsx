@@ -24,19 +24,25 @@ export function HashAuthHandler() {
   const [processing, setProcessing] = useState(false);
   const [hasRun, setHasRun] = useState(false);
 
-  // 构建时环境变量可能不存在，跳过 Supabase 客户端创建
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  // Check if there's a post-login redirect
+  const getPostLoginUrl = () => {
+    if (typeof window === 'undefined') return '/overview';
+    const redirect = sessionStorage.getItem('postLoginRedirect');
+    if (redirect) {
+      sessionStorage.removeItem('postLoginRedirect');
+      return redirect;
+    }
+    return '/overview';
+  };
 
   const supabase = useMemo(() => {
-    if (!supabaseUrl || !supabaseAnonKey) return null;
-    return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
-  }, [supabaseUrl, supabaseAnonKey]);
+    return createBrowserClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+  }, []);
 
   useEffect(() => {
-    // 无 Supabase 客户端时跳过（构建时环境变量缺失）
-    if (!supabase) return;
-
     // Prevent running multiple times
     if (hasRun) {
       console.log("[HashAuthHandler] Already ran, skipping");
@@ -62,9 +68,9 @@ export function HashAuthHandler() {
             return;
           }
 
-          console.log("[HashAuthHandler] ✓ PKCE exchange success, redirecting to /overview", data);
+          console.log("[HashAuthHandler] ✓ PKCE exchange success, redirecting", data);
           window.history.replaceState({}, '', window.location.pathname);
-          router.push("/overview");
+          router.push(getPostLoginUrl());
           return;
         } catch (err) {
           console.error("[HashAuthHandler] ✗ PKCE exchange unexpected error:", err);
@@ -119,9 +125,9 @@ export function HashAuthHandler() {
           return;
         }
 
-        console.log("[HashAuthHandler] ✓ Session established successfully, redirecting to /overview", data);
+        console.log("[HashAuthHandler] ✓ Session established successfully, redirecting", data);
         window.location.hash = "";
-        router.push("/overview");
+        router.push(getPostLoginUrl());
       } catch (err) {
         console.error("[HashAuthHandler] ✗ Unexpected error:", err);
         window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
