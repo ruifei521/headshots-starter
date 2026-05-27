@@ -1,4 +1,4 @@
-"use client";
+"use client"; // v2 - fixed supabase auth check
 
 import Link from "next/link";
 import { ArrowLeft, Loader2 } from "lucide-react";
