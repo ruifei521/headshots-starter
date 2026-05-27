@@ -423,7 +423,6 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
             {...getRootProps()}
             className=" rounded-md justify-center align-middle cursor-pointer flex flex-col gap-4"
           >
-            <FormLabel>Samples</FormLabel>
             <FormDescription>
               Upload 4-10 images of the person you want to generate headshots
               for.
