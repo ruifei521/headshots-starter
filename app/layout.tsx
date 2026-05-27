@@ -6,6 +6,7 @@ import "./globals.css";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { Analytics } from "@vercel/analytics/react";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "@/components/homepage/theme-provider"
 import { validateConfig } from "@/lib/config";
 import { HashAuthHandler } from "@/components/HashAuthHandler";
@@ -30,6 +31,9 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
+  verification: {
+    google: 'tN7APPasI_zAOB5ACzfwdHoe0Kp_Lt83OrBXcBk1h14',
+  },
   title: {
     default: `SnapProHead - AI Professional Headshots in ~30 Minutes | Just $29`,
     template: "%s | SnapProHead",
@@ -47,7 +51,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://snapprohead.com/hero.png",
+        url: "https://snapprohead.com/hero.webp",
         width: 1200,
         height: 630,
         alt: "SnapProHead - AI Generated Professional Headshots",
@@ -58,7 +62,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SnapProHead - AI Professional Headshots in ~30 Minutes",
     description: `Turn selfies into professional headshots in ~30 minutes. Just $29 with a 14-day money-back guarantee.`,
-    images: ["https://snapprohead.com/hero.png"],
+    images: ["https://snapprohead.com/hero.webp"],
   },
   manifest: "/site.webmanifest",
   icons: {
@@ -96,6 +100,7 @@ export default function RootLayout({
           <Footer />
           <Toaster />
           <Analytics />
+          {process.env.NODE_ENV === 'production' && <GoogleAnalytics gaId="G-CEBQCJJXYN" />}
         </ThemeProvider>
       </body>
     </html>
