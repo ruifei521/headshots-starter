@@ -1,22 +1,15 @@
-import { Badge } from "@/components/ui/badge"
 import ModernPricing from "@/components/homepage/modern-pricing"
 
 export default function PricingSection() {
   return (
-    <section id="pricing" className="border-t py-20 md:py-32 bg-muted/30">
+    <section id="pricing" className="scroll-mt-16 border-t py-12 md:py-16 bg-muted/30">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center gap-4 text-center md:gap-8">
-          <Badge variant="outline" className="mb-2">
-            Pricing
-          </Badge>
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            Professional headshots for <span className="text-primary">a fraction</span> of the cost
+<h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            Traditional studio: <span className="text-primary">$200–$500</span>.
           </h2>
-          <p className="max-w-[700px] text-muted-foreground text-lg">
-            Traditional photography sessions cost $200–$500. Get AI-generated professional headshots starting at $29.
-          </p>
         </div>
-        <div className="mt-16">
+        <div className="mt-8">
           <ModernPricing />
         </div>
       </div>

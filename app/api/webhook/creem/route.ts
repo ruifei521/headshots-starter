@@ -2,12 +2,14 @@ import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 import * as crypto from 'crypto';
-import { CREDITS_PER_PRODUCT } from '@/lib/pricing';
+// Single $29 product = 1 generation
+const CREDITS_PER_PRODUCT: Record<string, number> = {
+  'prod_6F4zKTNhL3V7vWPUhnjZDZ': 1,
+};
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const webhookSecret = process.env.CREEM_WEBHOOK_SECRET!;
-// CREDITS_PER_PRODUCT imported from @/lib/pricing
 
 function verifySignature(payload: string, signature: string): boolean {
   if (!webhookSecret || !signature) return false;

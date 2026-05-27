@@ -1,38 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PRICING, PRODUCT_IDS } from '@/lib/pricing';
+import { createServerClient } from '@supabase/ssr';
 
 const CREEM_API_KEY = process.env.CREEM_API_KEY!;
 const CREEM_API_BASE = 'https://api.creem.io/v1';
+const SINGLE_PRODUCT_ID = 'prod_6F4zKTNhL3V7vWPUhnjZDZ';
 
-// Product definitions from shared pricing
-const PRODUCTS = [
-  { id: PRODUCT_IDS.starter, name: 'Starter Pack', credits: PRICING.starter.credits, price: PRICING.starter.price * 100 },
-  { id: PRODUCT_IDS.pro, name: 'Pro Pack', credits: PRICING.pro.credits, price: PRICING.pro.price * 100 },
-  { id: PRODUCT_IDS.executive, name: 'Executive Pack', credits: PRICING.executive.credits, price: PRICING.executive.price * 100 },
-];
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const { productId, userId, email, name } = await req.json();
+    // Check auth from request cookies
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return req.cookies.getAll(); },
+          setAll() {},
+        },
+      }
+    );
+    
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!productId || !userId) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'Missing required fields: productId, userId' },
+        { error: 'Not authenticated', code: 'AUTH_REQUIRED' },
+        { status: 401 }
+      );
+    }
+
+    const { pack } = await req.json();
+
+    if (!pack) {
+      return NextResponse.json(
+        { error: 'Missing pack' },
         { status: 400 }
       );
     }
 
-    const product = PRODUCTS.find(p => p.id === productId);
-    if (!product) {
-      return NextResponse.json(
-        { error: 'Invalid product ID' },
-        { status: 400 }
-      );
-    }
-
-    // Create a checkout session via CREEM API
-    // POST /v1/checkouts — creates a hosted checkout page
-    // Docs: https://docs.creem.io/api-reference/checkout
+    // Create CREEM checkout
     const response = await fetch(`${CREEM_API_BASE}/checkouts`, {
       method: 'POST',
       headers: {
@@ -40,11 +47,10 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        product_id: productId,
-        success_url: 'https://snapprohead.com/get-credits?success=true',
-        cancel_url: 'https://snapprohead.com/get-credits?canceled=true',
-        request_id: userId,   // Used by CREEM to identify the user in webhook
-        customer: email ? { email, name: name || '' } : undefined,
+        product_id: SINGLE_PRODUCT_ID,
+        success_url: `https://snapprohead.com/overview/models/train/${pack}`,
+        request_id: user.id,
+        customer: user.email ? { email: user.email } : undefined,
       }),
     });
 
@@ -52,15 +58,12 @@ export async function POST(req: NextRequest) {
       const errorBody = await response.text();
       console.error('CREEM checkout API error:', response.status, errorBody);
       return NextResponse.json(
-        { error: `CREEM API error: ${response.status}`, details: errorBody },
+        { error: 'CREEM API error' },
         { status: 502 }
       );
     }
 
     const data = await response.json();
-    
-    // CREEM returns a checkout session with a checkout_url
-    // The user should be redirected to this URL to complete payment
     const checkoutUrl = data.checkout_url || data.url;
     
     if (!checkoutUrl) {
@@ -71,7 +74,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ url: checkoutUrl, session_id: data.id });
+    return NextResponse.json({ url: checkoutUrl });
 
   } catch (error) {
     console.error('Checkout error:', error);
