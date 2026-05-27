@@ -1,7 +1,5 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import fs from "fs";
-import path from "path";
 
 export const metadata: Metadata = {
   title: "All Headshot Styles – Professional AI Portraits by Industry",
@@ -17,26 +15,27 @@ interface Category {
   name: string;
 }
 
-function getCategories(): Category[] {
-  const dir = path.join(process.cwd(), "app", "headshots");
-  try {
-    const slugs = fs.readdirSync(dir, { withFileTypes: true })
-      .filter((d) => d.isDirectory() && d.name !== "page")
-      .map((d) => d.name);
-    return slugs.map((slug) => ({
-      slug,
-      name: slug
-        .replace(/-/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase()),
-    }));
-  } catch {
-    return [];
-  }
-}
+const CATEGORIES: Category[] = [
+  { slug: "linkedin", name: "LinkedIn" },
+  { slug: "lawyer", name: "Lawyer" },
+  { slug: "realtor", name: "Realtor" },
+  { slug: "executive", name: "Executive" },
+  { slug: "corporate", name: "Corporate" },
+  { slug: "business", name: "Business" },
+  { slug: "professional", name: "Professional" },
+  { slug: "portfolio", name: "Portfolio" },
+  { slug: "teacher", name: "Teacher" },
+  { slug: "nurse", name: "Nurse" },
+  { slug: "consultant", name: "Consultant" },
+  { slug: "accountant", name: "Accountant" },
+  { slug: "dentist", name: "Dentist" },
+  { slug: "doctor", name: "Doctor" },
+  { slug: "c-suite", name: "C-Suite" },
+  { slug: "startup", name: "Startup" },
+  { slug: "actor", name: "Actor" },
+];
 
 export default function HeadshotsIndexPage() {
-  const categories = getCategories();
-
   return (
     <main className="min-h-screen">
       <section className="py-16 md:py-24">
@@ -48,7 +47,7 @@ export default function HeadshotsIndexPage() {
             Professional AI headshots for every industry. Choose your style below.
           </p>
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {categories.map((cat) => (
+            {CATEGORIES.map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/headshots/${cat.slug}`}
@@ -56,14 +55,11 @@ export default function HeadshotsIndexPage() {
               >
                 <h2 className="font-semibold text-lg">{cat.name} Headshots</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Professional AI headshots for {cat.name}s
+                  Professional AI headshots for {cat.name.toLowerCase()}s
                 </p>
               </Link>
             ))}
           </div>
-          {categories.length === 0 && (
-            <p className="text-muted-foreground">No styles available yet. Check back soon.</p>
-          )}
         </div>
       </section>
     </main>
