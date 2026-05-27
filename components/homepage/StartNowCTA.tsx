@@ -1,0 +1,36 @@
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { ArrowRight } from "lucide-react"
+
+export default function StartNowCTA() {
+  return (
+    <section className="border-t py-14 md:py-20">
+      <div className="container px-4 md:px-6">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl mb-4">
+            Ready for Your <span className="text-primary">Professional Headshot</span>?
+          </h2>
+          <p className="text-muted-foreground text-lg mb-8">
+            No studio, no appointment, no hassle. Just upload 4-10 selfies and get 40+ studio-quality headshots in ~30 minutes.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/templates">
+              <Button size="lg" className="group text-base font-bold">
+                Start Now — $29
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/templates">
+              <Button size="lg" variant="outline">
+                See All Styles
+              </Button>
+            </Link>
+          </div>
+          <p className="text-xs text-muted-foreground mt-4">
+            14-day money-back guarantee • No hidden fees • Instant delivery
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
