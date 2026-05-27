@@ -4,12 +4,15 @@ import Link from "next/link";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Use browser client so it reads cookies and manages session automatically
+function getSupabase() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 export const runtime = 'nodejs';
 
@@ -111,9 +114,10 @@ function GenderCard({ title, img, count, price, packSlug, gender }: {
     setLoading(true);
     try {
       // Check if user is logged in first
+      const supabase = getSupabase();
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        // Redirect to auth page, then come back here
+        // Not logged in → redirect to login, come back after auth
         router.push(`/login?redirect=/packs/${packSlug}`);
         return;
       }
