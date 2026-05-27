@@ -40,6 +40,12 @@ module.exports = {
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
+      {
+        source: "/packs/:path*",
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
     ];
   },
 
@@ -52,6 +58,9 @@ module.exports = {
   },
 
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    // Only remove console.log in production, keep warn/error for API debugging
+    removeConsole: process.env.NODE_ENV === 'production'
+      ? { exclude: ['error', 'warn'] }
+      : false,
   },
 };
