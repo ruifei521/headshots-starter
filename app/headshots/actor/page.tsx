@@ -5,10 +5,10 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Actor Headshots - Professional AI Headshots for Actors & Performers',
-  description: 'Get professional AI actor headshots in ~30 minutes. Headshot photography for actors, performers, and entertainers. Multiple looks, one low price. Just $29 with 14-day guarantee.',
+  description: 'Get professional AI actor headshots in ~30 minutes. Headshot photography for actors, performers, and entertainers. Multiple looks, one low price. Starting at $29 with 14-day guarantee.',
   openGraph: {
     title: 'AI Actor Headshots - Professional Headshot Photography',
-    description: 'Professional actor headshots in ~30 minutes. Multiple looks, just $29.',
+    description: 'Professional actor headshots in ~30 minutes. Multiple looks, starting at $29.',
   },
 }
 
@@ -87,7 +87,7 @@ export default function ActorHeadshotsPage() {
           '@context': 'https://schema.org','@type': 'FAQPage',
           mainEntity: [
             {'@type':'Question', name:'How much do actor headshots cost?',
-             acceptedAnswer:{'@type':'Answer', text:'Just $29 for 40+ HD professional headshots. 14-day money-back guarantee.'}},
+             acceptedAnswer:{'@type':'Answer', text:'Starting at $29 for 40+ HD professional headshots. 14-day money-back guarantee.'}},
             {'@type':'Question', name:'How many looks can I get?',
              acceptedAnswer:{'@type':'Answer', text:'12 professional styles including corporate, natural, commercial, and theatrical looks.'}},
           ]}

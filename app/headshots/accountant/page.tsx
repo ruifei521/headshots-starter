@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Accountant Headshots – Professional AI Portraits for Accounting Professionals",
   description:
-    "Professional AI headshots for accountants. Build client confidence with a trustworthy, polished image for your firm website, LinkedIn, and business profiles. Just $29 for 40+ HD photos in ~30 minutes.",
+    "Professional AI headshots for accountants. Build client confidence with a trustworthy, polished image for your firm website, LinkedIn, and business profiles. Starting at $29 for 40+ HD photos in ~30 minutes.",
   alternates: {
     canonical: "https://snapprohead.com/headshots/accountant",
   },

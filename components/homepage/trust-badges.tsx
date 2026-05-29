@@ -14,7 +14,7 @@ export default function TrustBadges() {
         </div>
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-yellow-500" />
-          <span className="font-medium">6 Professional Styles</span>
+          <span className="font-medium">12 Professional Styles</span>
         </div>
         <div className="flex items-center gap-2">
           <Camera className="h-5 w-5 text-purple-500" />

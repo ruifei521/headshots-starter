@@ -5,10 +5,10 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Realtor Headshots - Professional AI Photos for Real Estate Agents',
-  description: 'Get professional AI headshots for real estate agents. Stand out on Zillow, Realtor.com, and MLS with polished, approachable photos. Just $29 — 40+ HD headshots in ~30 minutes.',
+  description: 'Get professional AI headshots for real estate agents. Stand out on Zillow, Realtor.com, and MLS with polished, approachable photos. Starting at $29 — 40+ HD headshots in ~30 minutes.',
   openGraph: {
     title: 'AI Headshots for Realtors & Real Estate Agents',
-    description: 'Professional real estate headshots that help you close more deals. Just $29.',
+    description: 'Professional real estate headshots that help you close more deals. Starting at $29.',
   },
 }
 
@@ -30,7 +30,7 @@ export default function RealtorHeadshotsPage() {
         name: "How much do professional realtor headshots cost?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Just $29 for 40+ HD headshots in your chosen professional style. All plans include a 14-day money-back guarantee — no questions asked.",
+          text: "Starting at $29 for 40+ HD headshots in your chosen professional style. All plans include a 14-day money-back guarantee — no questions asked.",
         },
       },
       {

@@ -4,10 +4,10 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Choose Your Style - AI Headshot Templates',
-  description: 'Browse professional AI headshot styles including corporate, speaker, realtor, natural looks, and more. Just $29 per pack — 40+ HD headshots in ~30 minutes.',
+  description: 'Browse professional AI headshot styles including corporate, speaker, realtor, natural looks, and more. Starting at $29 per pack — 40+ HD headshots in ~30 minutes.',
   openGraph: {
     title: 'AI Headshot Styles & Templates',
-    description: 'Browse professional styles for your AI headshot. Corporate, speaker, realtor & more. Just $29.',
+    description: 'Browse professional styles for your AI headshot. Corporate, speaker, realtor & more. Starting at $29.',
     url: 'https://snapprohead.com/templates',
   },
 };
@@ -18,7 +18,7 @@ const professionalPacks = [
   { slug: 'partners-headshots', title: "Partner's Headshots", desc: 'Legal Professional', img: 'partners-headshots_1.webp' },
   { slug: 'speaker', title: 'Speaker', desc: 'Public Speaking', img: 'speaker_1.webp' },
   { slug: 'realtor', title: 'Realtor', desc: 'Real Estate', img: 'realtor_1.webp' },
-  { slug: 'amichai-ai', title: 'Styled for Success', desc: 'Modern Professional', img: 'styled-for-success_1.webp' },
+  { slug: 'styled-for-success', title: 'Styled for Success', desc: 'Modern Professional', img: 'styled-for-success_1.webp' },
   { slug: 'lawyer-il', title: 'Lawyer Headshots', desc: 'Legal Professional', img: 'lawyer-il_1.webp' },
 ];
 
@@ -64,7 +64,7 @@ export default function TemplatesPage() {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: 'AI Headshot Styles - SnapProHead',
-    description: 'Browse 12 professional AI headshot styles. Just $29 per pack.',
+    description: 'Browse 12 professional AI headshot styles. Starting at $29 per pack.',
     url: 'https://snapprohead.com/templates',
     numberOfItems: professionalPacks.length + morePacks.length,
     mainEntity: {

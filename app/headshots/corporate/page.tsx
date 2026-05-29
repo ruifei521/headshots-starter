@@ -5,10 +5,10 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Corporate Headshots - Professional AI Photos for corporate professionals',
-  description: 'Get professional AI corporate in ~30 minutes. Corporate Headshots for corporate professionals. 40+ HD photos, just $29. 14-day money-back guarantee.',
+  description: 'Get professional AI corporate in ~30 minutes. Corporate Headshots for corporate professionals. 40+ HD photos, starting at $29. 14-day money-back guarantee.',
   openGraph: {
     title: 'AI Corporate Headshots - corporate professionals',
-    description: 'Professional corporate for corporate professionals. Just $29 for 40+ HD headshots.',
+    description: 'Professional corporate for corporate professionals. Starting at $29 for 40+ HD headshots.',
   },
 }
 
@@ -40,7 +40,7 @@ export default function CorporateHeadshotsPage() {
         <div className="mt-6 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
           <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> 40+ HD Photos</span>
           <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> Multiple Styles</span>
-          <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> Just $29</span>
+          <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> Starting at $29</span>
         </div>
       </div>
 
@@ -77,7 +77,7 @@ export default function CorporateHeadshotsPage() {
           '@context': 'https://schema.org','@type': 'FAQPage',
           mainEntity: [
             {'@type':'Question', name: 'How much do corporate cost?',
-             acceptedAnswer:{'@type':'Answer', text: 'Just $29 for 40+ HD professional headshots.'}},
+             acceptedAnswer:{'@type':'Answer', text: 'Starting at $29 for 40+ HD professional headshots.'}},
             {'@type':'Question', name: 'How long does it take?',
              acceptedAnswer:{'@type':'Answer', text: 'About 30 minutes. Upload 4-10 selfies and our AI generates your photos.'}},
           ]}

@@ -5,10 +5,10 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'LinkedIn Headshots - Professional AI Photos for Your Profile',
-  description: 'Get a professional LinkedIn headshot in ~30 minutes. AI-generated photos that get you noticed by recruiters. 40+ HD headshots, just $29. 14-day refund guarantee.',
+  description: 'Get a professional LinkedIn headshot in ~30 minutes. AI-generated photos that get you noticed by recruiters. 40+ HD headshots, starting at $29. 14-day refund guarantee.',
   openGraph: {
     title: 'AI LinkedIn Headshots - Stand Out to Recruiters',
-    description: 'Professional LinkedIn photos in ~30 minutes. Just $29 for 40+ HD headshots.',
+    description: 'Professional LinkedIn photos in ~30 minutes. Starting at $29 for 40+ HD headshots.',
   },
 }
 
@@ -116,7 +116,7 @@ export default function LinkedInHeadshotsPage() {
               },
               {
                 '@type': 'Question', name: 'How much do LinkedIn headshots cost?',
-                acceptedAnswer: { '@type': 'Answer', text: 'Just $29 for 40+ HD professional headshots in your chosen style. 14-day money-back guarantee.' },
+                acceptedAnswer: { '@type': 'Answer', text: 'Starting at $29 for 40+ HD professional headshots in your chosen style. 14-day money-back guarantee.' },
               },
             ],
           }),

@@ -5,10 +5,10 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Executive Headshots - Professional AI Photos for Executives',
-  description: 'Get boardroom-quality AI executive headshots. Professional portraits for C-suite leaders, executives, and business professionals. Just $29 — 40+ HD headshots in ~30 minutes.',
+  description: 'Get boardroom-quality AI executive headshots. Professional portraits for C-suite leaders, executives, and business professionals. Starting at $29 — 40+ HD headshots in ~30 minutes.',
   openGraph: {
     title: 'AI Executive Headshots - Boardroom Quality Portraits',
-    description: 'Executive headshots that command respect. Just $29 for 40+ HD portraits.',
+    description: 'Executive headshots that command respect. Starting at $29 for 40+ HD portraits.',
   },
 }
 
@@ -74,7 +74,7 @@ export default function ExecutiveHeadshotsPage() {
           '@context': 'https://schema.org','@type': 'FAQPage',
           mainEntity: [
             {'@type':'Question', name:'How much do executive headshots cost?',
-             acceptedAnswer:{'@type':'Answer', text:'Just $29 for 40+ HD professional headshots.'}},
+             acceptedAnswer:{'@type':'Answer', text:'Starting at $29 for 40+ HD professional headshots.'}},
           ]}
         )}}
       />

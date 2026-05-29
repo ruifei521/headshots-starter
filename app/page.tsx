@@ -38,7 +38,7 @@ const jsonLd = {
     {
       "@type": "Product",
       "name": "SnapProHead - AI Professional Headshot Generator",
-      "description": `Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. Just $29 with a 14-day money-back guarantee.`,
+      "description": `Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. Starting at $29 with a 14-day money-back guarantee.`,
       "url": "https://snapprohead.com",
       "image": "https://snapprohead.com/hero.png",
       "brand": {
@@ -48,8 +48,8 @@ const jsonLd = {
       "offers": {
         "@type": "AggregateOffer",
         "priceCurrency": "USD",
-        "lowPrice": `$29`,
-        "highPrice": `$29`,
+        "lowPrice": `29`,
+        "highPrice": `59`,
         "offerCount": "3",
         "availability": "https://schema.org/InStock"
       }

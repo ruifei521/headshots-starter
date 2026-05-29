@@ -12,7 +12,7 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
   const isBest = info.badge === "Best Value";
 
   // CTA action: checkout via Creem with tier parameter
-  const checkoutHref = `/overview/models/train/headshots`;
+  const checkoutHref = `/templates`;
 
   return (
     <div
@@ -38,12 +38,12 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
       {/* Price */}
       <div className="flex items-baseline justify-center gap-1">
         <span className="text-5xl font-extrabold">{info.priceLabel}</span>
-        <span className="text-sm text-muted-foreground">/ 次</span>
+        <span className="text-sm text-muted-foreground">/pack</span>
       </div>
 
       {/* Image count */}
       <p className="mt-1 text-center text-sm text-muted-foreground">
-        {info.imageCount} 张专业头像
+        {info.imageCount} HD headshots
       </p>
 
       {/* Delivery time */}
@@ -118,11 +118,11 @@ export default function ModernPricing() {
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <Shield className="h-4 w-4 text-primary" />
-            30天自动删除
+            30-day auto-delete
           </span>
           <span className="flex items-center gap-1">
             <Check className="h-4 w-4 text-primary" />
-            商业授权
+            Commercial license
           </span>
         </div>
 

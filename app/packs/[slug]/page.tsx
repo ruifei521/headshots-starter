@@ -1,11 +1,11 @@
-"use client"; // v2 - fixed supabase auth check
+"use client"; // v3 - three tier cards with gender selection
 
 import Link from "next/link";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Check, Clock, Star, Zap, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { TIERS, getTierInfo, type Tier } from "@/lib/tiers";
+import { TIERS, getTierInfo, type Tier, type TierInfo } from "@/lib/tiers";
 
 // Use browser client so it reads cookies and manages session automatically
 function getSupabase() {
@@ -47,7 +47,7 @@ const allPacks: Record<string, { title: string; desc: string; img: string; longD
     womanCount: 24, manCount: 24,
     longDesc: 'Approachable and trustworthy headshots for real estate agents. Warm, friendly style that helps you connect with potential buyers and sellers.'
   },
-  'amichai-ai': {
+  'styled-for-success': {
     title: 'Styled for Success', desc: 'Modern Professional',
     img: 'styled-for-success_1.webp',
     womanImg: 'styled-for-success_woman_cover.jpg', manImg: 'styled-for-success_man_cover.jpg',
@@ -105,29 +105,30 @@ const allPacks: Record<string, { title: string; desc: string; img: string; longD
   },
 };
 
-function GenderCard({ title, img, count, price, packSlug, gender, tier }: {
-  title: string; img: string; count: number; price: string; packSlug: string; gender: string; tier?: Tier;
-}) {
+/** Tier card with embedded gender selection */
+function TierPricingCard({ tierInfo, packSlug, highlight }: { tierInfo: TierInfo; packSlug: string; highlight?: boolean }) {
+  const [selectedGender, setSelectedGender] = useState<'woman' | 'man'>('woman');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const isPopular = tierInfo.badge === 'Most Popular';
+  const isBest = tierInfo.badge === 'Best Value';
 
   const handlePurchase = async () => {
     setLoading(true);
     try {
-      // Check if user is logged in first
       const supabase = getSupabase();
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        // Not logged in → redirect to login, come back after auth
         router.push(`/login?redirect=/packs/${packSlug}`);
         return;
       }
 
-      // ⭐ 构建 checkout 请求，包含 tier 参数
-      const body: Record<string, string> = { pack: packSlug, gender };
-      if (tier) {
-        body.tier = tier;
-      }
+      const body: Record<string, string> = {
+        pack: packSlug,
+        gender: selectedGender,
+        tier: tierInfo.tier,
+      };
 
       const res = await fetch('/api/creem/checkout', {
         method: 'POST',
@@ -147,39 +148,97 @@ function GenderCard({ title, img, count, price, packSlug, gender, tier }: {
     }
   };
 
-  // ⭐ 使用 TIERS 常量获取价格（而非硬编码 $29）
-  const displayPrice = price || TIERS.starter.priceLabel;
-
   return (
-    <div className="card shadow-sm max-w-xs overflow-hidden bg-white rounded-2xl">
-      <figure>
-        <img
-          src={`/packs/${img}`}
-          alt={title}
-          className="w-full max-h-80 object-cover"
-          onError={(e) => { (e.target as HTMLImageElement).src = `/packs/${packSlug}_1.webp`; }}
-        />
-      </figure>
-      <div className="p-4">
-        <h5 className="text-lg font-semibold">{title}</h5>
-        <div className="flex justify-between items-center mt-3">
-          <span className="text-sm text-gray-500">{count} images</span>
-          <span className="text-lg font-bold">{displayPrice}</span>
+    <div
+      className={`relative flex flex-col rounded-xl border bg-card p-6 shadow-sm transition-all duration-200 hover:shadow-md ${
+        highlight ? 'ring-2 ring-primary scale-[1.02]' : ''
+      }`}
+    >
+      {/* Badge */}
+      {tierInfo.badge && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+          <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${
+            isPopular
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
+          }`}>
+            {isBest && <Zap className="h-3 w-3" />}
+            {isPopular && <Star className="h-3 w-3" />}
+            {tierInfo.badge}
+          </span>
         </div>
-        <div className="mt-3">
+      )}
+
+      {/* Price */}
+      <div className="flex items-baseline justify-center gap-1 mt-2">
+        <span className="text-4xl font-extrabold">{tierInfo.priceLabel}</span>
+        <span className="text-sm text-muted-foreground">/pack</span>
+      </div>
+
+      {/* Image count */}
+      <p className="mt-1 text-center text-sm text-muted-foreground">
+        {tierInfo.imageCount} HD headshots
+      </p>
+
+      {/* Delivery time */}
+      <div className="mt-2 flex items-center justify-center gap-1 text-xs text-muted-foreground">
+        <Clock className="h-3 w-3" />
+        <span>{tierInfo.estimatedTime} · {tierInfo.resolution}</span>
+      </div>
+
+      {/* Features */}
+      <ul className="my-4 space-y-1.5 flex-1">
+        {tierInfo.features.slice(0, 4).map((feature, i) => (
+          <li key={i} className="flex items-start gap-2 text-sm">
+            <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+            <span>{feature}</span>
+          </li>
+        ))}
+      </ul>
+
+      {/* Gender Selection */}
+      <div className="mb-4">
+        <p className="text-xs font-medium text-muted-foreground mb-2">Select gender:</p>
+        <div className="flex gap-2">
           <button
-            onClick={handlePurchase}
-            disabled={loading}
-            className="w-full py-2.5 px-4 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+            onClick={() => setSelectedGender('woman')}
+            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border transition-colors ${
+              selectedGender === 'woman'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-background text-foreground border-border hover:bg-muted'
+            }`}
           >
-            {loading ? (
-              <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
-            ) : (
-              `Purchase - ${displayPrice}`
-            )}
+            Woman
+          </button>
+          <button
+            onClick={() => setSelectedGender('man')}
+            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border transition-colors ${
+              selectedGender === 'man'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-background text-foreground border-border hover:bg-muted'
+            }`}
+          >
+            Man
           </button>
         </div>
       </div>
+
+      {/* CTA Button */}
+      <button
+        onClick={handlePurchase}
+        disabled={loading}
+        className={`w-full py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-opacity disabled:opacity-50 ${
+          highlight
+            ? 'bg-primary text-primary-foreground hover:opacity-90'
+            : 'bg-secondary text-secondary-foreground hover:opacity-80'
+        }`}
+      >
+        {loading ? (
+          <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
+        ) : (
+          `Get ${tierInfo.name} — ${tierInfo.priceLabel}`
+        )}
+      </button>
     </div>
   );
 }
@@ -190,6 +249,8 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
   if (!pack) {
     router.replace('/templates'); return null;
   }
+
+  const tierList: TierInfo[] = [TIERS.starter, TIERS.professional, TIERS.executive];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -209,34 +270,43 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
           <p className="text-muted-foreground mt-1">{pack.desc}</p>
         </div>
 
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          {/* Steps */}
-          <div className="flex justify-center mb-8">
-            <ul className="flex gap-8 text-sm">
-              <li className="text-primary font-semibold"><span className="bg-primary text-white rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">1</span> Select type</li>
-              <li className="text-gray-400"><span className="bg-gray-200 text-gray-500 rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">2</span> Upload images</li>
-              <li className="text-gray-400"><span className="bg-gray-200 text-gray-500 rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">3</span> AI processing</li>
-            </ul>
+        {/* Description */}
+        <div className="max-w-2xl mx-auto px-4 mt-4">
+          <p className="text-center text-muted-foreground">{pack.longDesc}</p>
+        </div>
+
+        {/* Steps */}
+        <div className="flex justify-center mt-6 mb-8">
+          <ul className="flex gap-8 text-sm">
+            <li className="text-primary font-semibold"><span className="bg-primary text-white rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">1</span> Choose plan</li>
+            <li className="text-gray-400"><span className="bg-gray-200 text-gray-500 rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">2</span> Upload images</li>
+            <li className="text-gray-400"><span className="bg-gray-200 text-gray-500 rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">3</span> AI processing</li>
+          </ul>
+        </div>
+
+        {/* Three Tier Cards */}
+        <div className="max-w-5xl mx-auto px-4 pb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {tierList.map((tierInfo) => (
+              <TierPricingCard
+                key={tierInfo.tier}
+                tierInfo={tierInfo}
+                packSlug={params.slug}
+                highlight={tierInfo.tier === 'professional'}
+              />
+            ))}
           </div>
 
-          {/* Gender selection cards */}
-          <div className="flex flex-wrap justify-center gap-6">
-            <GenderCard
-              title="Woman"
-              img={pack.womanImg}
-              count={pack.womanCount}
-              price="$29"
-              packSlug={params.slug}
-              gender="woman"
-            />
-            <GenderCard
-              title="Man"
-              img={pack.manImg}
-              count={pack.manCount}
-              price="$29"
-              packSlug={params.slug}
-              gender="man"
-            />
+          {/* Trust line */}
+          <div className="flex items-center justify-center gap-4 mt-6 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Shield className="h-4 w-4 text-primary" />
+              14-day money-back guarantee
+            </span>
+            <span className="flex items-center gap-1">
+              <Check className="h-4 w-4 text-primary" />
+              Commercial license
+            </span>
           </div>
         </div>
 
@@ -246,7 +316,7 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
             <h2 className="text-2xl font-bold text-center mb-8">Preview Images</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {(() => {
-                const prefix = {'amichai-ai': 'styled-for-success', 'image-shots': 'talya-maor'}[params.slug] || params.slug;
+                const prefix = {'image-shots': 'talya-maor'}[params.slug] || params.slug;
                 const imgs = [];
                 for (let i = 1; i <= 12; i++) {
                   imgs.push(`/packs/${prefix}_${i}.jpg`);
@@ -267,13 +337,13 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
           </div>
         </div>
 
-        {/* FAQ */}
+        {/* How it works */}
         <div className="max-w-3xl mx-auto px-4 py-12 border-t mt-8">
           <h2 className="text-2xl font-bold mb-6">How does it work?</h2>
           <ol className="space-y-4 text-gray-600 list-decimal list-inside">
-            <li>Select the type of images you would like to buy from above</li>
-            <li>Upload your training images following the guideline</li>
-            <li>Our system processes your images and creates an AI model (~30 minutes). Using the new AI model, a set of predefined headshots will be created for you as shown in the preview images.</li>
+            <li>Choose your plan and select your gender above</li>
+            <li>Upload your training images following the guidelines</li>
+            <li>Our AI processes your images and creates your headshots (~30 minutes). You will receive your professional headshots as shown in the preview images.</li>
           </ol>
         </div>
       </main>

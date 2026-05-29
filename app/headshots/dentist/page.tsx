@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Dentist Headshots",
   description:
-    "Professional AI headshots for dentists. Build trust with polished, approachable portraits for your practice website, Google Business Profile, and social media. Just $29.",
+    "Professional AI headshots for dentists. Build trust with polished, approachable portraits for your practice website, Google Business Profile, and social media. Starting at $29.",
   alternates: {
     canonical: "https://snapprohead.com/headshots/dentist",
   },

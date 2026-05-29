@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Teacher Headshots – Professional AI Portraits for Educators",
   description:
-    "Professional AI headshots for teachers. Build trust with students and parents on school websites, staff directories, and social media. Just $29 for 40+ HD photos in ~30 minutes.",
+    "Professional AI headshots for teachers. Build trust with students and parents on school websites, staff directories, and social media. Starting at $29 for 40+ HD photos in ~30 minutes.",
   alternates: {
     canonical: "https://snapprohead.com/headshots/teacher",
   },

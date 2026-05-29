@@ -39,7 +39,7 @@ describe('TIERS constants', () => {
     expect(s.imageCount).toBe(40);
     expect(s.modelBranch).toBe('sd15');
     expect(s.resolution).toBe('512×768');
-    expect(s.estimatedTime).toBe('~45 分钟');
+    expect(s.estimatedTime).toBe('~45 min');
     expect(s.badge).toBeUndefined();
     expect(s.features.length).toBeGreaterThanOrEqual(4);
   });
@@ -53,7 +53,7 @@ describe('TIERS constants', () => {
     expect(p.imageCount).toBe(60);
     expect(p.modelBranch).toBe('sd15');
     expect(p.resolution).toBe('512×768');
-    expect(p.estimatedTime).toBe('~40 分钟');
+    expect(p.estimatedTime).toBe('~40 min');
     expect(p.badge).toBe('Most Popular');
     expect(p.features.length).toBeGreaterThanOrEqual(5);
   });
@@ -67,7 +67,7 @@ describe('TIERS constants', () => {
     expect(e.imageCount).toBe(100);
     expect(e.modelBranch).toBe('flux');
     expect(e.resolution).toBe('1024×1024');
-    expect(e.estimatedTime).toBe('~25 分钟');
+    expect(e.estimatedTime).toBe('~25 min');
     expect(e.badge).toBe('Best Value');
     expect(e.features.length).toBeGreaterThanOrEqual(5);
   });

@@ -377,7 +377,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
               {tierInfo.name}
             </Badge>
             <span className="text-sm text-muted-foreground">
-              {tierInfo.imageCount} 张专业头像
+              {tierInfo.imageCount} HD headshots
             </span>
           </div>
 

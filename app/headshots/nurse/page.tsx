@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Nurse Headshots – Professional AI Portraits for Nursing Professionals",
   description:
-    "Professional AI headshots for nurses. Present a caring, competent image on hospital websites, LinkedIn, and healthcare directories. Just $29 for 40+ HD photos in ~30 minutes.",
+    "Professional AI headshots for nurses. Present a caring, competent image on hospital websites, LinkedIn, and healthcare directories. Starting at $29 for 40+ HD photos in ~30 minutes.",
   alternates: {
     canonical: "https://snapprohead.com/headshots/nurse",
   },

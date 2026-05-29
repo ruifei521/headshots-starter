@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Startup Headshots",
   description:
-    "Professional headshots for startup founders and teams. Look polished and investable with AI-generated portraits. Just $29 — 14-day guarantee.",
+    "Professional headshots for startup founders and teams. Look polished and investable with AI-generated portraits. Starting at $29 — 14-day guarantee.",
   alternates: {
     canonical: "https://snapprohead.com/headshots/startup",
   },

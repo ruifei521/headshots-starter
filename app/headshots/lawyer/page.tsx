@@ -5,10 +5,10 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Lawyer Headshots - Professional AI Photos for Attorneys',
-  description: 'Get partner-quality AI headshots for lawyers and attorneys. Professional, trustworthy photos for law firm websites, LinkedIn, and court directories. Just $29 with 14-day guarantee.',
+  description: 'Get partner-quality AI headshots for lawyers and attorneys. Professional, trustworthy photos for law firm websites, LinkedIn, and court directories. Starting at $29 with 14-day guarantee.',
   openGraph: {
     title: 'Professional AI Headshots for Lawyers & Attorneys',
-    description: 'Partner-quality headshots for legal professionals. Just $29 — delivered in ~30 minutes.',
+    description: 'Partner-quality headshots for legal professionals. Starting at $29 — delivered in ~30 minutes.',
   },
 }
 
@@ -116,7 +116,7 @@ export default function LawyerHeadshotsPage() {
           '@context': 'https://schema.org','@type': 'FAQPage',
           mainEntity: [
             {'@type':'Question', name:'How much do lawyer headshots cost?',
-             acceptedAnswer:{'@type':'Answer', text:'Just $29 for 40+ HD professional headshots. No hidden fees.'}},
+             acceptedAnswer:{'@type':'Answer', text:'Starting at $29 for 40+ HD professional headshots. No hidden fees.'}},
             {'@type':'Question', name:'What style is best for attorney headshots?',
              acceptedAnswer:{'@type':'Answer', text:'Our Partner\'s Headshots and Corporate styles are most popular for legal professionals. Both feature formal backgrounds and professional attire.'}},
             {'@type':'Question', name:'How long does AI headshot generation take?',

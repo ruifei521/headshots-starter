@@ -18,132 +18,68 @@ export default function TierComparisonTable() {
 
   const rows: ComparisonRow[] = [
     {
-      label: "价格",
-      values: {
-        starter: "$29",
-        professional: "$39",
-        executive: "$59",
-      },
+      label: "Price",
+      values: { starter: "$29", professional: "$39", executive: "$59" },
     },
     {
-      label: "出图数量",
-      values: {
-        starter: "40 张",
-        professional: "60 张",
-        executive: "100 张",
-      },
+      label: "Headshots",
+      values: { starter: "40", professional: "60", executive: "100" },
     },
     {
-      label: "风格场景",
-      values: {
-        starter: "10 种",
-        professional: "15 种",
-        executive: "25 种",
-      },
+      label: "Style scenes",
+      values: { starter: "10", professional: "15", executive: "25" },
     },
     {
-      label: "分辨率",
-      values: {
-        starter: "512×768",
-        professional: "512×768",
-        executive: "1024×1024",
-      },
+      label: "Resolution",
+      values: { starter: "512×768", professional: "512×768", executive: "1024×1024" },
     },
     {
-      label: "AI 模型",
-      values: {
-        starter: "SD 1.5",
-        professional: "SD 1.5",
-        executive: "Flux (增强)",
-      },
+      label: "AI model",
+      values: { starter: "SD 1.5", professional: "SD 1.5", executive: "Flux (enhanced)" },
     },
     {
-      label: "交付时间",
-      values: {
-        starter: "~45 分钟",
-        professional: "~40 分钟",
-        executive: "~25 分钟",
-      },
+      label: "Delivery",
+      values: { starter: "~45 min", professional: "~40 min", executive: "~25 min" },
     },
     {
-      label: "商务正装风格",
-      values: {
-        starter: true,
-        professional: true,
-        executive: true,
-      },
+      label: "Business formal",
+      values: { starter: true, professional: true, executive: true },
     },
     {
-      label: "都市户外风格",
-      values: {
-        starter: false,
-        professional: true,
-        executive: true,
-      },
+      label: "Urban outdoor",
+      values: { starter: false, professional: true, executive: true },
     },
     {
-      label: "演讲/会议风格",
-      values: {
-        starter: false,
-        professional: true,
-        executive: true,
-      },
+      label: "Speaking / conference",
+      values: { starter: false, professional: true, executive: true },
     },
     {
-      label: "法律/金融风格",
-      values: {
-        starter: false,
-        professional: true,
-        executive: true,
-      },
+      label: "Legal / finance",
+      values: { starter: false, professional: true, executive: true },
     },
     {
-      label: "自然生活风格",
-      values: {
-        starter: false,
-        professional: true,
-        executive: true,
-      },
+      label: "Natural lifestyle",
+      values: { starter: false, professional: true, executive: true },
     },
     {
-      label: "房产经纪风格",
-      values: {
-        starter: false,
-        professional: false,
-        executive: true,
-      },
+      label: "Real estate",
+      values: { starter: false, professional: false, executive: true },
     },
     {
-      label: "医疗/学术风格",
-      values: {
-        starter: false,
-        professional: false,
-        executive: true,
-      },
+      label: "Medical / academic",
+      values: { starter: false, professional: false, executive: true },
     },
     {
-      label: "创意总监风格",
-      values: {
-        starter: false,
-        professional: false,
-        executive: true,
-      },
+      label: "Creative director",
+      values: { starter: false, professional: false, executive: true },
     },
     {
-      label: "商业授权",
-      values: {
-        starter: true,
-        professional: true,
-        executive: true,
-      },
+      label: "Commercial license",
+      values: { starter: true, professional: true, executive: true },
     },
     {
-      label: "30天隐私保护",
-      values: {
-        starter: true,
-        professional: true,
-        executive: true,
-      },
+      label: "30-day privacy",
+      values: { starter: true, professional: true, executive: true },
     },
   ];
 

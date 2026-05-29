@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "C-Suite Headshots",
   description:
-    "Executive headshots for CEOs, CFOs, and CTOs. Command authority with AI-generated professional portraits. Just $29 — 14-day money-back guarantee.",
+    "Executive headshots for CEOs, CFOs, and CTOs. Command authority with AI-generated professional portraits. Starting at $29 — 14-day money-back guarantee.",
   alternates: {
     canonical: "https://snapprohead.com/headshots/c-suite",
   },

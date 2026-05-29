@@ -35,16 +35,16 @@ export const metadata: Metadata = {
     google: 'tN7APPasI_zAOB5ACzfwdHoe0Kp_Lt83OrBXcBk1h14',
   },
   title: {
-    default: `SnapProHead - AI Professional Headshots in ~30 Minutes | Just $29`,
+    default: `SnapProHead - AI Professional Headshots in ~30 Minutes | From $29`,
     template: "%s | SnapProHead",
   },
-  description: `Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. 14-day money-back guarantee. Just $29 — a fraction of traditional photography.`,
+  description: `Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. 14-day money-back guarantee. Starting at $29 — a fraction of traditional photography.`,
     alternates: {
       canonical: "https://snapprohead.com",
     },
   openGraph: {
     title: "SnapProHead - AI Professional Headshots in ~30 Minutes",
-    description: `Turn selfies into professional headshots in ~30 minutes. Just $29 with a 14-day money-back guarantee. Used by professionals on LinkedIn and social media.`,
+    description: `Turn selfies into professional headshots in ~30 minutes. Starting at $29 with a 14-day money-back guarantee. Used by professionals on LinkedIn and social media.`,
     url: "https://snapprohead.com",
     siteName: "SnapProHead",
     locale: "en_US",
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "SnapProHead - AI Professional Headshots in ~30 Minutes",
-    description: `Turn selfies into professional headshots in ~30 minutes. Just $29 with a 14-day money-back guarantee.`,
+    description: `Turn selfies into professional headshots in ~30 minutes. Starting at $29 with a 14-day money-back guarantee.`,
     images: ["https://snapprohead.com/hero.webp"],
   },
   manifest: "/site.webmanifest",

@@ -45,10 +45,10 @@ export default function AboutPage() {
 
           <h2 className="text-xl font-semibold mt-10 mb-3">Our Guarantee</h2>
           <ul className="list-disc pl-5 space-y-2 text-muted-foreground mb-6">
-            <li><strong>$29 per pack</strong> — No subscription, no hidden fees.</li>
+            <li><strong>3 plans from $29</strong> — 40, 60, or 100 HD headshots. No subscription, no hidden fees.</li>
             <li><strong>14-day money-back guarantee</strong> — Not happy? Full refund.</li>
             <li><strong>~30 minute turnaround</strong> — Fast, no waiting.</li>
-            <li><strong>100+ AI-generated photos</strong> — Pick your favorites.</li>
+            <li><strong>12 professional styles</strong> — Corporate, legal, real estate, and more.</li>
           </ul>
 
           <h2 className="text-xl font-semibold mt-10 mb-3">Contact Us</h2>

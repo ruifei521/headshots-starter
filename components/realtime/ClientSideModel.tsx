@@ -61,7 +61,7 @@ function TierBadge({ tier }: { tier?: string }) {
         {tierInfo.name} Plan
       </Badge>
       <span className="text-xs text-muted-foreground">
-        {tierInfo.imageCount} 张专业头像 · {tierInfo.estimatedTime}
+        {tierInfo.imageCount} HD headshots · {tierInfo.estimatedTime}
       </span>
     </div>
   );

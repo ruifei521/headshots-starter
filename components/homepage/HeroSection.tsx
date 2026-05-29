@@ -29,18 +29,18 @@ export default function HeroSection() {
             Professional Headshots <span className="text-primary">Without the Studio</span>
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto">
-            Turn your selfies into studio-quality headshots in ~30 minutes. 
+            Turn your selfies into studio-quality headshots in ~30 minutes.
             Choose from <strong>12 professional styles</strong> — corporate, lawyer, speaker, realtor, studio portraits, and more.
-            Just <strong className="text-primary">$29</strong>.
+            Starting at <strong className="text-primary">$29</strong>.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/templates" className="w-full sm:w-auto">
               <Button size="lg" className="group w-full sm:w-auto">
-                Choose Your Style — $29
+                Choose Your Style — From $29
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link href="#pricing" className="w-full sm:w-auto">
+            <Link href="#how-it-works" className="w-full sm:w-auto">
               <Button size="lg" variant="outline" className="w-full sm:w-auto border-muted-foreground/30 text-muted-foreground hover:text-foreground">
                 How It Works ↓
               </Button>
