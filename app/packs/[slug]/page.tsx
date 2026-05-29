@@ -266,7 +266,7 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
               {(() => {
                 const prefix = {'image-shots': 'talya-maor'}[params.slug] || params.slug;
                 const imgs = [];
-                for (let i = 1; i <= 12; i++) {
+                for (let i = 1; i <= 60; i++) {
                   imgs.push(`/packs/${prefix}_${i}.jpg`);
                 }
                 return imgs.map((src, i) => (
