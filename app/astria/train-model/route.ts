@@ -2,6 +2,7 @@ import { Database } from "@/types/supabase";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
+import * as crypto from "crypto";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getTrainingConfig, isTier } from "@/lib/tiers";
@@ -21,6 +22,15 @@ const paymentIsConfigured = stripeIsConfigured || creemIsConfigured;
 if (!appWebhookSecret) {
   console.warn("MISSING APP_WEBHOOK_SECRET - train-model webhook will not function.");
 }
+
+/** 生成 HMAC-SHA256 webhook token，避免明文 secret 出现在 URL 中 */
+const generateWebhookToken = (uid: string, mid: number): string | null => {
+  if (!appWebhookSecret) return null;
+  return crypto
+    .createHmac("sha256", appWebhookSecret)
+    .update(`${uid}:${mid}`)
+    .digest("hex");
+};
 
 export async function POST(request: Request) {
   console.log("=== TRAIN MODEL ROUTE CALLED ===", new Date().toISOString());
@@ -206,14 +216,16 @@ export async function POST(request: Request) {
       ? deploymentUrl 
       : `https://${deploymentUrl}`;
 
+    const webhookToken = generateWebhookToken(user.id, modelId);
+
     const trainWebhook = `${baseUrl}/astria/train-webhook`;
-    const trainWebhookWithParams = appWebhookSecret
-      ? `${trainWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_secret=${appWebhookSecret}`
+    const trainWebhookWithParams = webhookToken
+      ? `${trainWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_token=${webhookToken}`
       : `${trainWebhook}?user_id=${user.id}&model_id=${modelId}`;
 
     const promptWebhook = `${baseUrl}/astria/prompt-webhook`;
-    const promptWebhookWithParams = appWebhookSecret
-      ? `${promptWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_secret=${appWebhookSecret}`
+    const promptWebhookWithParams = webhookToken
+      ? `${promptWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_token=${webhookToken}`
       : `${promptWebhook}?user_id=${user.id}&model_id=${modelId}`;
 
     console.log({ trainWebhookWithParams, promptWebhookWithParams });

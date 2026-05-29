@@ -1,5 +1,6 @@
 import { Database } from "@/types/supabase";
 import { createClient } from "@supabase/supabase-js";
+import * as crypto from "crypto";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
   const urlObj = new URL(request.url);
   const user_id = urlObj.searchParams.get("user_id");
   const model_id = urlObj.searchParams.get("model_id");
-  const webhook_secret = urlObj.searchParams.get("webhook_secret");
+  const webhook_token = urlObj.searchParams.get("webhook_token");
 
   if (!model_id) {
    return NextResponse.json(
@@ -62,22 +63,28 @@ export async function POST(request: Request) {
    );
   }  
 
-  if (appWebhookSecret && !webhook_secret) {
-   return NextResponse.json(
-     {
-       message: "Malformed URL, no webhook_secret detected!",
-     },
-     { status: 500 }
-   );
-  }
+  // HMAC 验证
+  if (appWebhookSecret) {
+    if (!webhook_token) {
+      return NextResponse.json(
+        { message: "Malformed URL, no webhook_token detected!" },
+        { status: 500 }
+      );
+    }
 
-  if (appWebhookSecret && webhook_secret && webhook_secret.toLowerCase() !== appWebhookSecret?.toLowerCase()) {
-   return NextResponse.json(
-     {
-       message: "Unauthorized!",
-     },
-     { status: 401 }
-   );
+    if (user_id) {
+      const expectedToken = crypto
+        .createHmac("sha256", appWebhookSecret)
+        .update(`${user_id}:${model_id}`)
+        .digest("hex");
+
+      if (webhook_token !== expectedToken) {
+        return NextResponse.json(
+          { message: "Unauthorized!" },
+          { status: 401 }
+        );
+      }
+    }
   }
 
   if (!user_id) {
