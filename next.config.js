@@ -35,6 +35,12 @@ module.exports = {
         ],
       },
       {
+        source: "/_next/static/:path*",
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
         source: "/images/:path*",
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
@@ -42,6 +48,12 @@ module.exports = {
       },
       {
         source: "/packs/:path*",
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: "/homepage/:path*",
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
@@ -55,6 +67,10 @@ module.exports = {
       { protocol: 'https', hostname: '**.vercel-storage.com' },
       { protocol: 'https', hostname: '**.supabase.co' },
     ],
+    // Allow Next.js Image optimization for local images
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   compiler: {
@@ -63,4 +79,9 @@ module.exports = {
       ? { exclude: ['error', 'warn'] }
       : false,
   },
+
+  // Enable SWC minification (default in Next.js 14, but explicit for clarity)
+  swcMinify: true,
+
+  // Static page generation where possible
 };
