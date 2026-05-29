@@ -1,7 +1,7 @@
 "use client"; // v5 - male/female cover selection + single $29 price → direct checkout
 
 import Link from "next/link";
-import { ArrowLeft, Loader2, Shield, Check } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
@@ -256,30 +256,6 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
             />
           </div>
 
-          {/* Trust line */}
-          <div className="flex items-center justify-center gap-6 mt-6 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Shield className="h-4 w-4 text-primary" />
-              14-day money-back guarantee
-            </span>
-            <span className="flex items-center gap-1">
-              <Check className="h-4 w-4 text-primary" />
-              Commercial license
-            </span>
-          </div>
-
-          {/* What you get */}
-          <div className="max-w-md mx-auto mt-6 p-4 rounded-xl bg-gray-50 border">
-            <h3 className="font-semibold text-center mb-3">What you get for {starterTier.priceLabel}</h3>
-            <ul className="space-y-2">
-              {starterTier.features.slice(0, 4).map((feature, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm">
-                  <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
 
         {/* Preview Images Grid */}
