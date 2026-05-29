@@ -211,13 +211,13 @@ export async function POST(request: Request) {
   const modelId = data?.id;
 
   try {
-    const deploymentUrl = process.env.DEPLOYMENT_URL || '';
+    // ⭐ 使用 VERCEL_URL 作为 fallback（Vercel 自动注入）
+    const deploymentUrl = process.env.DEPLOYMENT_URL || process.env.VERCEL_URL || '';
     const baseUrl = deploymentUrl.startsWith('http://') || deploymentUrl.startsWith('https://') 
       ? deploymentUrl 
       : `https://${deploymentUrl}`;
 
     const webhookToken = generateWebhookToken(user.id, modelId);
-
     const trainWebhook = `${baseUrl}/astria/train-webhook`;
     const trainWebhookWithParams = webhookToken
       ? `${trainWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_token=${webhookToken}`
@@ -247,9 +247,19 @@ export async function POST(request: Request) {
 
     console.log(`Creating tune with ${promptsAttributes.length} prompts for tier=${effectiveTier} (${promptTemplates.reduce((s, t) => s + t.num_images, 0)} images)`);
 
+    // 🔍 Debug: log payload shape (without full image URLs for privacy)
+    console.log("Astria payload shape:", {
+      title: name,
+      name: type,
+      branch: branch,
+      image_count: images?.length,
+      has_characteristics: !!characteristics,
+      prompts_count: promptsAttributes.length,
+      callback: trainWebhookWithParams ? 'set' : 'missing',
+    });
+
     // Create a fine tuned model using Astria tune API
-    // ⭐ Flux 使用 LoRA 微调，不需要 base_tune_id（SD1.5 才需要指定 base checkpoint）
-    // SD1.5 base_tune_id 690204 = Realistic Vision v5.1（仅 sd15 分支使用）
+    // Flux 使用 LoRA 微调，不需要 base_tune_id
     const tuneBody: Record<string, any> = {
       tune: {
         title: name,
@@ -258,16 +268,15 @@ export async function POST(request: Request) {
         token: "ohwx",
         image_urls: images,
         callback: trainWebhookWithParams,
-        characteristics,
         prompts_attributes: promptsAttributes,
       },
     };
 
-    // SD1.5 分支需要指定 base_tune_id（Realistic Vision v5.1）
-    // Flux 分支使用 LoRA 微调，不传 base_tune_id
-    if (branch === 'sd15') {
-      tuneBody.tune.base_tune_id = 690204;
+    // ⭐ 只有 non-empty characteristics 才发给 Astria（避免空对象导致 422）
+    if (characteristics && typeof characteristics === 'object' && Object.keys(characteristics).length > 0) {
+      tuneBody.tune.characteristics = characteristics;
     }
+    console.log("has_characteristics_in_payload:", !!tuneBody.tune.characteristics);
 
     // ⭐ POST /tunes + prompts_attributes：一次调用完成训练 + 出图
     const response = await axios.post(
@@ -339,15 +348,24 @@ export async function POST(request: Request) {
     }
   } catch (e: any) {
     console.error("Train model error:", e);
+    // 🔍 Astria 422/400 等错误 — 打印完整响应体用于排查
+    if (e?.response) {
+      console.error("Astria response status:", e.response.status);
+      console.error("Astria response data:", JSON.stringify(e.response.data, null, 2));
+    }
     // Rollback: Delete the created model if something goes wrong
     if (modelId) {
       await supabase.from("models").delete().eq("id", modelId);
     }
-    const message = e?.response?.data?.message || e?.message || "Something went wrong!";
+    const message = e?.response?.data?.message || e?.response?.data?.error || e?.message || "Something went wrong!";
+    // 提取 Astria errors 数组（通常是具体的校验错误）
+    const details = e?.response?.data?.errors
+      ? (Array.isArray(e.response.data.errors)
+          ? e.response.data.errors.map((err: any) => typeof err === 'string' ? err : (err.message || JSON.stringify(err))).join("; ")
+          : JSON.stringify(e.response.data.errors))
+      : (e?.response?.data?.details || '');
     return NextResponse.json(
-      {
-        message,
-      },
+      { message, details },
       { status: e?.response?.status || 500 }
     );
   }
