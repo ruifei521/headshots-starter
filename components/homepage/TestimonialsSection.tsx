@@ -1,29 +1,53 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
-import Image from "next/image"
+import { Check, X, Clock, DollarSign, Camera, Users, Palette } from "lucide-react"
 
-const testimonials = [
+const mediaQuotes = [
   {
-    quote:
-      "The quality of these AI headshots is incredible. I've updated all my professional profiles and received so many compliments.",
-    author: "Sarah Johnson",
-    role: "Marketing Director",
-    avatar: "/homepage/example001.jpg",
+    quote: "AI headshots are now indistinguishable from real photographs. The technology has arrived.",
+    source: "Business Insider",
   },
   {
-    quote:
-      "As a freelancer, having professional headshots was a game-changer for my personal brand. The process was so quick and easy!",
-    author: "Michael Chen",
-    role: "UX Designer",
-    avatar: "/homepage/example002.jpg",
+    quote: "Three-quarters of recruiters prefer AI headshots to real photos, according to recent studies.",
+    source: "PetaPixel",
   },
   {
-    quote:
-      "I was skeptical at first, but the results blew me away. These look better than the professional photos I paid hundreds for.",
-    author: "Mark Williams",
-    role: "Software Engineer",
-    avatar: "/homepage/example003.jpg",
+    quote: "It just makes traditional photography accessible to everyone.",
+    source: "Washington Post",
+  },
+]
+
+const comparisons = [
+  {
+    feature: "Cost",
+    icon: <DollarSign className="h-4 w-4" />,
+    us: "From $29",
+    them: "$250+ per session",
+  },
+  {
+    feature: "Time",
+    icon: <Clock className="h-4 w-4" />,
+    us: "As quick as 25 min",
+    them: "2–3 work days",
+  },
+  {
+    feature: "Headshots",
+    icon: <Camera className="h-4 w-4" />,
+    us: "Up to 100 per pack",
+    them: "5–10 per person",
+  },
+  {
+    feature: "Outfits",
+    icon: <Palette className="h-4 w-4" />,
+    us: "25+ style scenes",
+    them: "1–2 outfits",
+  },
+  {
+    feature: "Consistency",
+    icon: <Users className="h-4 w-4" />,
+    us: "Consistent style presets",
+    them: "Manual edits needed",
   },
 ]
 
@@ -31,58 +55,72 @@ export default function TestimonialsSection() {
   return (
     <section className="py-10 md:py-16 bg-muted/30">
       <div className="container px-4 md:px-6">
+        {/* Media Quotes */}
         <div className="flex flex-col items-center justify-center gap-4 text-center md:gap-8">
-          <Badge variant="outline" className="mb-2">Testimonials</Badge>
+          <Badge variant="outline" className="mb-2">As Seen In</Badge>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            What Our Users Say
+            Trusted by <span className="text-primary">Professionals</span>
           </h2>
-          <p className="max-w-[700px] text-muted-foreground text-lg">
-            Thousands of professionals have transformed their online presence with our AI headshots.
-          </p>
         </div>
 
-        <div className="mt-6 grid gap-8 md:grid-cols-3">
-          {testimonials.map((t, i) => (
+        <div className="mt-8 grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
+          {mediaQuotes.map((quote, i) => (
             <div
               key={i}
               className="flex flex-col rounded-xl border bg-card p-6 shadow-sm"
             >
-              {/* Stars */}
-              <div className="flex gap-1 mb-4">
-                {Array.from({ length: 5 }).map((_, j) => (
-                  <svg
-                    key={j}
-                    className="h-5 w-5 fill-yellow-400 text-yellow-400"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-
-              {/* Quote */}
-              <blockquote className="flex-1 text-muted-foreground text-sm leading-relaxed mb-6">
-                &ldquo;{t.quote}&rdquo;
+              <blockquote className="flex-1 text-muted-foreground text-sm leading-relaxed mb-4 italic">
+                &ldquo;{quote.quote}&rdquo;
               </blockquote>
-
-              {/* Author */}
-              <div className="flex items-center gap-3 pt-4 border-t">
-                <div className="relative h-10 w-10 rounded-full overflow-hidden">
-                  <Image
-                    src={t.avatar}
-                    alt={t.author}
-                    fill
-                    className="object-cover"
-                    sizes="40px"
-                  />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold">{t.author}</p>
-                  <p className="text-xs text-muted-foreground">{t.role}</p>
-                </div>
+              <div className="pt-3 border-t">
+                <p className="text-sm font-semibold">{quote.source}</p>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Comparison Table: SnapProHead vs Traditional Photographer */}
+        <div className="mt-16 max-w-3xl mx-auto">
+          <h3 className="text-center text-2xl font-bold mb-2">
+            SnapProHead vs Hiring a Photographer
+          </h3>
+          <p className="text-center text-muted-foreground text-sm mb-8">
+            See why thousands choose AI headshots over traditional photoshoots.
+          </p>
+
+          <div className="overflow-x-auto rounded-lg border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="px-4 py-3 text-left font-semibold min-w-[140px]"></th>
+                  <th className="px-4 py-3 text-center font-semibold text-primary">SnapProHead</th>
+                  <th className="px-4 py-3 text-center font-semibold">Traditional Photographer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparisons.map((row, i) => (
+                  <tr key={i} className={`border-b ${i % 2 === 0 ? "bg-muted/20" : ""}`}>
+                    <td className="px-4 py-3 font-medium flex items-center gap-2">
+                      {row.icon}
+                      {row.feature}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className="flex items-center justify-center gap-1.5">
+                        <Check className="h-4 w-4 text-green-500" />
+                        <span className="font-medium">{row.us}</span>
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center text-muted-foreground">
+                      <span className="flex items-center justify-center gap-1.5">
+                        <X className="h-4 w-4 text-red-400" />
+                        <span>{row.them}</span>
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>

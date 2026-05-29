@@ -61,7 +61,7 @@ export default function NavbarClient() {
               <Link href="/login" className="hidden sm:block text-sm font-medium hover:text-primary transition-colors py-2 cursor-pointer">
                 Login
               </Link>
-              <Link href="/login">
+              <Link href="/templates">
                 <Button>Create headshots</Button>
               </Link>
             </>

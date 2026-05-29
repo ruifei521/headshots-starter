@@ -36,7 +36,8 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
       )}
 
       {/* Price */}
-      <div className="flex items-baseline justify-center gap-1">
+      <div className="flex items-baseline justify-center gap-2">
+        <span className="text-lg text-muted-foreground line-through">${info.originalPrice}</span>
         <span className="text-5xl font-extrabold">{info.priceLabel}</span>
         <span className="text-sm text-muted-foreground">/pack</span>
       </div>
@@ -92,11 +93,15 @@ export default function ModernPricing() {
       <div className="flex flex-col items-center justify-center space-y-8">
         {/* Section Header */}
         <div className="text-center space-y-4">
+          {/* 20% off banner */}
+          <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-1.5 text-sm font-semibold text-white">
+            🔥 25% off all packages — limited time only!
+          </div>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
             Choose Your <span className="text-primary">Perfect Plan</span>
           </h2>
           <p className="max-w-[600px] text-muted-foreground text-lg mx-auto">
-            Professional AI headshots, one price. No subscriptions, no hidden fees.
+            Professional photoshoots cost $250+ on average. Save time and money with our AI-powered solution.
           </p>
         </div>
 

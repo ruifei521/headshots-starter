@@ -61,7 +61,7 @@ export default function FAQSection() {
     {
       question: "Can I buy additional packs later?",
       answer:
-        "Yes! You can purchase additional packs anytime. Each pack is $29. You don't need to upload new photos — we use your existing trained model to generate new styles.",
+        "Yes! You can purchase additional packs anytime. Packs start at $29. You don't need to upload new photos — we use your existing trained model to generate new styles.",
     },
     {
       question: "What kind of photos should I upload?",
@@ -87,6 +87,16 @@ export default function FAQSection() {
       question: "What if I'm not satisfied with the results?",
       answer:
         "We stand behind our AI headshots. If you don't get a single headshot you're happy with, we'll refund your entire purchase — no questions asked. Just contact us within 14 days.",
+    },
+    {
+      question: "How does SnapProHead compare to other AI headshot services?",
+      answer:
+        "SnapProHead offers 12 curated professional styles with up to 100 headshots per pack, starting at just $29. Our Executive plan uses advanced Flux AI for enhanced 1024×1024 resolution — higher than most competitors. Plus, we offer a 14-day money-back guarantee and 30-day auto-delete privacy that many alternatives don't.",
+    },
+    {
+      question: "I love my headshots! How can I spread the word?",
+      answer:
+        "We're glad you love them! Share your experience on social media and tag us, or tell your colleagues and friends. Word of mouth helps us keep prices affordable for everyone. If you have a large audience, reach out about our affiliate program at contact@snapprohead.com.",
     },
   ]
 

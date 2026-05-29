@@ -35,6 +35,7 @@ describe('TIERS constants', () => {
     expect(s.tier).toBe('starter');
     expect(s.name).toBe('Basic');
     expect(s.price).toBe(29);
+    expect(s.originalPrice).toBe(39);
     expect(s.priceLabel).toBe('$29');
     expect(s.imageCount).toBe(40);
     expect(s.modelBranch).toBe('sd15');
@@ -49,6 +50,7 @@ describe('TIERS constants', () => {
     expect(p.tier).toBe('professional');
     expect(p.name).toBe('Professional');
     expect(p.price).toBe(39);
+    expect(p.originalPrice).toBe(54);
     expect(p.priceLabel).toBe('$39');
     expect(p.imageCount).toBe(60);
     expect(p.modelBranch).toBe('sd15');
@@ -63,6 +65,7 @@ describe('TIERS constants', () => {
     expect(e.tier).toBe('executive');
     expect(e.name).toBe('Executive');
     expect(e.price).toBe(59);
+    expect(e.originalPrice).toBe(79);
     expect(e.priceLabel).toBe('$59');
     expect(e.imageCount).toBe(100);
     expect(e.modelBranch).toBe('flux');

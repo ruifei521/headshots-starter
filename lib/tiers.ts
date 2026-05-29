@@ -16,6 +16,7 @@ export interface TierInfo {
   tier: Tier;
   name: string;           // 显示名称
   price: number;          // 美元价格
+  originalPrice: number;  // 原价（用于划线价展示）
   priceLabel: string;     // 价格标签
   imageCount: number;     // 产出图片数量
   modelBranch: 'sd15' | 'flux';
@@ -30,6 +31,7 @@ export const TIERS: Record<Tier, TierInfo> = {
     tier: 'starter',
     name: 'Basic',
     price: 29,
+    originalPrice: 39,
     priceLabel: '$29',
     imageCount: 40,
     modelBranch: 'sd15',
@@ -48,6 +50,7 @@ export const TIERS: Record<Tier, TierInfo> = {
     tier: 'professional',
     name: 'Professional',
     price: 39,
+    originalPrice: 54,
     priceLabel: '$39',
     imageCount: 60,
     modelBranch: 'sd15',
@@ -67,6 +70,7 @@ export const TIERS: Record<Tier, TierInfo> = {
     tier: 'executive',
     name: 'Executive',
     price: 59,
+    originalPrice: 79,
     priceLabel: '$59',
     imageCount: 100,
     modelBranch: 'flux',

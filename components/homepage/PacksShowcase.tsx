@@ -74,7 +74,7 @@ export default function PacksShowcase() {
 
         <div className="mt-10 text-center">
           <p className="text-sm text-muted-foreground">
-            All styles <strong>$29 each</strong> — pick the ones you need, pay once.
+            All styles <strong>starting at $29 per pack</strong> — pick the ones you need, pay once.
           </p>
         </div>
       </div>

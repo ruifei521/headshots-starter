@@ -26,7 +26,7 @@ export default function HeroSection() {
             🚀 Professional AI Headshots in ~30 Minutes
           </Badge>
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6">
-            Professional Headshots <span className="text-primary">Without the Studio</span>
+            Skip the $250+ Photographer. <span className="text-primary">Get Studio-Quality Headshots from $29</span>
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto">
             Turn your selfies into studio-quality headshots in ~30 minutes.
@@ -36,7 +36,7 @@ export default function HeroSection() {
           <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/templates" className="w-full sm:w-auto">
               <Button size="lg" className="group w-full sm:w-auto">
-                Choose Your Style — From $29
+                Create Your Headshots Now
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -46,6 +46,10 @@ export default function HeroSection() {
               </Button>
             </Link>
           </div>
+          <p className="mt-3 text-sm text-muted-foreground flex items-center justify-center gap-1">
+            <svg className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+            Your photos stay private
+          </p>
         </div>
 
         {/* Before/After Gallery — lazy loaded, only when visible */}

@@ -23,6 +23,10 @@ const PricingSection = dynamic(
   () => import("@/components/homepage/PricingSection"),
   { ssr: false }
 )
+const ClosingCtaSection = dynamic(
+  () => import("@/components/homepage/ClosingCtaSection"),
+  { ssr: false }
+)
 const FAQSection = dynamic(
   () => import("@/components/homepage/FAQSection"),
   { ssr: false }
@@ -70,7 +74,7 @@ const jsonLd = {
           "name": "How much does it cost?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": `Just $29 for 40+ AI headshots in a professional style. All plans include a no-questions-asked refund guarantee within 14 days.`
+            "text": `Starting at $29 for 40+ AI headshots in a professional style. All plans include a no-questions-asked refund guarantee within 14 days.`
           }
         },
         {
@@ -155,6 +159,7 @@ export default async function Index() {
         <ExamplesSection />
         <TestimonialsSection />
         <PricingSection />
+        <ClosingCtaSection />
         <FAQSection />
         <PrivacySection />
       </div>

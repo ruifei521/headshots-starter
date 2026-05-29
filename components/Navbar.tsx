@@ -56,7 +56,7 @@ export default async function Navbar() {
               <Link href="/login" className="hidden sm:block text-base font-semibold hover:text-primary transition-colors py-2">
                 Login
               </Link>
-              <Link href="/login">
+              <Link href="/templates">
                 <Button>Create headshots</Button>
               </Link>
             </>

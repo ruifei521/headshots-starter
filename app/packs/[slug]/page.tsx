@@ -1,4 +1,4 @@
-"use client"; // v3 - three tier cards with gender selection
+"use client"; // v4 - three tier cards, gender selection removed
 
 import Link from "next/link";
 import { ArrowLeft, Loader2, Check, Clock, Star, Zap, Shield } from "lucide-react";
@@ -107,7 +107,6 @@ const allPacks: Record<string, { title: string; desc: string; img: string; longD
 
 /** Tier card with embedded gender selection */
 function TierPricingCard({ tierInfo, packSlug, highlight }: { tierInfo: TierInfo; packSlug: string; highlight?: boolean }) {
-  const [selectedGender, setSelectedGender] = useState<'woman' | 'man'>('woman');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -126,7 +125,7 @@ function TierPricingCard({ tierInfo, packSlug, highlight }: { tierInfo: TierInfo
 
       const body: Record<string, string> = {
         pack: packSlug,
-        gender: selectedGender,
+        gender: 'woman',
         tier: tierInfo.tier,
       };
 
@@ -170,7 +169,8 @@ function TierPricingCard({ tierInfo, packSlug, highlight }: { tierInfo: TierInfo
       )}
 
       {/* Price */}
-      <div className="flex items-baseline justify-center gap-1 mt-2">
+      <div className="flex items-baseline justify-center gap-2 mt-2">
+        <span className="text-base text-muted-foreground line-through">${tierInfo.originalPrice}</span>
         <span className="text-4xl font-extrabold">{tierInfo.priceLabel}</span>
         <span className="text-sm text-muted-foreground">/pack</span>
       </div>
@@ -195,33 +195,6 @@ function TierPricingCard({ tierInfo, packSlug, highlight }: { tierInfo: TierInfo
           </li>
         ))}
       </ul>
-
-      {/* Gender Selection */}
-      <div className="mb-4">
-        <p className="text-xs font-medium text-muted-foreground mb-2">Select gender:</p>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setSelectedGender('woman')}
-            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border transition-colors ${
-              selectedGender === 'woman'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'bg-background text-foreground border-border hover:bg-muted'
-            }`}
-          >
-            Woman
-          </button>
-          <button
-            onClick={() => setSelectedGender('man')}
-            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border transition-colors ${
-              selectedGender === 'man'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'bg-background text-foreground border-border hover:bg-muted'
-            }`}
-          >
-            Man
-          </button>
-        </div>
-      </div>
 
       {/* CTA Button */}
       <button
@@ -341,7 +314,7 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
         <div className="max-w-3xl mx-auto px-4 py-12 border-t mt-8">
           <h2 className="text-2xl font-bold mb-6">How does it work?</h2>
           <ol className="space-y-4 text-gray-600 list-decimal list-inside">
-            <li>Choose your plan and select your gender above</li>
+            <li>Choose your plan above</li>
             <li>Upload your training images following the guidelines</li>
             <li>Our AI processes your images and creates your headshots (~30 minutes). You will receive your professional headshots as shown in the preview images.</li>
           </ol>

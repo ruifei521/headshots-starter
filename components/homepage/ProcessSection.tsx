@@ -2,29 +2,36 @@
 
 import { useRef, useState } from "react"
 import { motion, useInView } from "motion/react"
-import { Camera, Download, Sparkles } from "lucide-react"
+import { Palette, Camera, Sparkles, Download } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 const processSteps = [
   {
     number: 1,
-    title: "Upload Your Photos",
-    description: "Upload 4-10 clear selfies: front-facing, good lighting, one person per photo. No sunglasses or hats.",
+    title: "Choose Your Style",
+    description: "Pick from 12 professional styles — corporate, lawyer, speaker, realtor, and more. Select your plan and you're on your way.",
+    icon: <Palette className="h-5 w-5" />,
+    images: ["/packs/corporate-headshots_1.jpg", "/packs/natural-headshots_1.jpg", "/packs/speaker_1.jpg"]
+  },
+  {
+    number: 2,
+    title: "Upload Your Selfies",
+    description: "Selfies work great! Just 4–6 uploads is all you need. Focus on good lighting, different angles, and one person per photo.",
     icon: <Camera className="h-5 w-5" />,
     images: ["/example1.png", "/example2.png", "/example3.png"]
   },
   {
-    number: 2,
-    title: "Pick Your Pack",
-    description: "Choose from 6 professional styles: Corporate, Partner's, Natural, Speaker, Realtor, and more.",
+    number: 3,
+    title: "AI Generates Your Headshots",
+    description: "Our AI gets to work on your photos. Just wait for your results — we'll email you when your headshots are ready!",
     icon: <Sparkles className="h-5 w-5" />,
     processingImage: "/blur.jpg"
   },
   {
-    number: 3,
-    title: "Get Your Headshots",
-    description: "Once trained, you'll receive 40+ HD headshots in your chosen styles. Download and use anywhere!",
+    number: 4,
+    title: "Download & Use Anywhere",
+    description: "Receive up to 100 high-quality headshots to use however you want — LinkedIn, resumes, company websites, and more.",
     icon: <Download className="h-5 w-5" />,
     resultImages: ["/result1.png", "/result2.png", "/result3.png"]
   }
@@ -136,10 +143,10 @@ export default function ProcessSection() {
           </Badge>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">How It Works</h2>
           <p className="max-w-[700px] text-muted-foreground text-lg">
-            Our AI-powered platform transforms your selfies into professional headshots in just three simple steps.
+            Get your headshots in minutes, not days. It's as easy as 1-2-3-4!
           </p>
         </div>
-        <div className="mt-8 grid gap-8 md:grid-cols-3 md:gap-12">
+        <div className="mt-8 grid gap-8 md:grid-cols-2 md:gap-12">
           {processSteps.map((step, index) => (
             <ProcessStep
               key={step.number}

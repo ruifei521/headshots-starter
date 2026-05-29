@@ -19,7 +19,7 @@ export default function Footer() {
             </p>
           </div>
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">Headshots</h3>
+            <h3 className="text-sm font-medium">AI Headshots</h3>
             <ul className="space-y-1.5">
               <li>
                 <Link href="/headshots/linkedin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -37,8 +37,48 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/templates" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  All Styles
+                <Link href="/headshots/corporate" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Corporate Headshots
+                </Link>
+              </li>
+              <li>
+                <Link href="/headshots/speaker" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Speaker Headshots
+                </Link>
+              </li>
+              <li>
+                <Link href="/headshots/actor" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Actor Headshots
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium">Use Cases</h3>
+            <ul className="space-y-1.5">
+              <li>
+                <Link href="/headshots/linkedin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  LinkedIn Profile
+                </Link>
+              </li>
+              <li>
+                <Link href="/headshots/resume" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Resume & CV
+                </Link>
+              </li>
+              <li>
+                <Link href="/headshots/team" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Team Page
+                </Link>
+              </li>
+              <li>
+                <Link href="/headshots/dating" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Dating Profile
+                </Link>
+              </li>
+              <li>
+                <Link href="/headshots/business-card" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Business Card
                 </Link>
               </li>
             </ul>
@@ -66,10 +106,15 @@ export default function Footer() {
                   FAQ
                 </Link>
               </li>
+              <li>
+                <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  About Us
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">Legal</h3>
+            <h3 className="text-sm font-medium">Legal & Support</h3>
             <ul className="space-y-1.5">
               <li>
                 <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -86,19 +131,9 @@ export default function Footer() {
                   Refund Policy
                 </Link>
               </li>
-            </ul>
-          </div>
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium">Support</h3>
-            <ul className="space-y-1.5">
-              <li>
-                <Link href="/refund" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Support & Refunds
-                </Link>
-              </li>
               <li>
                 <a href="mailto:contact@snapprohead.com" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Email Us
+                  Contact Support
                 </a>
               </li>
             </ul>

@@ -50,7 +50,7 @@ function PackCard({ pack }: { pack: typeof professionalPacks[0] }) {
         <h3 className="m-0 mb-1 text-lg font-semibold">{pack.title}</h3>
         <p className="m-0 text-gray-400 text-sm">{pack.desc}</p>
         <span className="inline-block mt-2.5 bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold">
-          $29
+          From $29
         </span>
       </div>
     </Link>
