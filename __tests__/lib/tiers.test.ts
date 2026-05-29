@@ -38,7 +38,7 @@ describe('TIERS constants', () => {
     expect(s.originalPrice).toBe(39);
     expect(s.priceLabel).toBe('$29');
     expect(s.imageCount).toBe(40);
-    expect(s.modelBranch).toBe('flux');
+    expect(s.modelBranch).toBe('flux1');
     expect(s.resolution).toBe('1024×1024');
     expect(s.estimatedTime).toBe('~25 min');
     expect(s.badge).toBeUndefined();
@@ -53,7 +53,7 @@ describe('TIERS constants', () => {
     expect(p.originalPrice).toBe(54);
     expect(p.priceLabel).toBe('$39');
     expect(p.imageCount).toBe(60);
-    expect(p.modelBranch).toBe('flux');
+    expect(p.modelBranch).toBe('flux1');
     expect(p.resolution).toBe('1024×1024');
     expect(p.estimatedTime).toBe('~25 min');
     expect(p.badge).toBe('Most Popular');
@@ -68,7 +68,7 @@ describe('TIERS constants', () => {
     expect(e.originalPrice).toBe(79);
     expect(e.priceLabel).toBe('$59');
     expect(e.imageCount).toBe(100);
-    expect(e.modelBranch).toBe('flux');
+    expect(e.modelBranch).toBe('flux1');
     expect(e.resolution).toBe('1024×1024');
     expect(e.estimatedTime).toBe('~25 min');
     expect(e.badge).toBe('Best Value');
@@ -139,17 +139,17 @@ describe('PRODUCT_ID_TO_TIER', () => {
 describe('getTrainingConfig', () => {
   it('starter: flux branch', () => {
     const config = getTrainingConfig('starter');
-    expect(config.branch).toBe('flux');
+    expect(config.branch).toBe('flux1');
   });
 
   it('professional: flux branch', () => {
     const config = getTrainingConfig('professional');
-    expect(config.branch).toBe('flux');
+    expect(config.branch).toBe('flux1');
   });
 
   it('executive: flux branch', () => {
     const config = getTrainingConfig('executive');
-    expect(config.branch).toBe('flux');
+    expect(config.branch).toBe('flux1');
   });
 
   it('branch should match TIERS.modelBranch', () => {
@@ -311,7 +311,7 @@ describe('End-to-end scenario: Purchase → Webhook → Training', () => {
 
     // Step 3: Train model uses tier to get config
     const config = getTrainingConfig(tier);
-    expect(config.branch).toBe('flux');
+    expect(config.branch).toBe('flux1');
   });
 
   it('professional purchase flow', () => {
@@ -322,7 +322,7 @@ describe('End-to-end scenario: Purchase → Webhook → Training', () => {
     expect(tier).toBe('professional');
 
     const config = getTrainingConfig(tier);
-    expect(config.branch).toBe('flux');
+    expect(config.branch).toBe('flux1');
   });
 
   it('executive purchase flow', () => {
@@ -333,7 +333,7 @@ describe('End-to-end scenario: Purchase → Webhook → Training', () => {
     expect(tier).toBe('executive');
 
     const config = getTrainingConfig(tier);
-    expect(config.branch).toBe('flux');
+    expect(config.branch).toBe('flux1');
   });
 
   it('upgrade scenario: starter → executive', () => {
@@ -351,7 +351,7 @@ describe('End-to-end scenario: Purchase → Webhook → Training', () => {
 
     // Training uses the upgraded tier
     const config = getTrainingConfig(resolvedTier);
-    expect(config.branch).toBe('flux');
+    expect(config.branch).toBe('flux1');
   });
 
   it('no-downgrade scenario: executive user buys starter again', () => {
@@ -369,7 +369,7 @@ describe('End-to-end scenario: Purchase → Webhook → Training', () => {
 
     // Training still uses executive config
     const config = getTrainingConfig(resolvedTier);
-    expect(config.branch).toBe('flux');
+    expect(config.branch).toBe('flux1');
   });
 
   it('legacy product ID backward compatibility', () => {
@@ -382,6 +382,6 @@ describe('End-to-end scenario: Purchase → Webhook → Training', () => {
 
     // Training uses starter config (now flux)
     const config = getTrainingConfig(tier);
-    expect(config.branch).toBe('flux');
+    expect(config.branch).toBe('flux1');
   });
 });

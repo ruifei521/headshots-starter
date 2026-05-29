@@ -81,7 +81,7 @@ describe('pricing.ts — backward compatibility constants', () => {
 describe('pricing.ts — function correctness (passthrough)', () => {
   it('getTrainingConfig via pricing.ts should match direct import', () => {
     const config = getTrainingConfig('professional');
-    expect(config.branch).toBe('flux');
+    expect(config.branch).toBe('flux1');
   });
 
   it('tierFromProductId via pricing.ts should handle legacy IDs', () => {

@@ -19,7 +19,7 @@ export interface TierInfo {
   originalPrice: number;  // 原价（用于划线价展示）
   priceLabel: string;     // 价格标签
   imageCount: number;     // 产出图片数量
-  modelBranch: 'sd15' | 'flux';
+  modelBranch: 'sd15' | 'flux1';
   resolution: string;     // 分辨率描述
   estimatedTime: string;  // 预估时间
   badge?: string;         // 推荐标签（如 "Most Popular"）
@@ -34,7 +34,7 @@ export const TIERS: Record<Tier, TierInfo> = {
     originalPrice: 39,
     priceLabel: '$29',
     imageCount: 40,
-    modelBranch: 'flux',
+    modelBranch: 'flux1',
     resolution: '1024×1024',
     estimatedTime: '~25 min',
     features: [
@@ -53,7 +53,7 @@ export const TIERS: Record<Tier, TierInfo> = {
     originalPrice: 54,
     priceLabel: '$39',
     imageCount: 60,
-    modelBranch: 'flux',
+    modelBranch: 'flux1',
     resolution: '1024×1024',
     estimatedTime: '~25 min',
     badge: 'Most Popular',
@@ -73,7 +73,7 @@ export const TIERS: Record<Tier, TierInfo> = {
     originalPrice: 79,
     priceLabel: '$59',
     imageCount: 100,
-    modelBranch: 'flux',
+    modelBranch: 'flux1',
     resolution: '1024×1024',
     estimatedTime: '~25 min',
     badge: 'Best Value',
@@ -115,13 +115,13 @@ export const PRODUCT_ID_TO_TIER: Record<string, Tier> = {
 // ============================================
 /**
  * 根据 tier 获取训练配置
- * - branch：AI 模型分支（所有套餐统一使用 flux）
+ * - branch：AI 模型分支（所有套餐统一使用 flux1）
  *
  * Prompt 生成：在 train-model 创建 tune 时通过 prompts_attributes 一并提交，
  * Astria 训练完成后自动跑所有 prompts，每个完成时回调 prompt-webhook
  */
 export function getTrainingConfig(tier: Tier): {
-  branch: 'sd15' | 'flux';
+  branch: 'sd15' | 'flux1';
 } {
   const info = TIERS[tier];
   return {

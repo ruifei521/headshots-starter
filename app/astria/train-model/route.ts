@@ -259,12 +259,13 @@ export async function POST(request: Request) {
     });
 
     // Create a fine tuned model using Astria tune API
-    // Flux 使用 LoRA 微调，不需要 base_tune_id
+    // Flux 使用 LoRA 微调
     const tuneBody: Record<string, any> = {
       tune: {
         title: name,
         name: type,
         branch: branch,
+        model_type: "lora",
         token: "ohwx",
         image_urls: images,
         callback: trainWebhookWithParams,
