@@ -92,11 +92,13 @@ export async function POST() {
 
     // Execute the SQL (pg supports multi-statement strings)
     const res = await client.query(sql);
-    results.push(`SQL executed: ${res.length} statement(s)`);
+    // pg returns QueryResult[] for multi-statement, QueryResult for single
+    const resArray = Array.isArray(res) ? res : [res];
+    results.push(`SQL executed: ${resArray.length} statement(s)`);
 
     // Show the last result (verification)
-    if (res.length > 0) {
-      const lastResult = res[res.length - 1];
+    if (resArray.length > 0) {
+      const lastResult = resArray[resArray.length - 1];
       results.push(
         `Verification: ${JSON.stringify(lastResult.rows)}`
       );
