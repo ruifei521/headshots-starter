@@ -7,10 +7,6 @@ const ProcessSection = dynamic(
   () => import("@/components/homepage/ProcessSection"),
   { ssr: false }
 )
-const PacksShowcase = dynamic(
-  () => import("@/components/homepage/PacksShowcase"),
-  { ssr: false }
-)
 const ExamplesSection = dynamic(
   () => import("@/components/homepage/ExamplesSection"),
   { ssr: false }
@@ -66,7 +62,7 @@ const jsonLd = {
           "name": "How does the AI headshot generation work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Upload 4-10 selfies, choose a professional style (Corporate, Natural, Formal, etc.), then our AI trains on your face and generates studio-quality headshots in ~30 minutes. You get 40+ photos with different backgrounds and outfits."
+            "text": "Upload 4-10 selfies, choose your plan, then our AI trains on your face and generates studio-quality headshots in ~25 minutes. You get 40+ photos with different backgrounds and outfits."
           }
         },
         {
@@ -74,7 +70,7 @@ const jsonLd = {
           "name": "How much does it cost?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": `Starting at $29 for 40+ AI headshots in a professional style. All plans include a no-questions-asked refund guarantee within 14 days.`
+            "text": `Starting at $29 for 40+ AI headshots. All plans include a no-questions-asked refund guarantee within 14 days.`
           }
         },
         {
@@ -90,7 +86,7 @@ const jsonLd = {
           "name": "How long does it take to get my headshots?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The AI model training takes about 30 minutes. Once trained, your headshots are ready to download."
+            "text": "The AI model training takes about 25 minutes. Once trained, your headshots are ready to download."
           }
         },
         {
@@ -155,7 +151,6 @@ export default async function Index() {
       <div>
         <HeroSection />
         <ProcessSection />
-        <PacksShowcase />
         <ExamplesSection />
         <TestimonialsSection />
         <PricingSection />

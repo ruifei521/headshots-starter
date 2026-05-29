@@ -34,14 +34,14 @@ export const TIERS: Record<Tier, TierInfo> = {
     originalPrice: 39,
     priceLabel: '$29',
     imageCount: 40,
-    modelBranch: 'sd15',
-    resolution: '512×768',
-    estimatedTime: '~45 min',
+    modelBranch: 'flux',
+    resolution: '1024×1024',
+    estimatedTime: '~25 min',
     features: [
       '40 HD AI headshots',
       '10 style scenes',
-      'Standard resolution 512×768',
-      '~45 min delivery',
+      'Enhanced resolution 1024×1024 (Flux)',
+      '~25 min fast delivery',
       'Commercial license',
       '30-day auto-delete privacy',
     ],
@@ -53,15 +53,15 @@ export const TIERS: Record<Tier, TierInfo> = {
     originalPrice: 54,
     priceLabel: '$39',
     imageCount: 60,
-    modelBranch: 'sd15',
-    resolution: '512×768',
-    estimatedTime: '~40 min',
+    modelBranch: 'flux',
+    resolution: '1024×1024',
+    estimatedTime: '~25 min',
     badge: 'Most Popular',
     features: [
       '60 HD AI headshots',
       '15 style scenes',
-      'Standard resolution 512×768',
-      '~40 min delivery',
+      'Enhanced resolution 1024×1024 (Flux)',
+      '~25 min fast delivery',
       'Commercial license',
       '30-day auto-delete privacy',
     ],
@@ -115,7 +115,7 @@ export const PRODUCT_ID_TO_TIER: Record<string, Tier> = {
 // ============================================
 /**
  * 根据 tier 获取训练配置
- * - branch：AI 模型分支（starter/professional → sd15，executive → flux）
+ * - branch：AI 模型分支（所有套餐统一使用 flux）
  *
  * Prompt 生成：在 train-model 创建 tune 时通过 prompts_attributes 一并提交，
  * Astria 训练完成后自动跑所有 prompts，每个完成时回调 prompt-webhook

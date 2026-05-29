@@ -97,11 +97,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/templates" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Choose Your Style
-                </Link>
-              </li>
-              <li>
                 <Link href="/#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   FAQ
                 </Link>

@@ -7,7 +7,7 @@ import TrustBadges from "@/components/homepage/trust-badges"
 
 const ThreeDBeforeAfterGallery = dynamic(
   () => import("@/components/homepage/3d-before-after-gallery"),
-  { 
+  {
     ssr: false,
     loading: () => (
       <div className="w-full aspect-[3/2] bg-muted/30 rounded-2xl flex items-center justify-center">
@@ -23,18 +23,18 @@ export default function HeroSection() {
       <div className="container px-4 md:px-6 pt-2">
         <div className="mx-auto max-w-3xl text-center mb-8">
           <Badge className="mb-4" variant="outline">
-            🚀 Professional AI Headshots in ~30 Minutes
+            🚀 Professional AI Headshots in ~25 Minutes
           </Badge>
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6">
             Skip the $250+ Photographer. <span className="text-primary">Get Studio-Quality Headshots from $29</span>
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto">
-            Turn your selfies into studio-quality headshots in ~30 minutes.
-            Choose from <strong>12 professional styles</strong> — corporate, lawyer, speaker, realtor, studio portraits, and more.
+            Turn your selfies into studio-quality headshots in ~25 minutes.
+            Powered by <strong>Flux AI</strong> for the best quality — corporate, LinkedIn, resume, and more.
             Starting at <strong className="text-primary">$29</strong>.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/templates" className="w-full sm:w-auto">
+            <Link href="/#pricing" className="w-full sm:w-auto">
               <Button size="lg" className="group w-full sm:w-auto">
                 Create Your Headshots Now
                 <ArrowRight className="ml-2 h-4 w-4" />

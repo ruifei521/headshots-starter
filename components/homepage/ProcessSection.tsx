@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils"
 const processSteps = [
   {
     number: 1,
-    title: "Choose Your Style",
-    description: "Pick from 12 professional styles — corporate, lawyer, speaker, realtor, and more. Select your plan and you're on your way.",
+    title: "Choose Your Plan",
+    description: "Pick the plan that fits your needs — Starter, Professional, or Executive. All powered by Flux AI for the best quality.",
     icon: <Palette className="h-5 w-5" />,
     images: ["/packs/corporate-headshots_1.jpg", "/packs/natural-headshots_1.jpg", "/packs/speaker_1.jpg"]
   },

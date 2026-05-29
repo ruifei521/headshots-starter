@@ -13,11 +13,11 @@ export default function ClosingCtaSection() {
             Ready for Your <span className="text-primary">Professional Headshots</span>?
           </h2>
           <p className="text-muted-foreground text-lg max-w-[600px] mx-auto">
-            Join thousands of professionals who upgraded their online presence with AI-powered headshots. 
-            Studio quality at a fraction of the cost — results in ~30 minutes.
+            Join thousands of professionals who upgraded their online presence with AI-powered headshots.
+            Studio quality at a fraction of the cost — results in ~25 minutes.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-2">
-            <Link href="/templates">
+            <Link href="/#pricing">
               <Button size="lg" className="group">
                 Create Your Headshots Now
                 <ArrowRight className="ml-2 h-4 w-4" />

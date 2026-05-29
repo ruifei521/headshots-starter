@@ -236,21 +236,26 @@ export async function POST(request: Request) {
     console.log(`Creating tune with ${promptsAttributes.length} prompts for tier=${effectiveTier} (${promptTemplates.reduce((s, t) => s + t.num_images, 0)} images)`);
 
     // Create a fine tuned model using Astria tune API
-    // ⭐ prompts_attributes 在创建时一次性传入，训练完成后 Astria 自动跑所有 prompts
-    const tuneBody = {
+    // ⭐ Flux 使用 LoRA 微调，不需要 base_tune_id（SD1.5 才需要指定 base checkpoint）
+    // SD1.5 base_tune_id 690204 = Realistic Vision v5.1（仅 sd15 分支使用）
+    const tuneBody: Record<string, any> = {
       tune: {
         title: name,
-        // Hard coded tune id of Realistic Vision v5.1 from the gallery
-        base_tune_id: 690204,
         name: type,
         branch: branch,
         token: "ohwx",
         image_urls: images,
         callback: trainWebhookWithParams,
-        prompts_attributes: promptsAttributes,
         characteristics,
+        prompts_attributes: promptsAttributes,
       },
     };
+
+    // SD1.5 分支需要指定 base_tune_id（Realistic Vision v5.1）
+    // Flux 分支使用 LoRA 微调，不传 base_tune_id
+    if (branch === 'sd15') {
+      tuneBody.tune.base_tune_id = 690204;
+    }
 
     // ⭐ POST /tunes + prompts_attributes：一次调用完成训练 + 出图
     const response = await axios.post(

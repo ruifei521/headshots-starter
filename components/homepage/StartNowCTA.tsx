@@ -11,18 +11,13 @@ export default function StartNowCTA() {
             Ready for Your <span className="text-primary">Professional Headshot</span>?
           </h2>
           <p className="text-muted-foreground text-lg mb-8">
-            No studio, no appointment, no hassle. Just upload 4-10 selfies and get 40+ studio-quality headshots in ~30 minutes.
+            No studio, no appointment, no hassle. Just upload 4-10 selfies and get 40+ studio-quality headshots in ~25 minutes.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/templates">
+            <Link href="/#pricing">
               <Button size="lg" className="group text-base font-bold">
                 Start Now — $29
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/templates">
-              <Button size="lg" variant="outline">
-                See All Styles
               </Button>
             </Link>
           </div>

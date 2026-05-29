@@ -91,7 +91,7 @@ export default function FAQSection() {
     {
       question: "How does SnapProHead compare to other AI headshot services?",
       answer:
-        "SnapProHead offers 12 curated professional styles with up to 100 headshots per pack, starting at just $29. Our Executive plan uses advanced Flux AI for enhanced 1024×1024 resolution — higher than most competitors. Plus, we offer a 14-day money-back guarantee and 30-day auto-delete privacy that many alternatives don't.",
+        "SnapProHead offers 12 curated professional styles with up to 100 headshots per pack, starting at just $29. All plans use advanced Flux AI for enhanced 1024×1024 resolution — higher than most competitors. Plus, we offer a 14-day money-back guarantee and 30-day auto-delete privacy that many alternatives don't.",
     },
     {
       question: "I love my headshots! How can I spread the word?",

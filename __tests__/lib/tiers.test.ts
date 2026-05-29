@@ -38,9 +38,9 @@ describe('TIERS constants', () => {
     expect(s.originalPrice).toBe(39);
     expect(s.priceLabel).toBe('$29');
     expect(s.imageCount).toBe(40);
-    expect(s.modelBranch).toBe('sd15');
-    expect(s.resolution).toBe('512×768');
-    expect(s.estimatedTime).toBe('~45 min');
+    expect(s.modelBranch).toBe('flux');
+    expect(s.resolution).toBe('1024×1024');
+    expect(s.estimatedTime).toBe('~25 min');
     expect(s.badge).toBeUndefined();
     expect(s.features.length).toBeGreaterThanOrEqual(4);
   });
@@ -53,9 +53,9 @@ describe('TIERS constants', () => {
     expect(p.originalPrice).toBe(54);
     expect(p.priceLabel).toBe('$39');
     expect(p.imageCount).toBe(60);
-    expect(p.modelBranch).toBe('sd15');
-    expect(p.resolution).toBe('512×768');
-    expect(p.estimatedTime).toBe('~40 min');
+    expect(p.modelBranch).toBe('flux');
+    expect(p.resolution).toBe('1024×1024');
+    expect(p.estimatedTime).toBe('~25 min');
     expect(p.badge).toBe('Most Popular');
     expect(p.features.length).toBeGreaterThanOrEqual(5);
   });
@@ -137,14 +137,14 @@ describe('PRODUCT_ID_TO_TIER', () => {
 // 4. getTrainingConfig()
 // ============================================
 describe('getTrainingConfig', () => {
-  it('starter: sd15 branch', () => {
+  it('starter: flux branch', () => {
     const config = getTrainingConfig('starter');
-    expect(config.branch).toBe('sd15');
+    expect(config.branch).toBe('flux');
   });
 
-  it('professional: sd15 branch', () => {
+  it('professional: flux branch', () => {
     const config = getTrainingConfig('professional');
-    expect(config.branch).toBe('sd15');
+    expect(config.branch).toBe('flux');
   });
 
   it('executive: flux branch', () => {
@@ -311,7 +311,7 @@ describe('End-to-end scenario: Purchase → Webhook → Training', () => {
 
     // Step 3: Train model uses tier to get config
     const config = getTrainingConfig(tier);
-    expect(config.branch).toBe('sd15');
+    expect(config.branch).toBe('flux');
   });
 
   it('professional purchase flow', () => {
@@ -322,7 +322,7 @@ describe('End-to-end scenario: Purchase → Webhook → Training', () => {
     expect(tier).toBe('professional');
 
     const config = getTrainingConfig(tier);
-    expect(config.branch).toBe('sd15');
+    expect(config.branch).toBe('flux');
   });
 
   it('executive purchase flow', () => {
@@ -380,8 +380,8 @@ describe('End-to-end scenario: Purchase → Webhook → Training', () => {
     const tier = tierFromProductId(legacyProductId);
     expect(tier).toBe('starter');
 
-    // Training uses starter config
+    // Training uses starter config (now flux)
     const config = getTrainingConfig(tier);
-    expect(config.branch).toBe('sd15');
+    expect(config.branch).toBe('flux');
   });
 });

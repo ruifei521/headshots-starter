@@ -31,15 +31,15 @@ export default function TierComparisonTable() {
     },
     {
       label: "Resolution",
-      values: { starter: "512×768", professional: "512×768", executive: "1024×1024" },
+      values: { starter: "1024×1024", professional: "1024×1024", executive: "1024×1024" },
     },
     {
       label: "AI model",
-      values: { starter: "SD 1.5", professional: "SD 1.5", executive: "Flux (enhanced)" },
+      values: { starter: "Flux", professional: "Flux", executive: "Flux" },
     },
     {
       label: "Delivery",
-      values: { starter: "~45 min", professional: "~40 min", executive: "~25 min" },
+      values: { starter: "~25 min", professional: "~25 min", executive: "~25 min" },
     },
     {
       label: "Business formal",

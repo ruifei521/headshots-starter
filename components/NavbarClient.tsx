@@ -41,27 +41,24 @@ export default function NavbarClient() {
         <Link href="/" className="flex items-center gap-2 font-bold text-xl cursor-pointer">
           <span>SnapProHead</span>
         </Link>
-        
+
         {user && (
           <nav className="flex gap-4 sm:gap-6 items-center text-sm sm:text-base">
             <Link href="/overview" className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors cursor-pointer">
               Home
             </Link>
-            <Link href="/packs" className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors cursor-pointer">
-              Styles
-            </Link>
           </nav>
         )}
-        
+
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          
+
           {!user && (
             <>
               <Link href="/login" className="hidden sm:block text-sm font-medium hover:text-primary transition-colors py-2 cursor-pointer">
                 Login
               </Link>
-              <Link href="/templates">
+              <Link href="/#pricing">
                 <Button>Create headshots</Button>
               </Link>
             </>

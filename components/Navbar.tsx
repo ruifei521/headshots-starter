@@ -45,18 +45,18 @@ export default async function Navbar() {
           <Camera className="h-5 w-5 text-primary" />
           <span>SnapProHead</span>
         </Link>
-        
+
         <NavLinks />
-        
+
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          
+
           {!user && (
             <>
               <Link href="/login" className="hidden sm:block text-base font-semibold hover:text-primary transition-colors py-2">
                 Login
               </Link>
-              <Link href="/templates">
+              <Link href="/#pricing">
                 <Button>Create headshots</Button>
               </Link>
             </>
