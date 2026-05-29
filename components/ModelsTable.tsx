@@ -24,9 +24,22 @@ const ESTIMATED_TRAINING_MS = 30 * 60 * 1000; // 30 minutes
 
 function TrainingProgress({ model }: { model: modelRowWithSamples }) {
   const [progress, setProgress] = useState(0);
-  const [elapsed, setElapsed] = useState("");
+  const [label, setLabel] = useState("");
+
+  // ⭐ 优先使用真实进度（images_generated / total_images）
+  const generated = (model as any).images_generated ?? 0;
+  const total = (model as any).total_images ?? 0;
+  const hasRealProgress = total > 0;
 
   useEffect(() => {
+    if (hasRealProgress) {
+      const pct = Math.round((generated / total) * 100);
+      setProgress(pct);
+      setLabel(`${generated}/${total}`);
+      return;
+    }
+
+    // Fallback: 基于时间的估算
     const update = () => {
       if (!model.created_at) return;
       const start = new Date(model.created_at).getTime();
@@ -35,18 +48,18 @@ function TrainingProgress({ model }: { model: modelRowWithSamples }) {
       const pct = Math.min(Math.round((elapsedMs / ESTIMATED_TRAINING_MS) * 100), 95);
       setProgress(pct);
       const mins = Math.floor(elapsedMs / 60000);
-      setElapsed(mins < 1 ? "<1m" : `${mins}m`);
+      setLabel(mins < 1 ? "<1m" : `${mins}m`);
     };
     update();
     const interval = setInterval(update, 5000);
     return () => clearInterval(interval);
-  }, [model.created_at]);
+  }, [model.created_at, hasRealProgress, generated, total]);
 
   return (
     <div className="flex items-center gap-2 min-w-[120px]">
       <Progress value={progress} className="h-2 w-20" />
       <span className="text-xs text-muted-foreground whitespace-nowrap">
-        {elapsed} / ~30m
+        {hasRealProgress ? label : `${label} / ~30m`}
       </span>
     </div>
   );
@@ -83,12 +96,12 @@ export default function ModelsTable({ models }: ModelsTableProps) {
                     className="flex gap-2 items-center w-min"
                     variant={model.status === "finished" ? "default" : "secondary"}
                   >
-                    {model.status === "processing" ? "training" : model.status}
-                    {model.status === "processing" && (
+                    {model.status === "processing" ? "training" : model.status === "pending" ? "queued" : model.status}
+                    {(model.status === "processing" || model.status === "pending") && (
                       <Icons.spinner className="h-4 w-4 animate-spin" />
                     )}
                   </Badge>
-                  {model.status === "processing" && (
+                  {(model.status === "processing" || model.status === "pending") && (
                     <TrainingProgress model={model} />
                   )}
                 </div>

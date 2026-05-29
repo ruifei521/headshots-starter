@@ -16,7 +16,20 @@ function TrainingProgressBanner({ model }: { model: modelRow }) {
   const [elapsed, setElapsed] = useState(0);
   const ESTIMATED = 30; // minutes
 
+  // ⭐ 优先使用真实进度（images_generated / total_images）
+  const generated = model.images_generated ?? 0;
+  const total = model.total_images ?? 0;
+  const hasRealProgress = total > 0;
+
   useEffect(() => {
+    if (hasRealProgress) {
+      // 真实进度：基于已生成图片数
+      const pct = Math.round((generated / total) * 100);
+      setProgress(pct);
+      return; // 不需要 interval，由 realtime 订阅驱动
+    }
+
+    // Fallback: 基于时间的估算
     const update = () => {
       if (!model.created_at) return;
       const start = new Date(model.created_at).getTime();
@@ -29,24 +42,38 @@ function TrainingProgressBanner({ model }: { model: modelRow }) {
     update();
     const interval = setInterval(update, 5000);
     return () => clearInterval(interval);
-  }, [model.created_at]);
+  }, [model.created_at, hasRealProgress, generated, total]);
 
-  const remaining = Math.max(ESTIMATED - elapsed, 0);
+  const remaining = hasRealProgress 
+    ? total - generated 
+    : Math.max(ESTIMATED - elapsed, 0);
 
   return (
     <div className="rounded-lg border bg-card p-4">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <Icons.spinner className="h-4 w-4 animate-spin text-primary" />
-          <span className="font-medium text-sm">Training in Progress</span>
+          {progress < 100 ? (
+            <Icons.spinner className="h-4 w-4 animate-spin text-primary" />
+          ) : (
+            <span className="text-green-500">&#10003;</span>
+          )}
+          <span className="font-medium text-sm">
+            {hasRealProgress 
+              ? `Generating Images (${generated}/${total})`
+              : "Training in Progress"}
+          </span>
         </div>
         <span className="text-xs text-muted-foreground">
-          ~{remaining} min remaining
+          {hasRealProgress
+            ? `${remaining} images remaining`
+            : `~${remaining} min remaining`}
         </span>
       </div>
       <Progress value={progress} className="h-3" />
       <p className="text-xs text-muted-foreground mt-2">
-        AI is learning your facial features. You can close this page — we'll email you when it's done.
+        {hasRealProgress
+          ? `AI is generating your headshots. ${generated} of ${total} images ready — you can close this page.`
+          : "AI is learning your facial features. You can close this page — we'll email you when it's done."}
       </p>
     </div>
   );
@@ -124,7 +151,7 @@ export default function ClientSideModel({
   return (
     <div id="train-model-container" className="w-full h-full">
       <div className="flex flex-col w-full mt-4 gap-8">
-        {model.status === "processing" && (
+        {(model.status === "processing" || model.status === "pending") && (
           <TrainingProgressBanner model={model} />
         )}
         {/* ⭐ Display tier info */}

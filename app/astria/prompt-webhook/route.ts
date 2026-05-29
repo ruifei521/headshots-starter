@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
   const { prompt } = incomingData;
 
-  console.log({ prompt });
+  console.log(`Prompt webhook: prompt_id=${prompt.id}, tune_id=${prompt.tune_id}, images=${prompt.images?.length || 0}`);
 
   const urlObj = new URL(request.url);
   const user_id = urlObj.searchParams.get("user_id");
@@ -153,17 +153,61 @@ export async function POST(request: Request) {
       );
     }
 
+    // ⭐ 幂等保护：逐张 upsert，单张失败不影响其他
+    // 用 modelId + uri 作为唯一键防重复写入
+    let savedCount = 0;
     await Promise.all(
       allHeadshots.map(async (image) => {
-        const { error: imageError } = await supabase.from("images").insert({
-          modelId: Number(model.id),
-          uri: image,
-        });
-        if (imageError) {
-          console.error({ imageError });
+        try {
+          // 先检查是否已存在（幂等）
+          const { data: existing } = await supabase
+            .from("images")
+            .select("id")
+            .eq("modelId", Number(model.id))
+            .eq("uri", image)
+            .maybeSingle();
+
+          if (existing) {
+            console.log(`Prompt webhook: skipping duplicate image for model ${model.id}`);
+            return; // 已存在，跳过
+          }
+
+          const { error: imageError } = await supabase.from("images").insert({
+            modelId: Number(model.id),
+            uri: image,
+          });
+
+          if (imageError) {
+            console.error(`Prompt webhook: failed to insert image for model ${model.id}:`, imageError);
+          } else {
+            savedCount++;
+          }
+        } catch (err) {
+          console.error(`Prompt webhook: error processing image for model ${model.id}:`, err);
         }
       })
     );
+
+    // ⭐ 更新 models.images_generated（累加本次保存的图片数）
+    if (savedCount > 0) {
+      const { data: currentModel } = await supabase
+        .from("models")
+        .select("images_generated")
+        .eq("id", Number(model.id))
+        .single();
+
+      const newCount = (currentModel?.images_generated || 0) + savedCount;
+      const { error: updateError } = await supabase
+        .from("models")
+        .update({ images_generated: newCount })
+        .eq("id", Number(model.id));
+
+      if (updateError) {
+        console.error(`Prompt webhook: failed to update images_generated for model ${model.id}:`, updateError);
+      } else {
+        console.log(`Prompt webhook: model ${model.id} progress ${newCount}/${model.total_images || '?'}`);
+      }
+    }
     return NextResponse.json(
       {
         message: "success",

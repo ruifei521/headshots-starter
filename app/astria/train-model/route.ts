@@ -119,7 +119,6 @@ export async function POST(request: Request) {
 
   // ⭐ 读取用户 tier（用于决定训练参数）
   let userTier: string = 'starter';
-  let _credits: any = null;
 
   if (paymentIsConfigured) {
     const { error: creditError, data: credits } = await supabase
@@ -173,7 +172,6 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     } else {
-      _credits = credits;
       // ⭐ 读取用户 tier（向后兼容：无 tier 字段默认 starter）
       userTier = credits[0]?.tier || 'starter';
       console.log(`User ${user.id} tier: ${userTier}`);
@@ -185,14 +183,24 @@ export async function POST(request: Request) {
 
   console.log(`Training config: branch=${trainingConfig.branch}, tier=${userTier}`);
 
-  // create a model row in supabase — ⭐ 写入 tier
+  // ⭐ 计算 total_images（从 prompts 数量得出）
+  // 这里先算一次用于 model.insert，正式值后面 promptsAttributes 生成后对齐
+  // 使用 getTierPrompts 预计算（后面正式生成时复用）
+  const effectiveTierForCount = isTier(userTier) ? userTier : 'starter';
+  const promptTemplatesForCount = getTierPrompts(effectiveTierForCount, type);
+  const totalImages = promptTemplatesForCount.reduce((s, t) => s + t.num_images, 0);
+
+  // create a model row in supabase — ⭐ 写入 tier + 进度字段
   const { error: modelError, data } = await supabase
     .from("models")
     .insert({
       user_id: user.id,
       name,
       type,
-      tier: userTier,  // ⭐ 记录训练时的 tier
+      tier: userTier,           // ⭐ 记录训练时的 tier
+      status: 'processing',     // 显式设置初始状态
+      images_generated: 0,      // 初始 0
+      total_images: totalImages, // 预计总图片数
     })
     .select("id")
     .single();
@@ -235,17 +243,15 @@ export async function POST(request: Request) {
     // ⭐ 根据 tier 决定 branch
     const branch = astriaTestModeIsOn ? "fast" : trainingConfig.branch;
 
-    // ⭐ 一次性生成该 tier 的所有 prompts（含 callback → prompt-webhook）
-    // Astria 训练完成后自动跑所有 prompts，每个 prompt 完成时回调 prompt-webhook
-    const effectiveTier = isTier(userTier) ? userTier : 'starter';
-    const promptTemplates = getTierPrompts(effectiveTier, type);
+    // ⭐ 复用已计算的 prompts（与 model.insert 时一致）
+    const promptTemplates = promptTemplatesForCount;
     const promptsAttributes = promptTemplates.map(t => ({
       text: t.text,
       callback: promptWebhookWithParams,
       num_images: t.num_images,
     }));
 
-    console.log(`Creating tune with ${promptsAttributes.length} prompts for tier=${effectiveTier} (${promptTemplates.reduce((s, t) => s + t.num_images, 0)} images)`);
+    console.log(`Creating tune with ${promptsAttributes.length} prompts for tier=${effectiveTierForCount} (${totalImages} images)`);
 
     // 🔍 Debug: log payload shape (without full image URLs for privacy)
     console.log("Astria payload shape:", {
@@ -328,32 +334,20 @@ export async function POST(request: Request) {
       );
     }
 
-    if (paymentIsConfigured && _credits && _credits.length > 0) {
-      const subtractedCredits = _credits[0].credits - 1;
-      const { error: updateCreditError, data: creditData } = await supabase
-        .from("credits")
-        .update({ credits: subtractedCredits })
-        .eq("user_id", user.id)
-        .select("*");
-
-      console.log({ creditData });
-      console.log({ subtractedCredits });
-
-      if (updateCreditError) {
-        console.error({ updateCreditError });
-        return NextResponse.json(
-          {
-            message: updateCreditError.message || "Failed to update credits.",
-          },
-          { status: 500 }
-        );
-      }
-    }
+    // ⭐ credits 扣减移到 train-webhook（确保只有训练成功才扣）
+    // 之前在此处扣减，但超时场景下 Astria 可能实际排队了但响应未到
   } catch (e: any) {
     console.error("Train model error:", e);
     // ⭐ Axios 超时（ECONNABORTED）：请求已发出但 Astria 响应慢，Vercel Hobby 10s 限制
+    // 保留 model 行，标记为 pending — train-webhook 回调时会更新为 finished + 扣 credits
     if (e?.code === 'ECONNABORTED' || e?.message?.includes('timeout')) {
-      console.warn("Astria request timed out (likely queued successfully) — returning 202");
+      console.warn("Astria request timed out (likely queued successfully) — setting status=pending");
+      if (modelId) {
+        await supabase
+          .from("models")
+          .update({ status: "pending" })
+          .eq("id", modelId);
+      }
       return NextResponse.json(
         { message: "success", queued: true },
         { status: 202 }

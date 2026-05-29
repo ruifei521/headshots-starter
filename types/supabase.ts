@@ -72,30 +72,36 @@ export interface Database {
         Row: {
           created_at: string
           id: number
+          images_generated: number  // 已生成图片数
           modelId: string | null
           name: string | null
           status: string
           tier: string          // ⭐ 新增：starter | professional | executive
+          total_images: number  // 预计总图片数
           type: string | null
           user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: number
+          images_generated?: number  // 已生成图片数，默认 0
           modelId?: string | null
           name?: string | null
           status?: string
           tier?: string         // ⭐ 新增
+          total_images?: number  // 预计总图片数
           type?: string | null
           user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: number
+          images_generated?: number
           modelId?: string | null
           name?: string | null
           status?: string
           tier?: string         // ⭐ 新增
+          total_images?: number
           type?: string | null
           user_id?: string | null
         }

@@ -159,6 +159,7 @@ export async function POST(request: Request) {
     // ⭐ 2. 更新 model 状态为 finished
     // prompts 已在 train-model 创建时通过 prompts_attributes 一并提交，
     // Astria 训练完成后会自动跑所有 prompts，每个 prompt 完成时回调 prompt-webhook
+    // 兼容 pending（超时场景）和 processing（正常场景）
     const { data: modelUpdated, error: modelUpdatedError } = await supabase
       .from("models")
       .update({
@@ -181,6 +182,38 @@ export async function POST(request: Request) {
     if (!modelUpdated) {
       console.error("No model updated!");
       console.error({ modelUpdated });
+    }
+
+    // ⭐ 3. 扣减 credits（确保只有训练成功才扣）
+    // 之前 credit 扣减在 train-model 中，超时场景会导致扣了但请求可能未到达 Astria
+    // 现在统一由 train-webhook 回调确认训练成功后扣减
+    const paymentIsConfigured = !!(process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true" || process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true");
+    if (paymentIsConfigured) {
+      try {
+        const { data: currentCredits, error: creditFetchError } = await supabase
+          .from("credits")
+          .select("credits")
+          .eq("user_id", user_id)
+          .single();
+
+        if (!creditFetchError && currentCredits && currentCredits.credits > 0) {
+          const { error: updateCreditError } = await supabase
+            .from("credits")
+            .update({ credits: currentCredits.credits - 1 })
+            .eq("user_id", user_id);
+
+          if (updateCreditError) {
+            console.error("train-webhook: Failed to deduct credits:", updateCreditError);
+          } else {
+            console.log(`train-webhook: Credit deducted for user ${user_id}, remaining: ${currentCredits.credits - 1}`);
+          }
+        } else {
+          console.warn(`train-webhook: No credits to deduct for user ${user_id} (credits=${currentCredits?.credits})`);
+        }
+      } catch (creditErr) {
+        // 不阻塞主流程：model 状态已更新，credits 扣减失败仅记录日志
+        console.error("train-webhook: Credit deduction error:", creditErr);
+      }
     }
 
     return NextResponse.json(

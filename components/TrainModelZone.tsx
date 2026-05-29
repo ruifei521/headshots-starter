@@ -221,15 +221,45 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       return;
     }
 
+    // ⭐ Credit 前置检查：避免上传完才发现没 credit
+    try {
+      const supabaseCheck = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { session } } = await supabaseCheck.auth.getSession();
+      if (session) {
+        const { data: credits } = await supabaseCheck
+          .from('credits')
+          .select('credits')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        if (!credits || credits.credits < 1) {
+          toast({
+            title: "No credits available",
+            description: "You don't have enough credits to start training. Please purchase a plan first.",
+            duration: 8000,
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      // Credit check failed — continue anyway (server will validate)
+      console.warn("Credit pre-check failed, will validate server-side:", e);
+    }
+
     setIsLoading(true);
+    const totalFiles = currentFileObjects.length;
     const loadingToast = toast({
-      title: "Step 1/3: Uploading images...",
+      title: `Step 1/3: Uploading images (0/${totalFiles})...`,
       description: "Please wait while we upload your photos.",
-      duration: Infinity, // keep showing until we dismiss
+      duration: Infinity,
     });
 
     try {
-      // Upload all files in PARALLEL
+      // ⭐ 并行上传 + 逐张进度更新
+      let completedUploads = 0;
       const uploadPromises = currentFileObjects.map(async (fileObj) => {
         const formData = new FormData();
         formData.append("file", fileObj.file);
@@ -246,6 +276,16 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         }
 
         const data = await response.json();
+        
+        // ⭐ 每张上传完成时更新进度
+        completedUploads++;
+        loadingToast.update({
+          id: loadingToast.id,
+          title: `Step 1/3: Uploading images (${completedUploads}/${totalFiles})...`,
+          description: `Uploaded ${completedUploads} of ${totalFiles} photos.`,
+          duration: Infinity,
+        });
+        
         return data.url;
       });
 
