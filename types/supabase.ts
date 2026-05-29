@@ -14,18 +14,21 @@ export interface Database {
           created_at: string
           credits: number
           id: number
+          tier: string          // ⭐ 新增：starter | professional | executive
           user_id: string
         }
         Insert: {
           created_at?: string
           credits?: number
           id?: number
+          tier?: string         // ⭐ 新增
           user_id: string
         }
         Update: {
           created_at?: string
           credits?: number
           id?: number
+          tier?: string         // ⭐ 新增
           user_id?: string
         }
         Relationships: [
@@ -72,6 +75,7 @@ export interface Database {
           modelId: string | null
           name: string | null
           status: string
+          tier: string          // ⭐ 新增：starter | professional | executive
           type: string | null
           user_id: string | null
         }
@@ -81,6 +85,7 @@ export interface Database {
           modelId?: string | null
           name?: string | null
           status?: string
+          tier?: string         // ⭐ 新增
           type?: string | null
           user_id?: string | null
         }
@@ -90,12 +95,60 @@ export interface Database {
           modelId?: string | null
           name?: string | null
           status?: string
+          tier?: string         // ⭐ 新增
           type?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "models_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      // ⭐ orders 表（新增）
+      orders: {
+        Row: {
+          id: number
+          user_id: string
+          creem_checkout_id: string | null
+          creem_product_id: string
+          tier: string
+          amount_cents: number
+          currency: string
+          status: string
+          raw_payload: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          user_id: string
+          creem_checkout_id?: string | null
+          creem_product_id: string
+          tier: string
+          amount_cents: number
+          currency?: string
+          status?: string
+          raw_payload?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          user_id?: string
+          creem_checkout_id?: string | null
+          creem_product_id?: string
+          tier?: string
+          amount_cents?: number
+          currency?: string
+          status?: string
+          raw_payload?: Json | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_user_id_fkey"
             columns: ["user_id"]
             referencedRelation: "users"
             referencedColumns: ["id"]

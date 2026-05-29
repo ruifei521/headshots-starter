@@ -4,13 +4,14 @@ import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getTrainingConfig, isTier } from "@/lib/tiers";
+import { getTierPrompts } from "@/lib/prompts";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30; // Extend Vercel timeout for Astria API call
 
 const astriaApiKey = process.env.ASTRIA_API_KEY;
 const astriaTestModeIsOn = process.env.ASTRIA_TEST_MODE === "true";
-const packsIsEnabled = true;
 
 const appWebhookSecret = process.env.APP_WEBHOOK_SECRET;
 const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
@@ -105,13 +106,15 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-  let _credits = null;
 
-  console.log({ paymentIsConfigured });
+  // ⭐ 读取用户 tier（用于决定训练参数）
+  let userTier: string = 'starter';
+  let _credits: any = null;
+
   if (paymentIsConfigured) {
     const { error: creditError, data: credits } = await supabase
       .from("credits")
-      .select("credits")
+      .select("credits, tier")
       .eq("user_id", user.id);
 
     if (creditError) {
@@ -131,6 +134,7 @@ export async function POST(request: Request) {
         .insert({
           user_id: user.id,
           credits: 0,
+          tier: 'starter',
         });
 
       if (errorCreatingCredits) {
@@ -160,16 +164,25 @@ export async function POST(request: Request) {
       );
     } else {
       _credits = credits;
+      // ⭐ 读取用户 tier（向后兼容：无 tier 字段默认 starter）
+      userTier = credits[0]?.tier || 'starter';
+      console.log(`User ${user.id} tier: ${userTier}`);
     }
   }
 
-  // create a model row in supabase
+  // ⭐ 根据 tier 决定训练配置
+  const trainingConfig = getTrainingConfig(isTier(userTier) ? userTier : 'starter');
+
+  console.log(`Training config: branch=${trainingConfig.branch}, tier=${userTier}`);
+
+  // create a model row in supabase — ⭐ 写入 tier
   const { error: modelError, data } = await supabase
     .from("models")
     .insert({
       user_id: user.id,
       name,
       type,
+      tier: userTier,  // ⭐ 记录训练时的 tier
     })
     .select("id")
     .single();
@@ -193,7 +206,7 @@ export async function POST(request: Request) {
       ? deploymentUrl 
       : `https://${deploymentUrl}`;
 
-  const trainWebhook = `${baseUrl}/astria/train-webhook`;
+    const trainWebhook = `${baseUrl}/astria/train-webhook`;
     const trainWebhookWithParams = appWebhookSecret
       ? `${trainWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_secret=${appWebhookSecret}`
       : `${trainWebhook}?user_id=${user.id}&model_id=${modelId}`;
@@ -207,51 +220,42 @@ export async function POST(request: Request) {
     const API_KEY = astriaApiKey;
     const DOMAIN = "https://api.astria.ai";
 
+    // ⭐ 根据 tier 决定 branch
+    const branch = astriaTestModeIsOn ? "fast" : trainingConfig.branch;
+
+    // ⭐ 一次性生成该 tier 的所有 prompts（含 callback → prompt-webhook）
+    // Astria 训练完成后自动跑所有 prompts，每个 prompt 完成时回调 prompt-webhook
+    const effectiveTier = isTier(userTier) ? userTier : 'starter';
+    const promptTemplates = getTierPrompts(effectiveTier, type);
+    const promptsAttributes = promptTemplates.map(t => ({
+      text: t.text,
+      callback: promptWebhookWithParams,
+      num_images: t.num_images,
+    }));
+
+    console.log(`Creating tune with ${promptsAttributes.length} prompts for tier=${effectiveTier} (${promptTemplates.reduce((s, t) => s + t.num_images, 0)} images)`);
+
     // Create a fine tuned model using Astria tune API
+    // ⭐ prompts_attributes 在创建时一次性传入，训练完成后 Astria 自动跑所有 prompts
     const tuneBody = {
       tune: {
         title: name,
-        // Hard coded tune id of Realistic Vision v5.1 from the gallery - https://www.astria.ai/gallery/tunes
-        // https://www.astria.ai/gallery/tunes/690204/prompts
+        // Hard coded tune id of Realistic Vision v5.1 from the gallery
         base_tune_id: 690204,
         name: type,
-        branch: astriaTestModeIsOn ? "fast" : "sd15",
+        branch: branch,
         token: "ohwx",
         image_urls: images,
         callback: trainWebhookWithParams,
+        prompts_attributes: promptsAttributes,
         characteristics,
-        prompts_attributes: [
-          {
-            text: `portrait of ohwx ${type} wearing a business suit, professional photo, white background, Amazing Details, Best Quality, Masterpiece, dramatic lighting highly detailed, analog photo, overglaze, 80mm Sigma f/1.4 or any ZEISS lens`,
-            callback: promptWebhookWithParams,
-            num_images: 8,
-          },
-          {
-            text: `8k close up linkedin profile picture of ohwx ${type}, professional jack suite, professional headshots, photo-realistic, 4k, high-resolution image, workplace settings, upper body, modern outfit, professional suit, business, blurred background, glass building, office window`,
-            callback: promptWebhookWithParams,
-            num_images: 8,
-          },
-        ],
       },
     };
 
-    // Create a fine tuned model using Astria packs API
-    const packBody = {
-      tune: {
-        title: name,
-        name: type,
-        callback: trainWebhookWithParams,
-        characteristics,
-        prompt_attributes: {
-          callback: promptWebhookWithParams,
-        },
-        image_urls: images,
-      },
-    };
-
+    // ⭐ POST /tunes + prompts_attributes：一次调用完成训练 + 出图
     const response = await axios.post(
-      DOMAIN + (packsIsEnabled ? `/p/${pack}/tunes` : "/tunes"),
-      packsIsEnabled ? packBody : tuneBody,
+      DOMAIN + "/tunes",
+      tuneBody,
       {
         headers: {
           "Content-Type": "application/json",
@@ -260,16 +264,16 @@ export async function POST(request: Request) {
       }
     );
 
-    const { status, data } = response;
+    const { status, data: astriaData } = response;
 
     if (status !== 201) {
-      console.error("Astria API error - status:", status, "response:", data);
+      console.error("Astria API error - status:", status, "response:", astriaData);
       // Rollback: Delete the created model if something goes wrong
       if (modelId) {
         await supabase.from("models").delete().eq("id", modelId);
       }
 
-      const errorMessage = (data as any)?.message || (data as any)?.error || `Astria API returned status ${status}`;
+      const errorMessage = (astriaData as any)?.message || (astriaData as any)?.error || `Astria API returned status ${status}`;
       return NextResponse.json(
         {
           message: errorMessage,
@@ -297,13 +301,13 @@ export async function POST(request: Request) {
 
     if (paymentIsConfigured && _credits && _credits.length > 0) {
       const subtractedCredits = _credits[0].credits - 1;
-      const { error: updateCreditError, data } = await supabase
+      const { error: updateCreditError, data: creditData } = await supabase
         .from("credits")
         .update({ credits: subtractedCredits })
         .eq("user_id", user.id)
         .select("*");
 
-      console.log({ data });
+      console.log({ creditData });
       console.log({ subtractedCredits });
 
       if (updateCreditError) {

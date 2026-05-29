@@ -3,10 +3,11 @@
 import { Icons } from "@/components/icons";
 import { Database } from "@/types/supabase";
 import { imageRow, modelRow, sampleRow } from "@/types/utils";
-import { createClient } from "@supabase/supabase-js";
-import { useEffect, useState, useMemo } from "react";
+import { createBrowserClient } from "@supabase/ssr";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { Badge } from "../ui/badge";
 import { Progress } from "../ui/progress";
+import { getTierInfo } from "@/lib/tiers";
 
 export const revalidate = 0;
 
@@ -51,6 +52,21 @@ function TrainingProgressBanner({ model }: { model: modelRow }) {
   );
 }
 
+/** ⭐ Tier badge component for model detail page */
+function TierBadge({ tier }: { tier?: string }) {
+  const tierInfo = getTierInfo(tier || 'starter');
+  return (
+    <div className="flex items-center gap-2 mb-3">
+      <Badge variant="secondary" className="text-xs font-medium">
+        {tierInfo.name} Plan
+      </Badge>
+      <span className="text-xs text-muted-foreground">
+        {tierInfo.imageCount} 张专业头像 · {tierInfo.estimatedTime}
+      </span>
+    </div>
+  );
+}
+
 type ClientSideModelProps = {
   serverModel: modelRow;
   serverImages: imageRow[];
@@ -63,22 +79,27 @@ export default function ClientSideModel({
   samples,
 }: ClientSideModelProps) {
   const [model, setModel] = useState<modelRow>(serverModel);
-  const [initError, setInitError] = useState<string | null>(null);
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  
-  if (!supabaseUrl || !supabaseAnonKey) {
+  // ✅ 使用 createBrowserClient（SSR 兼容），而非 createClient + process.env
+  const supabase = useMemo(() => {
+    try {
+      return createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+    } catch (e) {
+      console.error("ClientSideModel: Failed to create Supabase client:", e);
+      return null;
+    }
+  }, []);
+
+  if (!supabase) {
     return <div className="p-4 text-destructive">Missing Supabase configuration.</div>;
   }
 
-  let supabase: ReturnType<typeof createClient<Database>>;
-  try {
-    supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
-  } catch (e) {
-    console.error("ClientSideModel: Failed to create Supabase client:", e);
-    return <div className="p-4 text-destructive">Failed to connect.</div>;
-  }
+  // ✅ 用 ref 存储 model，避免 useEffect 因 model 变化重复订阅
+  const modelRef = useRef(model);
+  modelRef.current = model;
 
   useEffect(() => {
     const channel = supabase
@@ -95,7 +116,10 @@ export default function ClientSideModel({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, model, setModel]);
+  }, [supabase]);
+
+  // ⭐ Derive tier info for display
+  const modelTier: string = (model as any).tier || 'starter';
 
   return (
     <div id="train-model-container" className="w-full h-full">
@@ -103,6 +127,8 @@ export default function ClientSideModel({
         {model.status === "processing" && (
           <TrainingProgressBanner model={model} />
         )}
+        {/* ⭐ Display tier info */}
+        <TierBadge tier={modelTier} />
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-0">
           {samples && (
             <div className="flex w-full lg:w-1/2 flex-col gap-2">

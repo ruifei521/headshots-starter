@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -24,6 +25,8 @@ import * as z from "zod";
 import { fileUploadFormSchema } from "@/types/zod";
 import { ImageInspector } from "./ImageInspector";
 import { ImageInspectionResult, aggregateCharacteristics } from "@/lib/imageInspection";
+import { TIERS, isTier, type Tier } from "@/lib/tiers";
+import { createBrowserClient } from "@supabase/ssr";
 
 type FormInput = z.infer<typeof fileUploadFormSchema>;
 
@@ -46,6 +49,7 @@ interface FileObject {
 export default function TrainModelZone({ packSlug }: { packSlug: string }) {
   const [fileObjects, setFileObjects] = useState<FileObject[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [userTier, setUserTier] = useState<Tier>('starter'); // ⭐ 用户当前套餐
   const { toast } = useToast();
   const router = useRouter();
   // Track characteristics by file ID to avoid race conditions
@@ -66,6 +70,36 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
   useEffect(() => {
     fileObjectsRef.current = fileObjects;
   }, [fileObjects]);
+
+  // ⭐ Fetch user tier from Supabase on mount
+  useEffect(() => {
+    async function fetchTier() {
+      try {
+        const supabase = createBrowserClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const { data: credits } = await supabase
+          .from('credits')
+          .select('tier')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (credits?.tier && isTier(credits.tier)) {
+          setUserTier(credits.tier);
+        }
+      } catch (e) {
+        // Silently fallback to starter
+      }
+    }
+    fetchTier();
+  }, []);
+
+  // ⭐ Get tier display info
+  const tierInfo = TIERS[userTier];
 
   // Cleanup ALL preview URLs on unmount using ref (not stale closure)
   useEffect(() => {
@@ -337,6 +371,16 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
           onSubmit={form.handleSubmit(onSubmit)}
           className="rounded-md flex flex-col gap-8"
         >
+          {/* ⭐ Tier Info Badge */}
+          <div className="flex items-center gap-2 p-3 rounded-md bg-muted/50 border">
+            <Badge variant="secondary" className="text-xs">
+              {tierInfo.name}
+            </Badge>
+            <span className="text-sm text-muted-foreground">
+              {tierInfo.imageCount} 张专业头像
+            </span>
+          </div>
+
           <FormField
             control={form.control}
             name="name"

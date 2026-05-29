@@ -124,16 +124,34 @@ export async function POST(request: Request) {
   }
 
   try {
+    // ⭐ 1. 读取 model 信息（仅用于日志）
+    const { data: modelData, error: modelFetchError } = await supabase
+      .from("models")
+      .select("id, tier, type")
+      .eq("id", Number(model_id))
+      .single();
+
+    if (modelFetchError) {
+      console.error("Error fetching model:", modelFetchError);
+    }
+
+    const modelTier: string = modelData?.tier || 'starter';
+    const modelType: string = modelData?.type || 'person';
+    console.log(`Train webhook: model_id=${model_id}, tier=${modelTier}, type=${modelType}`);
+
     if (resendApiKey) {
       const resend = new Resend(resendApiKey);
       await resend.emails.send({
         from: "noreply@snapprohead.com",
         to: user?.email ?? "",
         subject: "Your model was successfully trained!",
-        html: `<h2>We're writing to notify you that your model training was successful! 1 credit has been used from your account.</h2>`,
+        html: `<h2>We're writing to notify you that your model training was successful! Your headshots are being generated now.</h2>`,
       });
     }
 
+    // ⭐ 2. 更新 model 状态为 finished
+    // prompts 已在 train-model 创建时通过 prompts_attributes 一并提交，
+    // Astria 训练完成后会自动跑所有 prompts，每个 prompt 完成时回调 prompt-webhook
     const { data: modelUpdated, error: modelUpdatedError } = await supabase
       .from("models")
       .update({

@@ -2,15 +2,16 @@ import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 import * as crypto from 'crypto';
-// Single $29 product = 1 generation
+import { tierFromProductId, maxTier, isTier } from '@/lib/tiers';
+
+// 向后兼容：旧 product_id 的 credit 映射
 const CREDITS_PER_PRODUCT: Record<string, number> = {
-  'prod_6F4zKTNhL3V7vWPUhnjZDZ': 1,
+  'prod_6F4zKTNhL3V7vWPUhnjZDZ': 1,  // 旧产品
 };
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const webhookSecret = process.env.CREEM_WEBHOOK_SECRET!;
-// CREDITS_PER_PRODUCT imported from @/lib/pricing
 
 function verifySignature(payload: string, signature: string): boolean {
   if (!webhookSecret || !signature) return false;
@@ -67,11 +68,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    if (isValid) {
-      console.log('Webhook signature verified ✓');
-    } else if (webhookSecret) {
-      console.warn('Webhook signature verification failed — payload may not be from CREEM');
+    if (!isValid) {
+      console.error('CREEM webhook signature verification failed — rejecting request');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
+    console.log('Webhook signature verified ✓');
 
     // Extract user ID from request_id
     let referenceId: string | null = null;
@@ -88,16 +89,17 @@ export async function POST(req: NextRequest) {
 
     // Extract product info from order
     const order = eventObject.order || {};
-    const productId = order.product || '';
+    const productId: string = order.product || '';
+    const checkoutId: string = eventObject.id || '';
+    const amountCents: number = order.amount || 0;
+    const currency: string = order.currency || 'USD';
 
-    const creditsToAdd = CREDITS_PER_PRODUCT[productId];
-    
-    if (!creditsToAdd) {
-      console.warn(`Unknown product: ${productId}, defaulting to 1 credit`);
-    }
+    // ⭐ product_id → tier 映射（利用 lib/tiers.ts 统一映射）
+    const tier = tierFromProductId(productId);
+    console.log(`Product ${productId} → tier: ${tier}`);
 
-    const finalCredits = creditsToAdd || 1;
-    console.log(`Processing credits for user ${referenceId}: +${finalCredits} credits (product: ${productId})`);
+    // 向后兼容：旧 product_id 仍使用 CREDITS_PER_PRODUCT
+    const creditsToAdd = CREDITS_PER_PRODUCT[productId] || 1;
 
     const supabase = createClient<Database>(
       supabaseUrl,
@@ -111,7 +113,7 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    // Check if user already has credits row
+    // ⭐ 1. 处理 credits 表：更新 credits + tier（使用 upgrade 逻辑，不降级）
     const { data: existingCredits } = await supabase
       .from('credits')
       .select('*')
@@ -119,30 +121,65 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (existingCredits) {
-      const newCredits = existingCredits.credits + finalCredits;
+      // 决定最终 tier：不降级（tier 升级规则：starter < professional < executive）
+      const resolvedTier = maxTier(existingCredits.tier || 'starter', tier);
+      const newCredits = existingCredits.credits + creditsToAdd;
+
       const { error } = await supabase
         .from('credits')
-        .update({ credits: newCredits })
+        .update({
+          credits: newCredits,
+          tier: resolvedTier,
+        })
         .eq('user_id', referenceId);
       
       if (error) {
         console.error('Error updating credits:', error);
         return NextResponse.json({ error: 'Failed to update credits' }, { status: 500 });
       }
-      console.log(`Updated credits for ${referenceId}: ${newCredits}`);
+      console.log(`Updated credits for ${referenceId}: ${newCredits} credits, tier=${resolvedTier}`);
     } else {
       const { error } = await supabase
         .from('credits')
         .insert({
           user_id: referenceId,
-          credits: finalCredits,
+          credits: creditsToAdd,
+          tier: tier,
         });
       
       if (error) {
         console.error('Error creating credits:', error);
         return NextResponse.json({ error: 'Failed to create credits' }, { status: 500 });
       }
-      console.log(`Created credits for ${referenceId}: ${finalCredits}`);
+      console.log(`Created credits for ${referenceId}: ${creditsToAdd} credits, tier=${tier}`);
+    }
+
+    // ⭐ 2. 写入 orders 表（审计记录）
+    // 注意：使用 INSERT 而非 UPSERT，避免覆盖已有记录
+    // 如果同一 checkout_id 重复回调，会静默忽略（依赖唯一约束或检查）
+    const { error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        user_id: referenceId,
+        creem_checkout_id: checkoutId || null,
+        creem_product_id: productId,
+        tier: tier,
+        amount_cents: amountCents,
+        currency: currency,
+        status: 'paid',
+        raw_payload: body,
+      });
+
+    if (orderError) {
+      // 如果是因为重复 creem_checkout_id 导致的错误，不视为失败
+      if (orderError.code === '23505') {
+        console.log(`Duplicate checkout_id ${checkoutId}, skipping orders insert`);
+      } else {
+        console.error('Error inserting order:', orderError);
+        // 不阻塞主流程：credits 已成功更新
+      }
+    } else {
+      console.log(`Order recorded: checkout=${checkoutId}, tier=${tier}, amount=${amountCents} ${currency}`);
     }
 
     return NextResponse.json({ received: true });

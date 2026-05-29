@@ -1,0 +1,204 @@
+classDiagram
+    %% ============================================
+    %% 常量/类型层
+    %% ============================================
+    class TierInfo {
+        +Tier tier
+        +string name
+        +number price
+        +string priceLabel
+        +number packCount
+        +string[] packSlugs
+        +string modelBranch : sd15 | flux
+        +string resolution
+        +string estimatedImages
+        +string estimatedTime
+        +string? badge
+        +string[] features
+    }
+
+    class TIERS {
+        <<constant>>
+        +TierInfo starter
+        +TierInfo professional
+        +TierInfo executive
+    }
+
+    class CREEM_PRODUCT_IDS {
+        <<constant>>
+        +string starter
+        +string professional
+        +string executive
+    }
+
+    class PRODUCT_ID_TO_TIER {
+        <<constant>>
+        +Tier fromProductId(id)
+    }
+
+    class TierUtils {
+        +getTrainingConfig(tier) TrainingConfig
+        +isTier(value) boolean
+        +getTierInfo(tier) TierInfo
+        +getCreemProductId(tier) string
+        +tierFromProductId(productId) Tier
+    }
+
+    %% ============================================
+    %% 数据库模型（Supabase Tables）
+    %% ============================================
+    class Models {
+        +bigint id PK
+        +uuid user_id FK
+        +text name
+        +text type : man|woman|person
+        +text status : processing|finished|error
+        +text modelId : Astria tune_id
+        +text tier : starter|professional|executive
+        +timestamptz created_at
+    }
+
+    class Credits {
+        +bigint id PK
+        +uuid user_id FK UNIQUE
+        +integer credits
+        +text tier : starter|professional|executive
+        +timestamptz created_at
+    }
+
+    class Orders {
+        +bigint id PK
+        +uuid user_id FK
+        +text creem_checkout_id
+        +text creem_product_id
+        +text tier
+        +integer amount_cents
+        +text currency
+        +text status : paid|refunded
+        +jsonb raw_payload
+        +timestamptz created_at
+    }
+
+    class Images {
+        +bigint id PK
+        +bigint modelId FK
+        +text uri
+        +timestamptz created_at
+    }
+
+    class Samples {
+        +bigint id PK
+        +bigint modelId FK
+        +text uri
+        +timestamptz created_at
+    }
+
+    %% ============================================
+    %% API Route 类
+    %% ============================================
+    class CreemCheckoutRoute {
+        +POST(req) Response
+        -getProductId(tier) string
+    }
+
+    class CreemWebhookRoute {
+        +POST(req) Response
+        -verifySignature(payload, signature) boolean
+        -processPayment(userId, productId) void
+        -upsertCredits(userId, tier) void
+        -createOrder(userId, productId, tier, amount) void
+    }
+
+    class TrainModelRoute {
+        +POST(req) Response
+        -validateUser(user) boolean
+        -checkCredits(userId) CreditsResult
+        -createModelRecord(userId, name, type, tier) ModelId
+        -callAstriaTune(pack, branch, images, callbacks) TuneResponse
+        -deductCredits(userId) void
+        -rollbackModel(modelId) void
+    }
+
+    class TrainWebhookRoute {
+        +POST(req) Response
+        -verifySecret(webhookSecret) boolean
+        -updateModelStatus(modelId, tuneId, status) void
+        -triggerAdditionalPacks(tuneId, tier) void
+        -sendEmailNotification(user) void
+    }
+
+    class PromptWebhookRoute {
+        +POST(req) Response
+        -verifySecret(webhookSecret) boolean
+        -storeImages(modelId, images) void
+    }
+
+    class TrainingConfig {
+        +string branch : sd15 | flux
+        +string primaryPack
+        +string[] additionalPacks
+    }
+
+    %% ============================================
+    %% 前端组件类
+    %% ============================================
+    class ModernPricing {
+        -Tier selectedTier
+        +renderTierCards() JSX
+        +handleSelectTier(tier) void
+        +handleCheckout(tier) void
+    }
+
+    class TierComparisonTable {
+        +renderComparison() JSX
+    }
+
+    class TierPackSelector {
+        -Tier currentTier
+        -string[] availablePacks
+        -string[] selectedPacks
+        +handleTogglePack(slug) void
+        +renderPackGrid() JSX
+    }
+
+    class TrainModelZone {
+        -string packSlug
+        -FileObject[] fileObjects
+        -boolean isLoading
+        +trainModel() void
+        +uploadImages() string[]
+        +callTrainAPI(payload) void
+    }
+
+    %% ============================================
+    %% 关系定义
+    %% ============================================
+    TIERS ..> TierInfo : contains
+    TierUtils ..> TIERS : reads
+
+    Models --> "1" Credits : user_id
+    Orders --> "1" Credits : user_id
+    Images --> "1" Models : modelId
+    Samples --> "1" Models : modelId
+
+    CreemCheckoutRoute ..> CREEM_PRODUCT_IDS : uses
+    CreemWebhookRoute ..> PRODUCT_ID_TO_TIER : uses
+    CreemWebhookRoute --> Credits : upserts
+    CreemWebhookRoute --> Orders : inserts
+
+    TrainModelRoute ..> TierUtils : calls getTrainingConfig
+    TrainModelRoute ..> Credits : reads tier, deducts
+    TrainModelRoute --> Models : inserts
+    TrainModelRoute --> Samples : inserts
+    TrainModelRoute --> Images : (via Astria callback)
+
+    TrainWebhookRoute --> Models : updates status
+    TrainWebhookRoute ..> TierUtils : calls getTrainingConfig
+    TrainWebhookRoute --> Images : (via Astria prompt callback)
+
+    PromptWebhookRoute --> Images : inserts
+
+    ModernPricing ..> TIERS : reads
+    ModernPricing ..> CreemCheckoutRoute : calls API
+    TierPackSelector ..> TierUtils : reads availablePacks
+    TrainModelZone ..> TrainModelRoute : calls API

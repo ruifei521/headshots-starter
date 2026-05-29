@@ -5,6 +5,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
+import { TIERS, getTierInfo, type Tier } from "@/lib/tiers";
 
 // Use browser client so it reads cookies and manages session automatically
 function getSupabase() {
@@ -104,8 +105,8 @@ const allPacks: Record<string, { title: string; desc: string; img: string; longD
   },
 };
 
-function GenderCard({ title, img, count, price, packSlug, gender }: {
-  title: string; img: string; count: number; price: string; packSlug: string; gender: string;
+function GenderCard({ title, img, count, price, packSlug, gender, tier }: {
+  title: string; img: string; count: number; price: string; packSlug: string; gender: string; tier?: Tier;
 }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -122,10 +123,16 @@ function GenderCard({ title, img, count, price, packSlug, gender }: {
         return;
       }
 
+      // ⭐ 构建 checkout 请求，包含 tier 参数
+      const body: Record<string, string> = { pack: packSlug, gender };
+      if (tier) {
+        body.tier = tier;
+      }
+
       const res = await fetch('/api/creem/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pack: packSlug, gender }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (data.url) {
@@ -139,6 +146,9 @@ function GenderCard({ title, img, count, price, packSlug, gender }: {
       setLoading(false);
     }
   };
+
+  // ⭐ 使用 TIERS 常量获取价格（而非硬编码 $29）
+  const displayPrice = price || TIERS.starter.priceLabel;
 
   return (
     <div className="card shadow-sm max-w-xs overflow-hidden bg-white rounded-2xl">
@@ -154,7 +164,7 @@ function GenderCard({ title, img, count, price, packSlug, gender }: {
         <h5 className="text-lg font-semibold">{title}</h5>
         <div className="flex justify-between items-center mt-3">
           <span className="text-sm text-gray-500">{count} images</span>
-          <span className="text-lg font-bold">{price}</span>
+          <span className="text-lg font-bold">{displayPrice}</span>
         </div>
         <div className="mt-3">
           <button
@@ -165,7 +175,7 @@ function GenderCard({ title, img, count, price, packSlug, gender }: {
             {loading ? (
               <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
             ) : (
-              `Purchase - $29`
+              `Purchase - ${displayPrice}`
             )}
           </button>
         </div>

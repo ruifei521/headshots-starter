@@ -125,7 +125,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Here we join all of the arrays into one.
+    // ⭐ 多 Pack 兼容：所有 prompt 回调统一处理
+    // 无论是主 Pack（corporate-headshots）还是额外 Pack（partners/natural/speaker/realtor），
+    // 都通过相同的 prompt-webhook 回调，model_id 保持不变
     const allHeadshots = prompt.images;
     
     const { data: model, error: modelError } = await supabase

@@ -1,47 +1,57 @@
-import { createClient } from "@supabase/supabase-js";
-import { NextResponse } from "next/server";
-import { Database } from "@/types/supabase";
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse } from 'next/server';
+import { Database } from '@/types/supabase';
 
-export const dynamic = "force-dynamic";
-
-// Upload images to Supabase Storage - use service_role_key to bypass RLS
+export const dynamic = 'force-dynamic';
 
 // Allowed MIME types
-const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
 // Maximum file size (10MB)
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export async function POST(request: Request): Promise<NextResponse> {
-  // Use service_role_key for storage operations to bypass RLS
-  const supabase = createClient<Database>(
+  // ✅ 鉴权：必须登录
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          // Next.js App Router: read cookies from Request
+          const cookie = request.headers.get('cookie') || '';
+          return cookie.split(';').map(c => {
+            const [name, ...rest] = c.trim().split('=');
+            return { name, value: rest.join('=') };
+          });
+        },
+        setAll() {},
+      },
+    }
+  );
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Use service_role key ONLY after auth check, for storage upload
+  const { createClient } = await import('@supabase/supabase-js');
+  const adminSupabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
+      auth: { autoRefreshToken: false, persistSession: false },
     }
   );
 
   try {
     const formData = await request.formData();
-    
-    // Debug: Log all form fields
-    console.log("FormData entries:");
-    const entries = Array.from(formData.entries());
-    entries.forEach(([key, value]) => {
-      console.log(`  ${key}: ${value instanceof File ? `File: ${(value as File).name} (${(value as File).size} bytes)` : value}`);
-    });
-    
-    const file = formData.get("file") as File;
-    const fileName = formData.get("fileName") as string;
 
-    console.log("Parsed file:", file?.name, file?.size, file?.type);
-    console.log("Parsed fileName:", fileName);
+    const file = formData.get('file') as File | null;
+    const fileName = formData.get('fileName') as string | null;
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
     // Server-side file type validation
@@ -60,21 +70,21 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
-    // Generate unique path: uploads/timestamp-originalName
+    // Generate unique path: uploads/{userId}/{timestamp}-{sanitizedName}
     const timestamp = Date.now();
-    const sanitized = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const filePath = `uploads/${timestamp}-${sanitized}`;
+    const sanitized = (fileName || file.name).replace(/[^a-zA-Z0-9._-]/g, '_');
+    const filePath = `uploads/${user.id}/${timestamp}-${sanitized}`;
 
     // Upload to Supabase Storage 'headshots' bucket
-    const { data, error } = await supabase.storage
-      .from("headshots")
+    const { data, error } = await adminSupabase.storage
+      .from('headshots')
       .upload(filePath, file, {
         contentType: file.type,
         upsert: false,
       });
 
     if (error) {
-      console.error("Storage upload error:", error);
+      console.error('Storage upload error:', error);
       return NextResponse.json(
         { error: `Upload failed: ${error.message}` },
         { status: 500 }
@@ -82,8 +92,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     // Get public URL
-    const { data: urlData } = supabase.storage
-      .from("headshots")
+    const { data: urlData } = adminSupabase.storage
+      .from('headshots')
       .getPublicUrl(filePath);
 
     return NextResponse.json({
@@ -91,7 +101,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       path: data.path,
     });
   } catch (error) {
-    console.error("Upload error:", error);
+    console.error('Upload error:', error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 }

@@ -21,6 +21,12 @@ export default function ThreeDBeforeAfterGallery() {
   const containerRef = useRef<HTMLDivElement>(null)
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
 
+  // ✅ 用 ref 存最新值，避免 setInterval 闭包捕获旧值
+  const activeIndexRef = useRef(activeIndex)
+  activeIndexRef.current = activeIndex
+  const isFlippingRef = useRef(isFlipping)
+  isFlippingRef.current = isFlipping
+
   // 8 pairs matching getheadshots.ai image set
   const galleryItems: GalleryItem[] = [
     { before: "/homepage/before0001.jpg", after: "/homepage/example0001.jpg", label: "① Corporate" },
@@ -32,8 +38,8 @@ export default function ThreeDBeforeAfterGallery() {
   ]
 
   const goToSlide = (index: number) => {
-    if (isFlipping) return
-    setDirection(index > activeIndex ? 1 : -1)
+    if (isFlippingRef.current) return
+    setDirection(index > activeIndexRef.current ? 1 : -1)
     setIsFlipping(true)
     setTimeout(() => {
       setActiveIndex(index)
@@ -41,8 +47,8 @@ export default function ThreeDBeforeAfterGallery() {
     }, 400)
   }
 
-  const nextSlide = () => goToSlide((activeIndex + 1) % galleryItems.length)
-  const prevSlide = () => goToSlide((activeIndex - 1 + galleryItems.length) % galleryItems.length)
+  const nextSlide = () => goToSlide((activeIndexRef.current + 1) % galleryItems.length)
+  const prevSlide = () => goToSlide((activeIndexRef.current - 1 + galleryItems.length) % galleryItems.length)
 
   // Gentle parallax
   useEffect(() => {
@@ -66,13 +72,13 @@ export default function ThreeDBeforeAfterGallery() {
     }
   }, [isFlipping, isHovered])
 
-  // Autoplay
+  // Autoplay — 只挂载一次，通过 ref 读取最新状态
   useEffect(() => {
     autoplayRef.current = setInterval(() => {
-      if (!isFlipping) nextSlide()
+      if (!isFlippingRef.current) nextSlide()
     }, 4000)
     return () => { if (autoplayRef.current) clearInterval(autoplayRef.current) }
-  }, [isFlipping])
+  }, [])
 
   const current = galleryItems[activeIndex]
 

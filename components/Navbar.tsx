@@ -10,8 +10,6 @@ import NavLinks from "./NavLinks";
 
 export const dynamic = "force-dynamic";
 
-const packsIsEnabled = true;
-
 export default async function Navbar() {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

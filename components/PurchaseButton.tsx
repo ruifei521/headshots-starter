@@ -4,19 +4,37 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Loader2, CreditCard } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { type Tier, isTier } from "@/lib/tiers";
 
-export default function PurchaseButton({ packSlug }: { packSlug: string }) {
+interface PurchaseButtonProps {
+  packSlug: string;
+  /** 套餐档位（用于 checkout 路由） */
+  tier?: Tier;
+  /** 性别（可选，传递给 checkout） */
+  gender?: string;
+}
+
+export default function PurchaseButton({ packSlug, tier, gender }: PurchaseButtonProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   async function handlePurchase() {
     setLoading(true);
     try {
+      // ⭐ 构建 Checkout 请求体，包含 tier 参数
+      const body: Record<string, string> = { pack: packSlug };
+      if (tier && isTier(tier)) {
+        body.tier = tier;
+      }
+      if (gender) {
+        body.gender = gender;
+      }
+
       // First try checkout (requires login)
       const res = await fetch("/api/creem/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pack: packSlug }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();

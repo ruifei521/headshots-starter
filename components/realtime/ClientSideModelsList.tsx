@@ -2,13 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { Database } from "@/types/supabase";
 import { modelRowWithSamples } from "@/types/utils";
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaImages } from "react-icons/fa";
 import ModelsTable from "../ModelsTable";
 
-const packsIsEnabled = true;
+const packsIsEnabled = false; // ⭐ 不再使用 Pack 选择，直接进入训练
 
 export const revalidate = 0;
 
@@ -22,22 +22,22 @@ export default function ClientSideModelsList({
   const [models, setModels] = useState<modelRowWithSamples[]>(serverModels);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !supabaseAnonKey) {
-      setError("Configuration error: missing Supabase credentials.");
-      return;
-    }
-
-    let supabase: ReturnType<typeof createClient<Database>>;
+  // ✅ 使用 createBrowserClient（SSR 兼容），useMemo 只创建一次
+  const supabase = useMemo(() => {
     try {
-      supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+      return createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
     } catch (e) {
       console.error("Failed to create Supabase client:", e);
       setError("Failed to connect to database. Please try again later.");
-      return;
+      return null;
     }
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
 
     const channel = supabase
       .channel("realtime-models")
@@ -80,7 +80,7 @@ export default function ClientSideModelsList({
         // ignore cleanup errors
       }
     };
-  }, []);
+  }, [supabase]);
 
   if (error) {
     return (
@@ -99,7 +99,7 @@ export default function ClientSideModelsList({
         <div className="flex flex-col gap-4">
           <div className="flex flex-row gap-4 w-full justify-between items-center text-center">
             <h1>Your models</h1>
-            <Link href={packsIsEnabled ? "/overview/packs" : "/overview/models/train/raw-tune"} className="w-fit">
+            <Link href="/overview/models/train/headshots" className="w-fit">
               <Button size={"sm"}>
                 Train model
               </Button>
@@ -115,7 +115,7 @@ export default function ClientSideModelsList({
             Get started by training your first model.
           </h1>
           <div>
-            <Link href={packsIsEnabled ? "/overview/packs" : "/overview/models/train/raw-tune"}>
+            <Link href="/overview/models/train/headshots">
               <Button size={"lg"}>Train model</Button>
             </Link>
           </div>

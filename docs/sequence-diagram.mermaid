@@ -1,0 +1,102 @@
+sequenceDiagram
+    actor User as 用户
+    participant Pricing as 定价页 (ModernPricing)
+    participant Checkout as /api/creem/checkout
+    participant Creem as Creem.io
+    participant Webhook as /api/webhook/creem
+    participant DB as Supabase
+    participant TM as /astria/train-model
+    participant Astria as Astria API
+    participant TWH as /astria/train-webhook
+    participant PWH as /astria/prompt-webhook
+
+    %% ============================================
+    %% Phase 1: 支付流程
+    %% ============================================
+    rect rgb(240, 248, 255)
+        Note over User,DB: === Phase 1: 用户选择套餐并完成支付 ===
+        User->>Pricing: 浏览三档套餐卡片
+        User->>Pricing: 点击 Professional $49 按钮
+        Pricing->>Checkout: POST {tier: 'professional'}
+        Checkout->>Checkout: 校验登录状态
+        Checkout->>Checkout: CREEM_PRODUCT_IDS['professional']<br/>→ 'prod_198ewWuQouDaQfEOT6kTvj'
+        Checkout->>Creem: POST /v1/checkouts<br/>{product_id, request_id: userId}
+        Creem-->>Checkout: {checkout_url}
+        Checkout-->>Pricing: {url: 'https://creem.io/...'}
+        Pricing->>Creem: 跳转至 Creem 支付页
+        User->>Creem: 完成信用卡支付
+        Creem->>Webhook: POST webhook (checkout.completed)<br/>{eventType, object: {request_id, order: {product: 'prod_198ewWuQ...'}}}
+        Webhook->>Webhook: HMAC-SHA256 签名验证
+        Webhook->>Webhook: PRODUCT_ID_TO_TIER['prod_198ewWuQ...']<br/>→ 'professional'
+        Webhook->>DB: UPSERT credits<br/>SET credits=credits+1, tier='professional'
+        Webhook->>DB: INSERT INTO orders<br/>(user_id, creem_product_id, tier, amount_cents)
+        Webhook-->>Creem: 200 OK
+    end
+
+    %% ============================================
+    %% Phase 2: 训练流程
+    %% ============================================
+    rect rgb(255, 248, 240)
+        Note over User,Astria: === Phase 2: 用户上传图片并启动训练 ===
+        User->>TM: 上传 4-10 张自拍照片
+        User->>TM: 点击 "开始训练" 按钮
+        TM->>TM: 并行上传图片至 Supabase Storage
+        TM->>DB: SELECT tier FROM credits WHERE user_id=userId
+        DB-->>TM: {tier: 'professional'}
+        TM->>TM: getTrainingConfig('professional')<br/>→ branch='sd15'<br/>→ primaryPack='corporate-headshots'<br/>→ additionalPacks=['partners-headshots','natural-headshots']
+        TM->>DB: INSERT INTO models<br/>(user_id, name, type, tier='professional')<br/>→ modelId=42
+        TM->>Astria: POST /p/corporate-headshots/tunes<br/>{tune: {branch:'sd15', image_urls,<br/>callback: trainWebhookUrl}}
+        Astria-->>TM: 201 Created {tune_id: 999}
+        TM->>DB: INSERT INTO samples (modelId=42, uri) × N
+        TM->>DB: UPDATE credits SET credits=credits-1
+        TM-->>User: ✓ 训练已提交！预计 ~40 分钟
+    end
+
+    %% ============================================
+    %% Phase 3: 训练完成回调
+    %% ============================================
+    rect rgb(240, 255, 240)
+        Note over Astria,TWH: === Phase 3: Astria 训练完成 → Webhook 回调 ===
+        Note over Astria: ~30-40 分钟训练 + corporate prompts 生成
+        Astria->>TWH: POST train-webhook<br/>{tune: {id: 999, name: 'man', ...}}
+        TWH->>TWH: 校验 webhook_secret
+
+        TWH->>DB: SELECT tier FROM models WHERE id=42
+        DB-->>TWH: {tier: 'professional'}
+
+        TWH->>DB: UPDATE models<br/>SET modelId='999', status='finished'
+
+        Note over TWH: === 根据 tier 触发额外 Pack ===
+
+        alt tier = 'starter'
+            Note over TWH: 无额外 — 仅 corporate (已完成)
+
+        else tier = 'professional'
+            TWH->>Astria: 触发 partners-headshots Pack<br/>使用 tune_id=999
+            Astria->>PWH: prompt callback: partners images
+            PWH->>DB: INSERT images (partners-headshots)
+
+            TWH->>Astria: 触发 natural-headshots Pack<br/>使用 tune_id=999
+            Astria->>PWH: prompt callback: natural images
+            PWH->>DB: INSERT images (natural-headshots)
+
+        else tier = 'executive'
+            TWH->>Astria: 触发 4 个额外 Pack prompts<br/>branch='flux', resolution=1024×1024
+            loop partners, natural, speaker, realtor
+                Astria->>PWH: prompt callback: images
+                PWH->>DB: INSERT images
+            end
+        end
+
+        TWH->>User: 发送邮件通知：训练完成！
+    end
+
+    %% ============================================
+    %% Phase 4: 展示结果
+    %% ============================================
+    rect rgb(248, 240, 255)
+        Note over User,DB: === Phase 4: 用户查看生成的头像 ===
+        User->>DB: 查看模型详情页
+        DB-->>User: 展示所有生成的图片<br/>Professional 套餐 · 3 种风格 · ~100 张
+        User->>User: 浏览、下载头像
+    end

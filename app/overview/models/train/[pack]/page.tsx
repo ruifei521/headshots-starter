@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
 
-const packsIsEnabled = true;
+const packsIsEnabled = false; // ⭐ 不再使用 Pack 选择，直接进入训练
 
 export default async function Index({ params }: { params: { pack : string } }) {
   
@@ -82,7 +82,7 @@ export default async function Index({ params }: { params: { pack : string } }) {
         {/* Middle: Card */}
         <div className="lg:col-span-6">
           <div id="train-model-container" className="flex flex-1 flex-col gap-2">
-            <Link href={packsIsEnabled ? "/overview/packs" : "/overview"} className="text-sm w-fit">
+            <Link href="/overview" className="text-sm w-fit">
               <Button variant={"outline"} className="h-7 text-xs px-2 py-0">
                 <FaArrowLeft className="mr-1" />
                 Go Back
