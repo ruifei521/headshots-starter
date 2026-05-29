@@ -1,11 +1,11 @@
-"use client"; // v4 - three tier cards, gender selection removed
+"use client"; // v5 - male/female cover selection + single $29 price → direct checkout
 
 import Link from "next/link";
-import { ArrowLeft, Loader2, Check, Clock, Star, Zap, Shield } from "lucide-react";
+import { ArrowLeft, Loader2, Shield, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { TIERS, getTierInfo, type Tier, type TierInfo } from "@/lib/tiers";
+import { TIERS } from "@/lib/tiers";
 
 // Use browser client so it reads cookies and manages session automatically
 function getSupabase() {
@@ -105,13 +105,14 @@ const allPacks: Record<string, { title: string; desc: string; img: string; longD
   },
 };
 
-/** Tier card with embedded gender selection */
-function TierPricingCard({ tierInfo, packSlug, highlight }: { tierInfo: TierInfo; packSlug: string; highlight?: boolean }) {
+/** Cover card with gender label, cover image, price and direct checkout button */
+function GenderCoverCard({ title, img, count, packSlug, gender }: {
+  title: string; img: string; count: number; packSlug: string; gender: 'woman' | 'man';
+}) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const isPopular = tierInfo.badge === 'Most Popular';
-  const isBest = tierInfo.badge === 'Best Value';
+  const starterTier = TIERS.starter;
 
   const handlePurchase = async () => {
     setLoading(true);
@@ -125,8 +126,8 @@ function TierPricingCard({ tierInfo, packSlug, highlight }: { tierInfo: TierInfo
 
       const body: Record<string, string> = {
         pack: packSlug,
-        gender: 'woman',
-        tier: tierInfo.tier,
+        gender,
+        tier: 'starter',
       };
 
       const res = await fetch('/api/creem/checkout', {
@@ -148,70 +149,41 @@ function TierPricingCard({ tierInfo, packSlug, highlight }: { tierInfo: TierInfo
   };
 
   return (
-    <div
-      className={`relative flex flex-col rounded-xl border bg-card p-6 shadow-sm transition-all duration-200 hover:shadow-md ${
-        highlight ? 'ring-2 ring-primary scale-[1.02]' : ''
-      }`}
-    >
-      {/* Badge */}
-      {tierInfo.badge && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${
-            isPopular
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
-          }`}>
-            {isBest && <Zap className="h-3 w-3" />}
-            {isPopular && <Star className="h-3 w-3" />}
-            {tierInfo.badge}
-          </span>
+    <div className="group relative flex flex-col rounded-2xl border bg-white overflow-hidden shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 max-w-xs w-full">
+      {/* Cover image */}
+      <div className="relative overflow-hidden">
+        <img
+          src={`/packs/${img}`}
+          alt={`${title} headshot preview`}
+          className="w-full aspect-[3/4] object-cover transition-transform duration-300 group-hover:scale-105"
+          onError={(e) => { (e.target as HTMLImageElement).src = `/packs/${packSlug}_1.webp`; }}
+        />
+        {/* Gender label overlay */}
+        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-4 pb-3 pt-8">
+          <span className="text-white text-lg font-semibold">{title}</span>
+          <span className="text-white/80 text-sm ml-2">{count} styles</span>
         </div>
-      )}
-
-      {/* Price */}
-      <div className="flex items-baseline justify-center gap-2 mt-2">
-        <span className="text-base text-muted-foreground line-through">${tierInfo.originalPrice}</span>
-        <span className="text-4xl font-extrabold">{tierInfo.priceLabel}</span>
-        <span className="text-sm text-muted-foreground">/pack</span>
       </div>
 
-      {/* Image count */}
-      <p className="mt-1 text-center text-sm text-muted-foreground">
-        {tierInfo.imageCount} HD headshots
-      </p>
-
-      {/* Delivery time */}
-      <div className="mt-2 flex items-center justify-center gap-1 text-xs text-muted-foreground">
-        <Clock className="h-3 w-3" />
-        <span>{tierInfo.estimatedTime} · {tierInfo.resolution}</span>
+      {/* Price + CTA */}
+      <div className="p-4 flex flex-col gap-3">
+        <div className="flex items-baseline justify-center gap-2">
+          <span className="text-muted-foreground line-through text-sm">${starterTier.originalPrice}</span>
+          <span className="text-2xl font-extrabold">{starterTier.priceLabel}</span>
+          <span className="text-sm text-muted-foreground">/pack</span>
+        </div>
+        <button
+          onClick={handlePurchase}
+          disabled={loading}
+          className="w-full py-3 px-4 bg-primary text-primary-foreground rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
+          ) : (
+            `Get Started — ${starterTier.priceLabel}`
+          )}
+        </button>
       </div>
-
-      {/* Features */}
-      <ul className="my-4 space-y-1.5 flex-1">
-        {tierInfo.features.slice(0, 4).map((feature, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm">
-            <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
-
-      {/* CTA Button */}
-      <button
-        onClick={handlePurchase}
-        disabled={loading}
-        className={`w-full py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-opacity disabled:opacity-50 ${
-          highlight
-            ? 'bg-primary text-primary-foreground hover:opacity-90'
-            : 'bg-secondary text-secondary-foreground hover:opacity-80'
-        }`}
-      >
-        {loading ? (
-          <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
-        ) : (
-          `Get ${tierInfo.name} — ${tierInfo.priceLabel}`
-        )}
-      </button>
     </div>
   );
 }
@@ -223,7 +195,7 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
     router.replace('/templates'); return null;
   }
 
-  const tierList: TierInfo[] = [TIERS.starter, TIERS.professional, TIERS.executive];
+  const starterTier = TIERS.starter;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -237,41 +209,55 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
       </header>
 
       <main className="flex-1">
-        {/* Title + Steps indicator */}
-        <div className="text-center mt-6">
+        {/* Title + Description */}
+        <div className="text-center mt-8">
           <h1 className="text-3xl font-bold">{pack.title}</h1>
           <p className="text-muted-foreground mt-1">{pack.desc}</p>
         </div>
 
-        {/* Description */}
-        <div className="max-w-2xl mx-auto px-4 mt-4">
+        <div className="max-w-2xl mx-auto px-4 mt-3">
           <p className="text-center text-muted-foreground">{pack.longDesc}</p>
         </div>
 
-        {/* Steps */}
+        {/* Steps indicator */}
         <div className="flex justify-center mt-6 mb-8">
           <ul className="flex gap-8 text-sm">
-            <li className="text-primary font-semibold"><span className="bg-primary text-white rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">1</span> Choose plan</li>
-            <li className="text-gray-400"><span className="bg-gray-200 text-gray-500 rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">2</span> Upload images</li>
-            <li className="text-gray-400"><span className="bg-gray-200 text-gray-500 rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">3</span> AI processing</li>
+            <li className="text-primary font-semibold">
+              <span className="bg-primary text-white rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">1</span>
+              Select type
+            </li>
+            <li className="text-gray-400">
+              <span className="bg-gray-200 text-gray-500 rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">2</span>
+              Upload images
+            </li>
+            <li className="text-gray-400">
+              <span className="bg-gray-200 text-gray-500 rounded-full w-6 h-6 inline-flex items-center justify-center mr-1 text-xs">3</span>
+              AI processing
+            </li>
           </ul>
         </div>
 
-        {/* Three Tier Cards */}
-        <div className="max-w-5xl mx-auto px-4 pb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {tierList.map((tierInfo) => (
-              <TierPricingCard
-                key={tierInfo.tier}
-                tierInfo={tierInfo}
-                packSlug={params.slug}
-                highlight={tierInfo.tier === 'professional'}
-              />
-            ))}
+        {/* Gender selection cover cards */}
+        <div className="max-w-3xl mx-auto px-4 pb-4">
+          <div className="flex flex-wrap justify-center gap-8">
+            <GenderCoverCard
+              title="Woman"
+              img={pack.womanImg}
+              count={pack.womanCount}
+              packSlug={params.slug}
+              gender="woman"
+            />
+            <GenderCoverCard
+              title="Man"
+              img={pack.manImg}
+              count={pack.manCount}
+              packSlug={params.slug}
+              gender="man"
+            />
           </div>
 
           {/* Trust line */}
-          <div className="flex items-center justify-center gap-4 mt-6 text-sm text-muted-foreground">
+          <div className="flex items-center justify-center gap-6 mt-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Shield className="h-4 w-4 text-primary" />
               14-day money-back guarantee
@@ -280,6 +266,19 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
               <Check className="h-4 w-4 text-primary" />
               Commercial license
             </span>
+          </div>
+
+          {/* What you get */}
+          <div className="max-w-md mx-auto mt-6 p-4 rounded-xl bg-gray-50 border">
+            <h3 className="font-semibold text-center mb-3">What you get for {starterTier.priceLabel}</h3>
+            <ul className="space-y-2">
+              {starterTier.features.slice(0, 4).map((feature, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
@@ -314,7 +313,7 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
         <div className="max-w-3xl mx-auto px-4 py-12 border-t mt-8">
           <h2 className="text-2xl font-bold mb-6">How does it work?</h2>
           <ol className="space-y-4 text-gray-600 list-decimal list-inside">
-            <li>Choose your plan above</li>
+            <li>Select the type of images you would like (Woman or Man)</li>
             <li>Upload your training images following the guidelines</li>
             <li>Our AI processes your images and creates your headshots (~30 minutes). You will receive your professional headshots as shown in the preview images.</li>
           </ol>
