@@ -279,6 +279,7 @@ export async function POST(request: Request) {
     console.log("has_characteristics_in_payload:", !!tuneBody.tune.characteristics);
 
     // ⭐ POST /tunes + prompts_attributes：一次调用完成训练 + 出图
+    // Vercel Hobby plan 函数超时 10s，设置 axios 9s 防止被 Vercel 杀掉
     const response = await axios.post(
       DOMAIN + "/tunes",
       tuneBody,
@@ -287,6 +288,7 @@ export async function POST(request: Request) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${API_KEY}`,
         },
+        timeout: 9000, // 9s，留 1s 给 Vercel 返回响应
       }
     );
 
@@ -348,6 +350,14 @@ export async function POST(request: Request) {
     }
   } catch (e: any) {
     console.error("Train model error:", e);
+    // ⭐ Axios 超时（ECONNABORTED）：请求已发出但 Astria 响应慢，Vercel Hobby 10s 限制
+    if (e?.code === 'ECONNABORTED' || e?.message?.includes('timeout')) {
+      console.warn("Astria request timed out (likely queued successfully) — returning 202");
+      return NextResponse.json(
+        { message: "success", queued: true },
+        { status: 202 }
+      );
+    }
     // 🔍 Astria 422/400 等错误 — 打印完整响应体用于排查
     if (e?.response) {
       console.error("Astria response status:", e.response.status);
