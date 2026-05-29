@@ -17,6 +17,11 @@ const ThreeDBeforeAfterGallery = dynamic(
   }
 )
 
+const ScrollingGallery = dynamic(
+  () => import("@/components/homepage/scrolling-gallery"),
+  { ssr: false }
+)
+
 export default function HeroSection() {
   return (
     <section className="relative overflow-hidden py-10 md:py-16">
@@ -48,12 +53,17 @@ export default function HeroSection() {
           </div>
           <p className="mt-3 text-sm text-muted-foreground flex items-center justify-center gap-1">
             <svg className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-            Your photos stay private
+            Your photos stay private · 14-day money-back guarantee
           </p>
         </div>
 
+        {/* Scrolling Gallery — infinite marquee of example headshots */}
+        <div className="mt-8 -mx-4 md:-mx-6">
+          <ScrollingGallery />
+        </div>
+
         {/* Before/After Gallery — lazy loaded, only when visible */}
-        <div className="mt-6">
+        <div className="mt-12">
           <ThreeDBeforeAfterGallery />
         </div>
 
