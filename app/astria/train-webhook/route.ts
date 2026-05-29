@@ -142,7 +142,7 @@ export async function POST(request: Request) {
     if (resendApiKey) {
       const resend = new Resend(resendApiKey);
       await resend.emails.send({
-        from: "noreply@snapprohead.com",
+        from: "contact@snapprohead.com",
         to: user?.email ?? "",
         subject: "Your model was successfully trained!",
         html: `<h2>We're writing to notify you that your model training was successful! Your headshots are being generated now.</h2>`,
