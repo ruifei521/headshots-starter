@@ -27,14 +27,14 @@ export default function HeroSection() {
     <section className="relative overflow-hidden py-10 md:py-16">
       <div className="container px-4 md:px-6 pt-2">
         <div className="mx-auto max-w-3xl text-center mb-8">
-          <Badge className="mb-4" variant="outline">
+          <Badge className="mb-3 text-sm px-4 py-1.5 font-semibold tracking-wide border-primary/15 bg-primary/[0.03]" variant="outline">
             🚀 Professional AI Headshots in ~25 Minutes
           </Badge>
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6">
-            Skip the $250+ Photographer. <span className="text-primary">Get Studio-Quality Headshots from $29</span>
+            Turn Your Selfies Into <span className="text-primary">Studio-Quality Headshots</span>
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto">
-            Turn your selfies into studio-quality headshots in ~25 minutes.
+            Upload 4-6 selfies, and our AI will generate 40-100 professional headshots.
             Powered by <strong>Flux AI</strong> for the best quality — corporate, LinkedIn, resume, and more.
             Starting at <strong className="text-primary">$29</strong>.
           </p>
@@ -62,16 +62,15 @@ export default function HeroSection() {
           <ScrollingGallery />
         </div>
 
-        {/* Before/After Gallery — lazy loaded, only when visible */}
-        <div className="mt-12">
-          <ThreeDBeforeAfterGallery />
-        </div>
-
-        {/* Trust Badges */}
+        {/* Trust Badges — moved here from bottom */}
         <div className="mt-6">
           <TrustBadges />
         </div>
 
+        {/* Before/After Gallery — lazy loaded, only when visible */}
+        <div className="mt-12">
+          <ThreeDBeforeAfterGallery />
+        </div>
 
       </div>
     </section>

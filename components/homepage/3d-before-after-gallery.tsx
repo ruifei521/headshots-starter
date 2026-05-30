@@ -91,7 +91,7 @@ export default function ThreeDBeforeAfterGallery() {
         </h2>
       </div>
 
-      <div className="relative mx-auto max-w-4xl">
+      <div className="relative mx-auto max-w-2xl">
         <div
           ref={containerRef}
           onMouseEnter={() => setIsHovered(true)}
@@ -110,7 +110,7 @@ export default function ThreeDBeforeAfterGallery() {
                 transition={{ duration: 0.35, ease: "easeInOut" }}
               >
                 {/* BEFORE */}
-                <div className="relative w-full md:w-1/2 aspect-[3/4]">
+                <div className="relative w-full md:w-1/2 aspect-[4/5]">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
                   <Image
                     src={current.before}
@@ -142,7 +142,7 @@ export default function ThreeDBeforeAfterGallery() {
                 </div>
 
                 {/* AFTER */}
-                <div className="relative w-full md:w-1/2 aspect-[3/4] overflow-hidden">
+                <div className="relative w-full md:w-1/2 aspect-[4/5] overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10" />
                   <motion.div
                     initial={{ scale: 1.1 }}

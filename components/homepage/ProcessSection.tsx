@@ -10,26 +10,19 @@ import { cn } from "@/lib/utils"
 const processSteps = [
   {
     number: 1,
-    title: "Choose Your Plan",
-    description: "Pick the plan that fits your needs — Starter, Professional, or Executive. All powered by Flux AI for the best quality.",
-    icon: <Palette className="h-5 w-5" />,
-    images: ["/homepage/example0001.jpg", "/homepage/example0004.jpg", "/homepage/example0006.jpg"]
-  },
-  {
-    number: 2,
     title: "Upload Your Selfies",
     description: "Selfies work great! Just 4–6 uploads is all you need. Focus on good lighting, different angles, and one person per photo.",
     icon: <Camera className="h-5 w-5" />,
     images: ["/homepage/before0001.jpg", "/homepage/before0002.jpg", "/homepage/example0003.jpg"]
   },
   {
-    number: 3,
-    title: "AI Generates Your Headshots",
+    number: 2,
+    title: "AI Trains on Your Face",
     description: "Our AI gets to work on your photos. Just wait for your results — we'll email you when your headshots are ready!",
     icon: <Sparkles className="h-5 w-5" />,
   },
   {
-    number: 4,
+    number: 3,
     title: "Download & Use Anywhere",
     description: "Receive up to 100 high-quality headshots to use however you want — LinkedIn, resumes, company websites, and more.",
     icon: <Download className="h-5 w-5" />,
