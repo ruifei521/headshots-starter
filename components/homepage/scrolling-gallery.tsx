@@ -2,42 +2,12 @@
 
 import Image from "next/image"
 
-// Curated selection of the best pack cover images for the marquee
-// Mix of man/woman covers from different style packs to show diversity
-const galleryImages = [
-  "/packs/corporate-headshots_woman_cover.jpg",
-  "/packs/corporate_man_cover.jpg",
-  "/packs/americana_man_cover.jpg",
-  "/packs/americana_woman_cover.jpg",
-  "/packs/business-profile-studio_woman_cover.jpg",
-  "/packs/business-profile-studio_man_cover.jpg",
-  "/packs/effortless-professionalism_man_cover.jpg",
-  "/packs/effortless-professionalism_woman_cover.jpg",
-  "/packs/natural-headshots_woman_cover.jpg",
-  "/packs/natural-headshots_man_cover.jpg",
-  "/packs/lawyer-il_man_cover.jpg",
-  "/packs/lawyer-il_woman_cover.jpg",
-  "/packs/neutral-muse_woman_cover.jpg",
-  "/packs/neutral-muse_man_cover.jpg",
-  "/packs/speaker_man_cover.jpg",
-  "/packs/speaker_woman_cover.jpg",
-  "/packs/office-outfits_woman_cover.jpg",
-  "/packs/office-outfits_man_cover.jpg",
-  "/packs/styled-for-success_man_cover.jpg",
-  "/packs/styled-for-success_woman_cover.jpg",
-  "/packs/portraits_minimalist_woman_cover.jpg",
-  "/packs/portraits_minimalist_man_cover.jpg",
-  "/packs/dating_man_cover.jpg",
-  "/packs/dating_woman_cover.jpg",
-  "/packs/partners-headshots_woman_cover.jpg",
-  "/packs/partners-headshots_man_cover.jpg",
-  "/packs/realtor_man_cover.jpg",
-  "/packs/realtor_woman_cover.jpg",
-  "/packs/stylish-studio-portraits_woman_cover.jpg",
-  "/packs/stylish-studio-portraits_man_cover.jpg",
-  "/packs/me-iconic_man_cover.jpg",
-  "/packs/me-iconic_woman_cover.jpg",
-]
+// 32 AI-generated headshot examples from Astria.ai
+// Displayed in the hero section marquee gallery
+const galleryImages = Array.from({ length: 32 }, (_, i) => {
+  const num = String(i + 1).padStart(2, "0")
+  return `/gallery-images/${num}.jpg`
+})
 
 function MarqueeRow({ images, direction = "left", speed = 40 }: { images: string[]; direction?: "left" | "right"; speed?: number }) {
   // Double the images for seamless infinite loop
