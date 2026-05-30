@@ -35,23 +35,23 @@ export const metadata: Metadata = {
     google: 'tN7APPasI_zAOB5ACzfwdHoe0Kp_Lt83OrBXcBk1h14',
   },
   title: {
-    default: `SnapProHead - AI Professional Headshots in ~30 Minutes | From $29`,
+    default: `SnapProHead - AI Professional Headshots in ~25 Minutes | From $29`,
     template: "%s | SnapProHead",
   },
-  description: `Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. 14-day money-back guarantee. Starting at $29 — a fraction of traditional photography.`,
+  description: `Generate professional AI headshots for LinkedIn, resumes, and social media in ~25 minutes. 14-day money-back guarantee. Starting at $29 — a fraction of traditional photography.`,
     alternates: {
       canonical: "https://snapprohead.com",
     },
   openGraph: {
-    title: "SnapProHead - AI Professional Headshots in ~30 Minutes",
-    description: `Turn selfies into professional headshots in ~30 minutes. Starting at $29 with a 14-day money-back guarantee. Used by professionals on LinkedIn and social media.`,
+    title: "SnapProHead - AI Professional Headshots in ~25 Minutes",
+    description: `Turn selfies into professional headshots in ~25 minutes. Starting at $29 with a 14-day money-back guarantee. Used by professionals on LinkedIn and social media.`,
     url: "https://snapprohead.com",
     siteName: "SnapProHead",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "https://snapprohead.com/hero.webp",
+        url: "https://snapprohead.com/hero.png",
         width: 1200,
         height: 630,
         alt: "SnapProHead - AI Generated Professional Headshots",
@@ -60,9 +60,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SnapProHead - AI Professional Headshots in ~30 Minutes",
-    description: `Turn selfies into professional headshots in ~30 minutes. Starting at $29 with a 14-day money-back guarantee.`,
-    images: ["https://snapprohead.com/hero.webp"],
+    title: "SnapProHead - AI Professional Headshots in ~25 Minutes",
+    description: `Turn selfies into professional headshots in ~25 minutes. Starting at $29 with a 14-day money-back guarantee.`,
+    images: ["https://snapprohead.com/hero.png"],
   },
   manifest: "/site.webmanifest",
   icons: {

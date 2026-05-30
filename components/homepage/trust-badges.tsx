@@ -10,7 +10,7 @@ export default function TrustBadges() {
         </div>
         <div className="flex items-center gap-2">
           <Clock className="h-5 w-5 text-blue-500" />
-          <span className="font-medium">Delivery in ~30 Minutes</span>
+          <span className="font-medium">Delivery in ~25 Minutes</span>
         </div>
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-yellow-500" />

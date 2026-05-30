@@ -150,10 +150,10 @@ export default async function Index() {
       />
       <div>
         <HeroSection />
+        <PricingSection />
         <ProcessSection />
         <ExamplesSection />
         <TestimonialsSection />
-        <PricingSection />
         <ClosingCtaSection />
         <FAQSection />
         <PrivacySection />
