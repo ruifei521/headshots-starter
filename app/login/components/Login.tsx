@@ -174,15 +174,6 @@ export const Login = ({
     <>
       <div className='flex items-center justify-center p-8'>
         <div className='flex flex-col gap-4 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 p-4 rounded-xl max-w-sm w-full'>
-          <h1 className='text-xl'>Welcome back</h1>
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-3 text-xs space-y-1.5">
-            <p><strong>✉️ Sign in to:</strong></p>
-            <p>• View and download your AI headshots</p>
-            <p>• Track your order status</p>
-            <p>• Purchase additional styles</p>
-            <p>• Manage privacy settings</p>
-          </div>
-
           <form
             onSubmit={handleSubmit(onSubmit)}
             className='flex flex-col gap-2'

@@ -1,7 +1,18 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Star } from "lucide-react"
+import { reviews } from "@/components/homepage/reviews-data"
+
+// 从滚动画廊中精选 8 张 Astria AI 生成的样片
+const exampleImages = ["01", "17", "08", "12", "16", "05", "24", "28"].map(
+  (n) => `/gallery-images/${n}.jpg`
+)
+
+// 从 reviews 中选 8 条简短真实的评论（不展示头像）
+const featuredReviews = reviews
+  .filter((r) => r.text.length < 200 && r.rating >= 4)
+  .slice(0, 8)
 
 export default function ExamplesSection() {
   return (
@@ -13,11 +24,11 @@ export default function ExamplesSection() {
           </Badge>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Stunning Transformations</h2>
           <p className="max-w-[700px] text-muted-foreground text-lg">
-            See how our AI transforms regular selfies into professional headshots that make you stand out.
+            These photos are not real. They were all created using AI.
           </p>
         </div>
         <div className="mt-8 grid gap-4 sm:gap-6 md:gap-8 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (`/homepage/example00${i}.jpg`)).map((src, i) => (
+          {exampleImages.map((src, i) => (
             <div
               key={i}
               className="group relative overflow-hidden rounded-lg border bg-background transition-all hover:shadow-lg"
@@ -44,6 +55,45 @@ export default function ExamplesSection() {
           ))}
         </div>
 
+        {/* 8 条评论，每行 4 条，不展示头像 */}
+        <div className="mt-10 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          {featuredReviews.map((review, i) => (
+            <div
+              key={i}
+              className="rounded-lg border bg-background p-4 transition-all hover:shadow-sm"
+            >
+              <div className="mb-2 flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, j) => (
+                  <Star
+                    key={j}
+                    className={`h-3.5 w-3.5 ${j < review.rating ? "fill-amber-400 text-amber-400" : "fill-muted text-muted"}`}
+                  />
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                "{review.text}"
+              </p>
+              <p className="mt-2 text-xs font-medium">
+                {review.name}
+                {review.role && <span className="text-muted-foreground font-normal"> · {review.role}</span>}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* 查看更多示例和评论 */}
+        <div className="mt-8 flex justify-center">
+          <Link
+            href="/examples"
+            prefetch={true}
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline underline-offset-4 transition-colors"
+          >
+            查看更多示例和评论
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
       </div>
     </section>
   )

@@ -85,6 +85,17 @@ export default function ThreeDBeforeAfterGallery() {
   return (
     <div className="w-full">
       <div className="text-center mb-8">
+        <div className="mb-6 mx-auto max-w-3xl">
+          <Image
+            src="/steps-hero.png"
+            alt="Steps"
+            width={768}
+            height={343}
+            className="w-full h-auto"
+            priority
+            unoptimized
+          />
+        </div>
         <Badge variant="outline" className="mb-3">See the Transformation</Badge>
         <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
           From Selfie to <span className="text-primary">Studio Quality</span>
