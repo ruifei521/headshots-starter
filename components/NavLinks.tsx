@@ -4,8 +4,8 @@ import Link from "next/link";
 
 export default function NavLinks() {
   const links = [
-    { href: "/#examples", label: "Examples" },
     { href: "/#how-it-works", label: "How It Works" },
+    { href: "/examples", label: "Examples" },
     { href: "/#pricing", label: "Pricing" },
   ];
 
