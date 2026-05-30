@@ -100,7 +100,7 @@ export default function RootLayout({
           <Footer />
           <Toaster />
           <Analytics />
-          {process.env.NODE_ENV === 'production' && <GoogleAnalytics gaId="G-CEBQCJJXYN" />}
+          {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
         </ThemeProvider>
       </body>
     </html>
