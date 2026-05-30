@@ -2,17 +2,11 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import dynamic from "next/dynamic"
 import HeroSection from "@/components/homepage/HeroSection"
+import ExamplesSection from "@/components/homepage/ExamplesSection"
+import TestimonialsSection from "@/components/homepage/TestimonialsSection"
 
 const ProcessSection = dynamic(
   () => import("@/components/homepage/ProcessSection"),
-  { ssr: false }
-)
-const ExamplesSection = dynamic(
-  () => import("@/components/homepage/ExamplesSection"),
-  { ssr: false }
-)
-const TestimonialsSection = dynamic(
-  () => import("@/components/homepage/TestimonialsSection"),
   { ssr: false }
 )
 const PricingSection = dynamic(
@@ -38,7 +32,7 @@ const jsonLd = {
     {
       "@type": "Product",
       "name": "SnapProHead - AI Professional Headshot Generator",
-      "description": `Generate professional AI headshots for LinkedIn, resumes, and social media in ~30 minutes. Starting at $29 with a 14-day money-back guarantee.`,
+      "description": `Generate professional AI headshots for LinkedIn, resumes, and social media in ~25 minutes. Starting at $29 with a 14-day money-back guarantee.`,
       "url": "https://snapprohead.com",
       "image": "https://snapprohead.com/hero.png",
       "brand": {
@@ -52,6 +46,12 @@ const jsonLd = {
         "highPrice": `59`,
         "offerCount": "3",
         "availability": "https://schema.org/InStock"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "bestRating": "5",
+        "reviewCount": "6000"
       }
     },
     {
