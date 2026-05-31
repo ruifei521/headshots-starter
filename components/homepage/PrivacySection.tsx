@@ -1,11 +1,8 @@
-"use client"
-
-import { Shield, Star, Trash2 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
 const features = [
   {
-    icon: Star,
+    icon: "/icons/icon-thumb.svg",
     title: "AI Headshots You Can Actually Use",
     description: (
       <>
@@ -15,13 +12,13 @@ const features = [
     ),
   },
   {
-    icon: Shield,
+    icon: "/icons/icon-user-secure.svg",
     title: "You Own Your Headshots",
     description:
       "We are an independently owned company that takes privacy seriously. We never sell your photos. You have full commercial rights and ownership of your photos — use them however you want.",
   },
   {
-    icon: Trash2,
+    icon: "/icons/icon-lock-secure.svg",
     title: "Your Details Are Deleted in 30 Days",
     description:
       "All input photos are deleted after 7 days. All AI headshots are deleted after 30 days. Delete your data faster, anytime you want, with the click of a button in your account settings.",
@@ -42,10 +39,10 @@ export default function PrivacySection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {features.map(({ icon: Icon, title, description }) => (
+          {features.map(({ icon, title, description }) => (
             <Card key={title} className="flex flex-col items-center text-center p-6 shadow-md">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
-                <Icon className="h-6 w-6" />
+              <div className="mb-4">
+                <img src={icon} alt="" className="h-12 w-12" />
               </div>
               <CardContent className="p-0 space-y-2">
                 <h3 className="text-lg font-bold">{title}</h3>
