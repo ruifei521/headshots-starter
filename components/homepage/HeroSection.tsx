@@ -43,11 +43,6 @@ export default function HeroSection() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link href="#how-it-works" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-muted-foreground/30 text-muted-foreground hover:text-foreground">
-                How It Works ↓
-              </Button>
-            </Link>
           </div>
           <p className="mt-3 text-sm text-muted-foreground flex items-center justify-center gap-2">
             ★★★★★  6,000+ headshots delivered  ·  🛡️ Privacy first
