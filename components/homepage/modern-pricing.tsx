@@ -142,9 +142,9 @@ export default function ModernPricing() {
       <div className="flex flex-col items-center justify-center space-y-8">
         {/* Section Header */}
         <div className="text-center space-y-4">
-          {/* 25% off banner */}
+          {/* 20% off banner */}
           <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-1.5 text-sm font-semibold text-white">
-            🔥 25% off all packages — limited time only!
+            🔥 所有套餐8折 — 限时优惠！
           </div>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
             Choose Your <span className="text-primary">Perfect Plan</span>
