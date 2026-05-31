@@ -11,6 +11,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { User } from "@supabase/supabase-js";
+import Link from "next/link";
 
 type UserDropdownProps = {
   user: User;
@@ -28,6 +29,12 @@ export default function UserDropdown({ user }: UserDropdownProps) {
         <DropdownMenuLabel className="text-primary text-center overflow-hidden text-ellipsis">
           {user.email}
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/overview" className="w-full cursor-pointer">
+            My Models
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <form action="/auth/sign-out" method="post">
           <Button
