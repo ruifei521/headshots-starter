@@ -27,6 +27,7 @@ import { ImageInspector } from "./ImageInspector";
 import { ImageInspectionResult, aggregateCharacteristics } from "@/lib/imageInspection";
 import { TIERS, isTier, type Tier } from "@/lib/tiers";
 import { createBrowserClient } from "@supabase/ssr";
+import Image from "next/image";
 
 type FormInput = z.infer<typeof fileUploadFormSchema>;
 
@@ -537,10 +538,12 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
                           Failed to load preview
                         </div>
                       ) : (
-                        <img
+                        <Image
                           src={fileObj.previewUrl}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                           alt="Preview"
+                          unoptimized
                           onError={() => handleImageError(fileObj.id)}
                         />
                       )}

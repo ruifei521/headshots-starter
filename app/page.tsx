@@ -1,10 +1,23 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import dynamic from "next/dynamic"
+import type { Metadata } from "next"
 import HeroSection from "@/components/homepage/HeroSection"
 import ExamplesSection from "@/components/homepage/ExamplesSection"
 import TestimonialsSection from "@/components/homepage/TestimonialsSection"
 
+export const metadata: Metadata = {
+  title: {
+    absolute: "SnapProHead - AI Professional Headshot Generator | Studio-Quality in 30 Min",
+  },
+  description:
+    "Turn selfies into studio-quality professional headshots with AI. 50,000+ headshots delivered. Starting at $29. 14-day money-back guarantee.",
+}
+
+const WhyAIHeadshotsSection = dynamic(
+  () => import("@/components/homepage/WhyAIHeadshotsSection"),
+  { ssr: false }
+)
 const ProcessSection = dynamic(
   () => import("@/components/homepage/ProcessSection"),
   { ssr: false }

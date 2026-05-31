@@ -1,4 +1,6 @@
 "use client"
+import { useState } from "react"
+import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 
@@ -52,14 +54,13 @@ export default function PacksShowcase() {
               href={`/packs/${pack.slug}.html`}
               className="group flex flex-col rounded-xl border bg-card overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1"
             >
-              <div className="aspect-[3/4] overflow-hidden bg-muted">
-                <img
+              <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+                <Image
                   src={`/packs/${pack.slug}_cover.jpg`}
                   alt={pack.title}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  loading="lazy"
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                   onError={(e) => {
-                    // fallback to first image
                     (e.target as HTMLImageElement).src = `/packs/${pack.slug}_1.jpg`;
                   }}
                 />

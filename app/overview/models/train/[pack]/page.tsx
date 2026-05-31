@@ -1,5 +1,6 @@
 import TrainModelZone from "@/components/TrainModelZone";
 // import CreditCheckBanner from "@/components/CreditCheckBanner";
+import PurchaseTracker from "@/components/PurchaseTracker";
 import { Button } from "@/components/ui/button";
 import {
   Card,

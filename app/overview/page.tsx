@@ -3,6 +3,12 @@ import { Database } from "@/types/supabase";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Your AI Headshots Dashboard',
+  description: 'Manage your AI headshot models, view generated results, and create new professional headshots.',
+}
 
 export const dynamic = "force-dynamic";
 

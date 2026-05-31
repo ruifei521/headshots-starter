@@ -15,17 +15,17 @@ interface FAQItemProps {
 function FAQItem({ question, answer, isOpen, onClick, index }: FAQItemProps) {
   return (
     <motion.div
-      className="border-b last:border-b-0"
+      className="border rounded-lg p-4 transition-all hover:shadow-md"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.1 }}
     >
       <button
         onClick={onClick}
-        className="flex w-full items-center justify-between py-4 text-left font-medium transition-all hover:text-primary"
+        className="flex w-full items-center justify-between text-left font-medium transition-all hover:text-primary"
       >
-        <span>{question}</span>
-        <ChevronDown className={`h-5 w-5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <span className="pr-2">{question}</span>
+        <ChevronDown className={`h-5 w-5 flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
       <AnimatePresence>
         {isOpen && (
@@ -36,7 +36,7 @@ function FAQItem({ question, answer, isOpen, onClick, index }: FAQItemProps) {
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="pb-4 text-muted-foreground">{answer}</div>
+            <div className="pt-3 text-muted-foreground">{answer}</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -98,10 +98,65 @@ export default function FAQSection() {
       answer:
         "We're glad you love them! Share your experience on social media and tag us, or tell your colleagues and friends. Word of mouth helps us keep prices affordable for everyone. If you have a large audience, reach out about our affiliate program at contact@snapprohead.com.",
     },
+    {
+      question: "What do you do with my uploaded photos? Are they safe?",
+      answer:
+        "We never sell or share your photos. All uploaded photos are automatically deleted 30 days after AI training completes. We are GDPR compliant and take your privacy seriously.",
+    },
+    {
+      question: "How long do you keep my photos?",
+      answer:
+        "Uploaded photos are used to train your AI model and are automatically deleted 30 days after training completes. You can request earlier deletion anytime from your account settings.",
+    },
+    {
+      question: "Can other people see my headshots?",
+      answer:
+        "No. Your headshots are visible only to you. We never display, share, or showcase your headshots publicly. Your privacy is our priority.",
+    },
+    {
+      question: "Is my data encrypted and secure?",
+      answer:
+        "Yes. All data is transmitted with SSL encryption and stored with AES-256 encryption. We use industry-standard security practices to protect your information.",
+    },
+    {
+      question: "How does SnapProHead compare to a $500 photographer?",
+      answer:
+        "A professional photographer costs $500+ and takes 2-3 weeks. SnapProHead starts at just $29 and delivers 40+ headshots in ~30 minutes. That's 97% cheaper and 95% faster — with a money-back guarantee.",
+    },
+    {
+      question: "Is there a free trial?",
+      answer:
+        "We don't offer a free trial because AI model training has real computing costs. But we do offer a 14-day no-questions-asked money-back guarantee — so there's zero risk to try.",
+    },
+    {
+      question: "How many selfies do I need to upload?",
+      answer:
+        "We recommend 4-10 clear selfies with good lighting. Front-facing only, no sunglasses or hats. Different angles and expressions give you better variety. Phone selfies work great — no professional equipment needed.",
+    },
+    {
+      question: "Are the headshots realistic? Will people know they're AI-generated?",
+      answer:
+        "Our AI uses the latest Flux technology, generating 1024×1024 high-resolution headshots. 95% of our customers say the results look very natural and indistinguishable from real photos — perfect for LinkedIn and professional use.",
+    },
+    {
+      question: "How many good photos can I expect?",
+      answer:
+        "Based on customer feedback, the average customer gets 25-35 usable headshots and 10-15 photos they're very happy with, per pack. With 40+ headshots per pack, you'll have plenty to choose from.",
+    },
+    {
+      question: "Who owns the copyright? Can I use them commercially?",
+      answer:
+        "You have full copyright and commercial rights to your headshots. Use them on LinkedIn, company websites, resumes, marketing materials, print — anywhere you need. No additional licensing or attribution required.",
+    },
+    {
+      question: "What devices can I use? Can I upload from my phone?",
+      answer:
+        "Any device works — phone, computer, or tablet. Upload directly from your camera roll. We recommend iPhone 11+ or recent Android phones for best photo quality. No professional camera needed.",
+    },
   ]
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {faqs.map((faq, index) => (
         <FAQItem
           key={index}

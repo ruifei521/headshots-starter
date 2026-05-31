@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import dynamic from "next/dynamic"
-import TrustBadges from "@/components/homepage/trust-badges"
+import TrustedByLogos from "@/components/homepage/trusted-by-logos"
 
 const ThreeDBeforeAfterGallery = dynamic(
   () => import("@/components/homepage/3d-before-after-gallery"),
@@ -27,27 +27,20 @@ export default function HeroSection() {
     <section className="relative overflow-hidden py-10 md:py-16">
       <div className="container px-4 md:px-6 pt-2">
         <div className="mx-auto max-w-3xl text-center mb-8">
-          <Badge className="mb-3 text-sm px-4 py-1.5 font-semibold tracking-wide border-primary/15 bg-primary/[0.03]" variant="outline">
-            🚀 Professional AI Headshots in ~25 Minutes
+          <Badge className="mb-3 text-sm px-4 py-1.5 font-semibold tracking-wide border-blue-200/20 bg-blue-50/30" variant="outline">
+            The #1 AI Headshot Generator for Professional Headshots
           </Badge>
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6">
             Turn Your Selfies Into <span className="text-primary">Studio-Quality Headshots</span>
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto">
-            Upload 4-6 selfies, and our AI will generate 40-100 professional headshots.
-            Powered by <strong>Flux AI</strong> for the best quality — corporate, LinkedIn, resume, and more.
-            Starting at <strong className="text-primary">$29</strong>.
+            Professional enough for LinkedIn. Natural enough to still be you. 8x cheaper than a $500 photoshoot.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/#pricing" className="w-full sm:w-auto">
               <Button size="lg" className="group w-full sm:w-auto">
                 Create Your Headshots Now
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="#how-it-works" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-muted-foreground/30 text-muted-foreground hover:text-foreground">
-                How It Works ↓
               </Button>
             </Link>
           </div>
@@ -62,9 +55,9 @@ export default function HeroSection() {
           <ScrollingGallery />
         </div>
 
-        {/* Trust Badges — moved here from bottom */}
-        <div className="mt-6">
-          <TrustBadges />
+        {/* Trusted By Section — scrolling company logos for social proof */}
+        <div className="mt-10">
+          <TrustedByLogos />
         </div>
 
         {/* Before/After Gallery — lazy loaded, only when visible */}
