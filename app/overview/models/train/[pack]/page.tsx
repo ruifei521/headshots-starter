@@ -1,5 +1,6 @@
 import TrainModelZone from "@/components/TrainModelZone";
 // import CreditCheckBanner from "@/components/CreditCheckBanner";
+import PurchaseTracker from "@/components/PurchaseTracker";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,10 +14,17 @@ import { FaArrowLeft } from "react-icons/fa";
 
 const packsIsEnabled = false; // ⭐ 不再使用 Pack 选择，直接进入训练
 
-export default async function Index({ params }: { params: { pack : string } }) {
+export default async function Index({
+  params,
+  searchParams,
+}: {
+  params: { pack: string };
+  searchParams: { tier?: string };
+}) {
   
   return (
     <div className="w-full">
+      <PurchaseTracker tier={searchParams.tier} />
       {/* <CreditCheckBanner packSlug={params.pack} /> */}
       {/* Three-column layout */}
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
