@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Check, Clock, Shield, ArrowRight, Zap, Star, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TIERS, type Tier, type TierInfo } from "@/lib/tiers"
-import TierComparisonTable from "@/components/homepage/tier-comparison-table"
 import { createBrowserClient } from "@supabase/ssr"
 import { useRouter } from "next/navigation"
 
@@ -164,9 +163,6 @@ export default function ModernPricing() {
             />
           ))}
         </div>
-
-        {/* Tier Comparison Table */}
-        <TierComparisonTable />
 
         {/* Trust Badges */}
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
