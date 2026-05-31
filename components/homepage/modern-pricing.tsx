@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Check, Clock, Shield, ArrowRight, Zap, Star, Loader2 } from "lucide-react"
+import { Check, Clock, Shield, ArrowRight, Zap, Star, Loader2, X, DollarSign, Camera, Users, Palette } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TIERS, type Tier, type TierInfo } from "@/lib/tiers"
 import { createBrowserClient } from "@supabase/ssr"
@@ -179,6 +179,120 @@ export default function ModernPricing() {
         <p className="mt-2 text-center text-sm text-muted-foreground">
           100% satisfaction guaranteed. Prices exclude applicable taxes, collected at checkout.
         </p>
+
+        {/* Comparison Table: SnapProHead vs Traditional Photographer */}
+        <div className="mt-16 max-w-3xl mx-auto w-full">
+          <h3 className="text-center text-2xl font-bold mb-2">
+            SnapProHead vs Hiring a Photographer
+          </h3>
+          <p className="text-center text-muted-foreground text-sm mb-8">
+            See why thousands choose AI headshots over traditional photoshoots.
+          </p>
+
+          <div className="overflow-x-auto rounded-lg border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="px-4 py-3 text-left font-semibold min-w-[140px]"></th>
+                  <th className="px-4 py-3 text-center font-semibold text-primary">SnapProHead</th>
+                  <th className="px-4 py-3 text-center font-semibold">Traditional Photographer</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b bg-muted/20">
+                  <td className="px-4 py-3 font-medium flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    Cost
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="font-medium">From $29</span>
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center text-muted-foreground">
+                    <span className="flex items-center justify-center gap-1.5">
+                      <X className="h-4 w-4 text-red-400" />
+                      <span>$250+ per session</span>
+                    </span>
+                  </td>
+                </tr>
+                <tr className="border-b">
+                  <td className="px-4 py-3 font-medium flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    Time
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="font-medium">As quick as 25 min</span>
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center text-muted-foreground">
+                    <span className="flex items-center justify-center gap-1.5">
+                      <X className="h-4 w-4 text-red-400" />
+                      <span>2–3 work days</span>
+                    </span>
+                  </td>
+                </tr>
+                <tr className="border-b bg-muted/20">
+                  <td className="px-4 py-3 font-medium flex items-center gap-2">
+                    <Camera className="h-4 w-4" />
+                    Headshots
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="font-medium">Up to 100 per pack</span>
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center text-muted-foreground">
+                    <span className="flex items-center justify-center gap-1.5">
+                      <X className="h-4 w-4 text-red-400" />
+                      <span>5–10 per person</span>
+                    </span>
+                  </td>
+                </tr>
+                <tr className="border-b">
+                  <td className="px-4 py-3 font-medium flex items-center gap-2">
+                    <Palette className="h-4 w-4" />
+                    Outfits
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="font-medium">25+ style scenes</span>
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center text-muted-foreground">
+                    <span className="flex items-center justify-center gap-1.5">
+                      <X className="h-4 w-4 text-red-400" />
+                      <span>1–2 outfits</span>
+                    </span>
+                  </td>
+                </tr>
+                <tr className="border-b bg-muted/20">
+                  <td className="px-4 py-3 font-medium flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Consistency
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="font-medium">Consistent style presets</span>
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center text-muted-foreground">
+                    <span className="flex items-center justify-center gap-1.5">
+                      <X className="h-4 w-4 text-red-400" />
+                      <span>Manual edits needed</span>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   )
