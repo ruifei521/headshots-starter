@@ -54,26 +54,4 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     })),
   ]
-
-  const headshotCareers = [
-    'lawyer', 'doctor', 'realtor', 'corporate', 'linkedin', 'professional',
-    'executive', 'business', 'actor', 'accountant', 'consultant', 'dentist',
-    'nurse', 'portfolio', 'startup', 'teacher', 'c-suite', 'speaker'
-  ]
-
-  const staticEntries: MetadataRoute.Sitemap = staticPages.map((page) => ({
-    url: `${baseUrl}${page.url}`,
-    lastModified: new Date(),
-    changeFrequency: page.changeFrequency,
-    priority: page.priority,
-  }))
-
-  const careerEntries: MetadataRoute.Sitemap = headshotCareers.map((career) => ({
-    url: `${baseUrl}/headshots/${career}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }))
-
-  return [...staticEntries, ...careerEntries]
 }

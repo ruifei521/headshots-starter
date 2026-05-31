@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
-import PurchaseTracker from "@/components/PurchaseTracker";
 
 const packsIsEnabled = false; // ⭐ 不再使用 Pack 选择，直接进入训练
 
