@@ -174,19 +174,23 @@ export default function ModernPricing() {
         </div>
 
         {/* Trust Badges */}
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <p className="flex items-center justify-center gap-3 text-sm text-muted-foreground flex-wrap">
           <span className="flex items-center gap-1">
             <Shield className="h-4 w-4 text-primary" />
             30-day auto-delete
           </span>
+          <span className="text-muted-foreground/40">·</span>
           <span className="flex items-center gap-1">
             <Check className="h-4 w-4 text-primary" />
             Commercial license
           </span>
-        </div>
-
-        <p className="mt-2 text-center text-sm text-muted-foreground">
-          100% satisfaction guaranteed. Prices exclude applicable taxes, collected at checkout.
+          <span className="text-muted-foreground/40">·</span>
+          <span className="flex items-center gap-1">
+            <Check className="h-4 w-4 text-primary" />
+            100% satisfaction guaranteed
+          </span>
+          <span className="text-muted-foreground/40">·</span>
+          <span>Prices exclude applicable taxes.</span>
         </p>
 
         {/* Comparison Table: SnapProHead vs Traditional Photographer */}
