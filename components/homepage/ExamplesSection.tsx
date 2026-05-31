@@ -88,7 +88,7 @@ export default function ExamplesSection() {
             prefetch={true}
             className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline underline-offset-4 transition-colors"
           >
-            查看更多示例和评论
+            See more examples &amp; reviews
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>

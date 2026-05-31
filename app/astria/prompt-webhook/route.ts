@@ -2,6 +2,7 @@ import { Database } from "@/types/supabase";
 import { createClient } from "@supabase/supabase-js";
 import * as crypto from "crypto";
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
 
 export const dynamic = "force-dynamic";
 
@@ -206,8 +207,51 @@ export async function POST(request: Request) {
         console.error(`Prompt webhook: failed to update images_generated for model ${model.id}:`, updateError);
       } else {
         console.log(`Prompt webhook: model ${model.id} progress ${newCount}/${model.total_images || '?'}`);
+
+        // ⭐ 完成检测：达标时标记 model.status = "completed" + 发送邮件
+        // 幂等保护：model.status 已是 "completed" 时跳过，避免重复发邮件
+        if (
+          model.total_images &&
+          newCount >= model.total_images &&
+          model.status !== "completed"
+        ) {
+          const { error: completeError } = await supabase
+            .from("models")
+            .update({ status: "completed" })
+            .eq("id", Number(model.id));
+
+          if (completeError) {
+            console.error(
+              `Prompt webhook: failed to mark model ${model.id} as completed:`,
+              completeError
+            );
+          } else {
+            console.log(
+              `Prompt webhook: model ${model.id} COMPLETED — ${newCount}/${model.total_images} images ready!`
+            );
+
+            // 发送完成邮件通知
+            if (resendApiKey) {
+              try {
+                const resend = new Resend(resendApiKey);
+                await resend.emails.send({
+                  from: "contact@snapprohead.com",
+                  to: user?.email ?? "",
+                  subject: "Your AI headshots are ready!",
+                  html: `<h2>Great news! Your ${newCount} AI headshots have been generated successfully.</h2><p>Visit your <a href="https://snapprohead.com/overview">dashboard</a> to view and download your headshots.</p>`,
+                });
+              } catch (emailErr) {
+                console.error(
+                  `Prompt webhook: failed to send completion email for model ${model.id}:`,
+                  emailErr
+                );
+              }
+            }
+          }
+        }
       }
     }
+
     return NextResponse.json(
       {
         message: "success",

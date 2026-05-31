@@ -46,6 +46,15 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
       });
       const data = await res.json();
       if (data.url) {
+        // GA4: track begin_checkout event
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          const priceNum = parseFloat(info.priceLabel.replace(/[^0-9.]/g, '')) || 0;
+          (window as any).gtag('event', 'begin_checkout', {
+            currency: 'USD',
+            value: priceNum,
+            items: [{ item_id: info.tier, item_name: info.name, price: priceNum }],
+          });
+        }
         window.location.href = data.url;
       } else {
         alert('Failed to create checkout: ' + (data.error || 'Unknown error'));

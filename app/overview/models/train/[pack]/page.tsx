@@ -10,13 +10,21 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
+import PurchaseTracker from "@/components/PurchaseTracker";
 
 const packsIsEnabled = false; // ⭐ 不再使用 Pack 选择，直接进入训练
 
-export default async function Index({ params }: { params: { pack : string } }) {
-  
+export default async function Index({
+  params,
+  searchParams,
+}: {
+  params: { pack: string };
+  searchParams: { tier?: string };
+}) {
   return (
     <div className="w-full">
+      {/* GA4: fire purchase event once on client mount — tier from Creem success_url */}
+      <PurchaseTracker tier={searchParams.tier} />
       {/* <CreditCheckBanner packSlug={params.pack} /> */}
       {/* Three-column layout */}
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-4">

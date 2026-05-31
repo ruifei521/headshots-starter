@@ -55,7 +55,7 @@ export default function ExamplesPage() {
                 <span className="font-bold text-2xl">4.9</span>
                 <span className="text-muted-foreground">/ 5</span>
                 <span className="mx-2 text-muted-foreground">·</span>
-                <span className="text-muted-foreground">based on 6,000+ reviews</span>
+                <span className="text-muted-foreground">based on 50,000+ professionals</span>
               </div>
             </div>
           </div>

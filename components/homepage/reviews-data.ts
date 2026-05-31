@@ -423,7 +423,6 @@ export const reviews: Review[] = [
     name: "Brandon",
     rating: 5,
     date: "April 24, 2026",
-    text: "Simple, fast, affordable. What more could you ask for?",
-    avatar: "/gallery-images/01.jpg"
+    text: "Simple, fast, affordable. What more could you ask for?"
   }
 ]

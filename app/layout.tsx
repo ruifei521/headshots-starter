@@ -81,6 +81,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background">
+        {/* Skip navigation - accessibility: first focusable element for keyboard users */}
+        <a
+          href="#main"
+          className="absolute -top-10 left-4 z-[100] bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium transition-all focus:top-4 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        >
+          Skip to main content
+        </a>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <HashAuthHandler />
           <AnnouncementBar />
@@ -94,7 +101,7 @@ export default function RootLayout({
           >
             <Navbar />
           </Suspense>
-          <main className="flex-1">
+          <main id="main" className="flex-1">
             {children}
           </main>
           <Footer />

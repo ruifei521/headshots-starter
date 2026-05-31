@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Build success_url: redirect to train page for the pack
-    const successUrl = `https://snapprohead.com/overview/models/train/${packParam}`;
+    // Build success_url: redirect to train page for the pack, with tier for GA4 tracking
+    const successUrl = `https://snapprohead.com/overview/models/train/${packParam}?tier=${effectiveTier}`;
 
     // Create CREEM checkout
     const response = await fetch(`${CREEM_API_BASE}/checkouts`, {
