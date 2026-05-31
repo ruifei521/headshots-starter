@@ -12,14 +12,6 @@ export async function GET(req: NextRequest) {
   const requestCookies = parseCookieHeader(req.headers.get("Cookie") ?? "");
   const cookieNames = requestCookies.map(c => c.name);
 
-  // 详细日志
-  console.log("========== AUTH CALLBACK ==========");
-  console.log("Full URL:", req.url);
-  console.log("All params:", JSON.stringify(params, null, 2));
-  console.log("Cookie names in request:", cookieNames);
-  console.log("Is localhost:", isLocalhost);
-  console.log("===================================");
-
   // 提取所有可能的参数
   const code = requestUrl.searchParams.get("code");
   const tokenHash = requestUrl.searchParams.get("token_hash");
@@ -71,13 +63,10 @@ export async function GET(req: NextRequest) {
 
   // 方法 1: PKCE 流程 - 使用 code 交换 session (新版 Supabase 默认)
   if (code) {
-    console.log("Flow: PKCE (code exchange)");
-
     // 诊断：检查 code_verifier cookie 是否存在
     const hasCodeVerifier = cookieNames.some(name =>
       name.includes('code-verifier') || name.includes('code_verifier')
     );
-    console.log("PKCE code_verifier cookie present:", hasCodeVerifier);
     if (!hasCodeVerifier) {
       console.warn("⚠️ code_verifier cookie NOT found! This will likely cause PKCE exchange to fail.");
       console.warn("Possible causes:");
@@ -115,19 +104,14 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log("PKCE success! User:", data.user?.email);
-    console.log("Session established, redirecting to:", next);
-
     // 确保所有 auth cookie 都被正确设置
     const setCookies = res.cookies.getAll();
-    console.log("Cookies being set:", setCookies.map(c => c.name));
 
     return res;
   }
 
   // 方法 2: 带 email 的 token (新版 Magic Link)
   if (token && email) {
-    console.log("Flow: verifyOtp with email + token");
     const { supabase, res } = createSupabaseClient();
 
     const { data, error: verifyError } = await supabase.auth.verifyOtp({
@@ -143,13 +127,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log("verifyOtp success, user:", data.user?.email);
     return res;
   }
 
   // 方法 3: token_hash (旧版 Magic Link)
   if (tokenHash || (token && type === "magiclink")) {
-    console.log("Flow: verifyOtp with token_hash");
     const { supabase, res } = createSupabaseClient();
 
     const { data, error: verifyError } = await supabase.auth.verifyOtp({
@@ -164,13 +146,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log("token_hash verify success, user:", data.user?.email);
     return res;
   }
 
   // 方法 4: 纯 token (不带 email)
   if (token) {
-    console.log("Flow: verifyOtp plain token (no email)");
     const { supabase, res } = createSupabaseClient();
 
     const { data, error: verifyError } = await supabase.auth.verifyOtp({
@@ -185,13 +165,9 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log("plain token verify success, user:", data.user?.email);
     return res;
   }
 
   // 没有任何参数
-  console.log("ERROR: No auth parameters found!");
-  console.log("This Magic Link URL format is not recognized.");
-  console.log("Params received:", Object.keys(params));
   return NextResponse.redirect(`${requestUrl.origin}/login?error=${encodeURIComponent('Invalid login link. Please request a new one.')}`);
 }

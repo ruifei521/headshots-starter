@@ -33,8 +33,6 @@ const generateWebhookToken = (uid: string, mid: number): string | null => {
 };
 
 export async function POST(request: Request) {
-  console.log("=== TRAIN MODEL ROUTE CALLED ===", new Date().toISOString());
-  
   let payload;
   try {
     payload = await request.json();
@@ -236,7 +234,6 @@ export async function POST(request: Request) {
       ? `${promptWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_token=${webhookToken}`
       : `${promptWebhook}?user_id=${user.id}&model_id=${modelId}`;
 
-    console.log({ trainWebhookWithParams, promptWebhookWithParams });
     const API_KEY = astriaApiKey;
     const DOMAIN = "https://api.astria.ai";
 
@@ -252,17 +249,6 @@ export async function POST(request: Request) {
     }));
 
     console.log(`Creating tune with ${promptsAttributes.length} prompts for tier=${effectiveTierForCount} (${totalImages} images)`);
-
-    // 🔍 Debug: log payload shape (without full image URLs for privacy)
-    console.log("Astria payload shape:", {
-      title: name,
-      name: type,
-      branch: branch,
-      image_count: images?.length,
-      has_characteristics: !!characteristics,
-      prompts_count: promptsAttributes.length,
-      callback: trainWebhookWithParams ? 'set' : 'missing',
-    });
 
     // Create a fine tuned model using Astria tune API
     // Flux 使用 LoRA 微调
@@ -283,7 +269,6 @@ export async function POST(request: Request) {
     if (characteristics && typeof characteristics === 'object' && Object.keys(characteristics).length > 0) {
       tuneBody.tune.characteristics = characteristics;
     }
-    console.log("has_characteristics_in_payload:", !!tuneBody.tune.characteristics);
 
     // ⭐ POST /tunes + prompts_attributes：一次调用完成训练 + 出图
     // Vercel Hobby plan 函数超时 10s，设置 axios 9s 防止被 Vercel 杀掉

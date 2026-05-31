@@ -33,8 +33,6 @@ const creditsPerPriceId: {
 };
 
 export async function POST(request: Request) {
-  console.log("Request from: ", request.url);
-  console.log("Request: ", request);
   const headersObj = headers();
   const sig = headersObj.get("stripe-signature");
 
@@ -122,13 +120,6 @@ export async function POST(request: Request) {
       const priceId = lineItems.data[0].price!.id;
       const creditsPerUnit = creditsPerPriceId[priceId];
       const totalCreditsPurchased = quantity! * creditsPerUnit;
-
-      console.log({ lineItems });
-      console.log({ quantity });
-      console.log({ priceId });
-      console.log({ creditsPerUnit });
-
-      console.log("totalCreditsPurchased: " + totalCreditsPurchased);
 
       const { data: existingCredits } = await supabase
         .from("credits")

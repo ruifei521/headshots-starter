@@ -45,12 +45,10 @@ export function HashAuthHandler() {
   useEffect(() => {
     // Prevent running multiple times
     if (hasRun) {
-      console.log("[HashAuthHandler] Already ran, skipping");
       return;
     }
 
     const handleAuth = async () => {
-      console.log("[HashAuthHandler] ★★★ Starting auth handling ★★★");
       setHasRun(true);
 
       // ===== Flow 1: Check for PKCE code in query params =====
@@ -58,7 +56,6 @@ export function HashAuthHandler() {
       const code = searchParams.get("code");
 
       if (code) {
-        console.log("[HashAuthHandler] PKCE code found, exchanging for session...");
         setProcessing(true);
         try {
           const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
@@ -68,7 +65,6 @@ export function HashAuthHandler() {
             return;
           }
 
-          console.log("[HashAuthHandler] ✓ PKCE exchange success, redirecting", data);
           window.history.replaceState({}, '', window.location.pathname);
           router.push(getPostLoginUrl());
           return;
@@ -84,11 +80,9 @@ export function HashAuthHandler() {
       // ===== Flow 2: Check for implicit flow tokens in hash =====
       const hash = window.location.hash.substring(1);
       if (!hash) {
-        console.log("[HashAuthHandler] No hash found, skipping implicit flow check");
         return;
       }
 
-      console.log("[HashAuthHandler] Hash found, parsing...", hash.substring(0, 50) + "...");
       const hashParams = new URLSearchParams(hash);
 
       // Check for error in hash
@@ -105,12 +99,10 @@ export function HashAuthHandler() {
       const refreshToken = hashParams.get("refresh_token");
 
       if (!accessToken || !refreshToken) {
-        console.log("[HashAuthHandler] No access_token or refresh_token in hash, skipping");
         return;
       }
 
       // Found auth tokens in hash - process them
-      console.log("[HashAuthHandler] Implicit flow tokens found, establishing session...");
       setProcessing(true);
 
       try {
@@ -125,7 +117,6 @@ export function HashAuthHandler() {
           return;
         }
 
-        console.log("[HashAuthHandler] ✓ Session established successfully, redirecting", data);
         window.location.hash = "";
         router.push(getPostLoginUrl());
       } catch (err) {
