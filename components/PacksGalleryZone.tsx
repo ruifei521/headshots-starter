@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import Link from "next/link";
+import Image from "next/image";
 import { Progress } from "./ui/progress";
 import { Loader2, Users, ImageIcon } from "lucide-react";
 
@@ -90,11 +91,12 @@ export default function PacksGalleryZone() {
             className="group flex flex-col rounded-xl border bg-card overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1"
           >
             <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-              <img
+              <Image
                 src={pack.cover_url ?? "https://snapprohead.com/placeholder-logo.png"}
                 alt={pack.title}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                unoptimized
               />
               {pack.tag && (
                 <span className="absolute top-2 left-2 px-2 py-1 text-xs font-medium rounded-full bg-primary/80 text-primary-foreground backdrop-blur-sm">

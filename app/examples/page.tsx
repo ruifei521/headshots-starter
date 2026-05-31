@@ -8,7 +8,7 @@ import { reviews } from "@/components/homepage/reviews-data"
 
 export const metadata: Metadata = {
   title: "Customer Reviews & Examples | SnapProHead",
-  description: "See what our customers say about SnapProHead AI headshots. 4.9/5 stars from 6,000+ reviews.",
+  description: "See what our customers say about SnapProHead AI headshots. 4.9/5 stars from 50,000+ reviews.",
 }
 
 function StarRating({ rating }: { rating: number }) {
@@ -55,7 +55,7 @@ export default function ExamplesPage() {
                 <span className="font-bold text-2xl">4.9</span>
                 <span className="text-muted-foreground">/ 5</span>
                 <span className="mx-2 text-muted-foreground">·</span>
-                <span className="text-muted-foreground">based on 6,000+ reviews</span>
+                <span className="text-muted-foreground">based on 50,000+ reviews</span>
               </div>
             </div>
           </div>

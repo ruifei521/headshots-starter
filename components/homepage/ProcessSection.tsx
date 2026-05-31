@@ -42,12 +42,12 @@ function ProcessStep({ step, isActive, index }: { step: typeof processSteps[0], 
           {step.images?.map((img, i) => (
             <motion.div
               key={`upload-${i}`}
-              className="aspect-square rounded-lg overflow-hidden bg-muted"
+              className="relative aspect-square rounded-lg overflow-hidden bg-muted"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0.5, y: 10 }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
             >
-              <img src={img} alt="Upload example" className="w-full h-full object-cover" />
+              <Image src={img} alt="Upload example" fill className="object-cover" />
             </motion.div>
           ))}
         </div>
@@ -61,7 +61,7 @@ function ProcessStep({ step, isActive, index }: { step: typeof processSteps[0], 
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : { opacity: 0.5 }}
         >
-          <img src={step.processingImage} alt="AI processing" className="rounded-lg w-full" />
+          <Image src={step.processingImage} alt="AI processing" width={800} height={600} className="rounded-lg w-full h-auto" />
           {isInView && (
             <motion.div
               className="absolute inset-0 bg-primary/20 flex items-center justify-center rounded-lg"
@@ -85,7 +85,7 @@ function ProcessStep({ step, isActive, index }: { step: typeof processSteps[0], 
             animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0.5, scale: 0.95 }}
             transition={{ duration: 0.4, delay: i * 0.1 }}
           >
-            <img src={img} alt="Result example" className="w-full h-full object-cover" />
+            <Image src={img} alt="Result example" fill className="object-cover" />
           </motion.div>
         ))}
       </div>

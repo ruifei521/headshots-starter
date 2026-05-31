@@ -5,6 +5,7 @@ import { Database } from "@/types/supabase";
 import { imageRow, modelRow, sampleRow } from "@/types/utils";
 import { createBrowserClient } from "@supabase/ssr";
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { Progress } from "../ui/progress";
 import { getTierInfo } from "@/lib/tiers";
@@ -162,12 +163,14 @@ export default function ClientSideModel({
               <h2 className="text-xl">Training Data</h2>
               <div className="flex flex-row gap-4 flex-wrap">
                 {samples.map((sample) => (
-                  <img
+                  <Image
                     key={sample.id}
                     src={sample.uri}
                     className="rounded-md w-60 h-60 object-cover"
                     alt="Training sample"
-                    loading="lazy"
+                    width={240}
+                    height={240}
+                    unoptimized
                   />
                 ))}
               </div>
@@ -198,11 +201,13 @@ export default function ClientSideModel({
                 <div className="flex flex-row flex-wrap gap-4">
                   {serverImages?.map((image) => (
                     <div key={image.id}>
-                      <img
+                      <Image
                         src={image.uri}
                         className="rounded-md w-60 object-cover"
                         alt="Generated headshot"
-                        loading="lazy"
+                        width={240}
+                        height={240}
+                        unoptimized
                       />
                     </div>
                   ))}

@@ -3,6 +3,12 @@ import { Login } from "./components/Login";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Login - AI Professional Headshots',
+  description: 'Sign in to SnapProHead and start generating studio-quality AI headshots in ~30 minutes. Starting at $29 with a 14-day money-back guarantee.',
+}
 
 export const dynamic = "force-dynamic";
 
