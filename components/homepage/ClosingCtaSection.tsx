@@ -28,16 +28,7 @@ export default function ClosingCtaSection() {
           {/* Mini trust badges */}
           <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <svg className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-              14-day money-back guarantee
-            </span>
-            <span className="flex items-center gap-1.5">
-              <svg className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-              Commercial license included
-            </span>
-            <span className="flex items-center gap-1.5">
-              <svg className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-              Your photos stay private
+              ★★★★★ 6,000+ headshots delivered · 🛡️ Privacy first
             </span>
           </div>
         </div>
