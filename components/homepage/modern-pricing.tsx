@@ -189,8 +189,6 @@ export default function ModernPricing() {
             <Check className="h-4 w-4 text-primary" />
             100% satisfaction guaranteed
           </span>
-          <span className="text-muted-foreground/40">·</span>
-          <span>Prices exclude applicable taxes.</span>
         </p>
 
         {/* Comparison Table: SnapProHead vs Traditional Photographer */}
