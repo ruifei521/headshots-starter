@@ -15,17 +15,17 @@ interface FAQItemProps {
 function FAQItem({ question, answer, isOpen, onClick, index }: FAQItemProps) {
   return (
     <motion.div
-      className="border-b last:border-b-0"
+      className="border rounded-lg p-4 transition-all hover:shadow-md"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.1 }}
     >
       <button
         onClick={onClick}
-        className="flex w-full items-center justify-between py-4 text-left font-medium transition-all hover:text-primary"
+        className="flex w-full items-center justify-between text-left font-medium transition-all hover:text-primary"
       >
-        <span>{question}</span>
-        <ChevronDown className={`h-5 w-5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <span className="pr-2">{question}</span>
+        <ChevronDown className={`h-5 w-5 flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
       <AnimatePresence>
         {isOpen && (
@@ -36,7 +36,7 @@ function FAQItem({ question, answer, isOpen, onClick, index }: FAQItemProps) {
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="pb-4 text-muted-foreground">{answer}</div>
+            <div className="pt-3 text-muted-foreground">{answer}</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -101,7 +101,7 @@ export default function FAQSection() {
   ]
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {faqs.map((faq, index) => (
         <FAQItem
           key={index}

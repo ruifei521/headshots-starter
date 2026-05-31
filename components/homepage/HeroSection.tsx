@@ -3,7 +3,6 @@ import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import dynamic from "next/dynamic"
-import TrustBadges from "@/components/homepage/trust-badges"
 
 const ThreeDBeforeAfterGallery = dynamic(
   () => import("@/components/homepage/3d-before-after-gallery"),
@@ -62,9 +61,19 @@ export default function HeroSection() {
           <ScrollingGallery />
         </div>
 
-        {/* Trust Badges — moved here from bottom */}
-        <div className="mt-6">
-          <TrustBadges />
+        {/* Trusted By Section — company logos for social proof */}
+        <div className="mt-12 mb-8">
+          <p className="text-center text-sm font-semibold text-muted-foreground mb-6">
+            Trusted by professionals and teams
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-8 opacity-60">
+            {/* Placeholder company logos - replace with actual logos */}
+            <div className="h-8 w-24 bg-muted-foreground/20 rounded" />
+            <div className="h-8 w-24 bg-muted-foreground/20 rounded" />
+            <div className="h-8 w-24 bg-muted-foreground/20 rounded" />
+            <div className="h-8 w-24 bg-muted-foreground/20 rounded" />
+            <div className="h-8 w-24 bg-muted-foreground/20 rounded" />
+          </div>
         </div>
 
         {/* Before/After Gallery — lazy loaded, only when visible */}
