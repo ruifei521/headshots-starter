@@ -80,7 +80,9 @@ export default async function Index() {
       />
       <div>
         <HeroSection />
-        <PricingSection />
+        <div id="pricing" className="scroll-mt-16">
+          <PricingSection />
+        </div>
         <ProcessSection />
         <ExamplesSection />
         <TestimonialsSection />
