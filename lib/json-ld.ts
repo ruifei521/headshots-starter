@@ -50,7 +50,12 @@ export const FAQ_DATA: FAQItem[] = [
   {
     question: "How does AI headshot generation work?",
     answer:
-      "Upload 4-10 selfies, choose a professional style (Corporate, Natural, Formal, etc.), then our AI trains on your face and generates studio-quality headshots in ~30 minutes. You get 40+ photos with different backgrounds and outfits.",
+      "Upload 4-10 selfies from any device (phone, computer, or tablet), choose a professional style, then our Flux AI trains on your face and generates studio-quality headshots in ~30 minutes. You get 40+ photos with different backgrounds and outfits.",
+  },
+  {
+    question: "What kind of photos should I upload?",
+    answer:
+      "At least 4 high-quality selfies with good lighting. Front-facing, one person per frame, no sunglasses or hats. Different angles and expressions give better variety. Avoid heavily filtered or group photos. Phone selfies work great — iPhone 11+ or recent Android recommended.",
   },
   {
     question: "What styles are available?",
@@ -58,99 +63,59 @@ export const FAQ_DATA: FAQItem[] = [
       "We offer 12 professional styles: Corporate Headshots, Partner's Headshots, Lawyer Headshots, Natural Looks, Speaker, Realtor, Styled for Success, Talya Maor, Business Profile Studio, Effortless Professionalism, Office Outfits, and Stylish Studio Portraits.",
   },
   {
-    question: "Can I buy additional packs later?",
+    question: "How many headshots do I get per pack?",
     answer:
-      "Yes! You can purchase additional packs anytime. Packs start at $29. You don't need to upload new photos — we use your existing trained model to generate new styles.",
+      "Starter packs include 40 headshots, Professional packs include 60, and Executive packs include 100 headshots. Each style within a pack generates multiple variations with different backgrounds, outfits, and poses.",
   },
   {
-    question: "What kind of photos should I upload?",
+    question: "How long does it take to get my AI headshots?",
     answer:
-      "At least 4 high-quality selfies with good lighting. Front-facing, one person per frame, no sunglasses or hats. Different angles and expressions give better variety. Avoid heavily filtered or group photos.",
+      "Standard processing takes ~30 minutes. Professional and Executive plans get priority processing for faster turnaround. You'll receive an email notification as soon as your headshots are ready.",
   },
   {
-    question: "How many headshots per style?",
+    question: "Can I use AI headshots professionally?",
     answer:
-      "Each style generates 20-81 professional headshots, depending on the style you choose. Larger styles like Lawyer Headshots produce 81 images (women) or 69 images (men) with diverse backgrounds and outfits.",
+      "Absolutely. Use them on LinkedIn, company websites, resumes, email signatures, social media, and marketing materials. All plans include full commercial rights — no attribution or additional licensing required.",
   },
   {
-    question: "Can I use these headshots professionally?",
+    question: "What if I don't like my AI headshots?",
     answer:
-      "Absolutely. All plans include full commercial rights. Use them on LinkedIn, company websites, resumes, social media, email signatures — anywhere you need a professional look.",
-  },
-  {
-    question: "How quickly will I receive my headshots?",
-    answer:
-      "Standard processing is ~30 minutes. Pro and Executive plans get priority processing. You'll receive an email when your headshots are ready.",
-  },
-  {
-    question: "What if I'm not satisfied with the results?",
-    answer:
-      "We stand behind our AI headshots. If you don't get a single headshot you're happy with, we'll refund your entire purchase — no questions asked. Just contact us within 14 days.",
+      "We stand behind our results. If you don't get a single headshot you're happy with, we'll refund your entire purchase — no questions asked. Just contact us within 14 days of delivery.",
   },
   {
     question: "How does SnapProHead compare to other AI headshot services?",
     answer:
-      "SnapProHead offers 12 curated professional styles with up to 100 headshots per pack, starting at just $29. All plans use advanced Flux AI for enhanced 1024×1024 resolution — higher than most competitors. Plus, we offer a 14-day money-back guarantee and 30-day auto-delete privacy that many alternatives don't.",
+      "SnapProHead starts at just $29 with up to 100 headshots per pack — that's 97% cheaper than a $500 professional photographer and 95% faster (30 minutes vs 2-3 weeks). We use advanced Flux AI for 1024×1024 resolution, offer 12 curated styles, a 14-day money-back guarantee, and 30-day auto-delete privacy that many alternatives don't provide.",
   },
   {
-    question: "I love my headshots! How can I spread the word?",
+    question: "How much does it cost?",
     answer:
-      "Share your experience on social media and tag us, or tell your colleagues and friends. If you have a large audience, reach out about our affiliate program at contact@snapprohead.com.",
-  },
-  {
-    question: "What do you do with my uploaded photos? Are they safe?",
-    answer:
-      "We never sell or share your photos. All uploaded photos are automatically deleted 30 days after AI training completes. We are GDPR compliant and take your privacy seriously.",
-  },
-  {
-    question: "How long do you keep my photos?",
-    answer:
-      "Uploaded photos are used to train your AI model and are automatically deleted 30 days after training completes. You can request earlier deletion anytime from your account settings.",
-  },
-  {
-    question: "Can other people see my headshots?",
-    answer:
-      "No. Your headshots are visible only to you. We never display, share, or showcase your headshots publicly. Your privacy is our priority.",
-  },
-  {
-    question: "Is my data encrypted and secure?",
-    answer:
-      "Yes. All data is transmitted with SSL encryption and stored with AES-256 encryption. We use industry-standard security practices to protect your information.",
-  },
-  {
-    question: "How does SnapProHead compare to a $500 photographer?",
-    answer:
-      "A professional photographer costs $500+ and takes 2-3 weeks. SnapProHead starts at just $29 and delivers 40+ headshots in ~30 minutes. That's 97% cheaper and 95% faster — with a money-back guarantee.",
-  },
-  {
-    question: "Is there a free trial?",
-    answer:
-      "We don't offer a free trial because AI model training has real computing costs. But we offer a 14-day no-questions-asked money-back guarantee — so there's zero risk to try.",
-  },
-  {
-    question: "How many selfies do I need to upload?",
-    answer:
-      "We recommend 4-10 clear selfies with good lighting. Front-facing only, no sunglasses or hats. Phone selfies work great — no professional equipment needed.",
+      "Starter: $29 (40 headshots), Professional: $39 (60 headshots), Executive: $59 (100 headshots). You can purchase additional packs anytime without re-uploading photos — your trained model is reused.",
   },
   {
     question: "Are the headshots realistic? Will people know they're AI-generated?",
     answer:
-      "Our AI uses the latest Flux technology, generating 1024×1024 high-resolution headshots. 95% of our customers say the results look very natural and indistinguishable from real photos.",
+      "Yes — our AI uses the latest Flux technology to produce 1024×1024 high-resolution headshots with natural skin textures, realistic lighting, and authentic-looking backgrounds. 95% of our customers say the results are indistinguishable from real photos.",
   },
   {
     question: "How many good photos can I expect?",
     answer:
-      "Based on customer feedback, the average customer gets 25-35 usable headshots and 10-15 photos they're very happy with, per pack. With 40+ headshots per pack, you'll have plenty to choose from.",
+      "Based on customer feedback, the average user gets 25-35 usable headshots and 10-15 photos they absolutely love per Starter pack. With 40-100 headshots depending on your plan, you'll have plenty to choose from.",
   },
   {
     question: "Who owns the copyright? Can I use them commercially?",
     answer:
-      "You have full copyright and commercial rights to your headshots. Use them on LinkedIn, company websites, resumes, marketing materials, print — anywhere you need. No additional licensing or attribution required.",
+      "You have full copyright and commercial rights to your headshots. Use them on LinkedIn, company websites, resumes, marketing materials, print — anywhere you need. No additional licensing or attribution required. The photos are yours.",
   },
   {
-    question: "What devices can I use? Can I upload from my phone?",
+    question: "Is there a free trial?",
     answer:
-      "Any device works — phone, computer, or tablet. Upload directly from your camera roll. We recommend iPhone 11+ or recent Android phones for best photo quality. No professional camera needed.",
+      "We don't offer a free trial because AI model training has real computing costs. However, we offer a 14-day no-questions-asked money-back guarantee — so there's zero risk to see the results for yourself.",
+  },
+  {
+    question: "What do you do with my uploaded photos?",
+    answer:
+      "We never sell, share, or display your photos. They're used solely to train your personal AI model and are automatically deleted 30 days after training completes. All data is transmitted with SSL encryption and stored with AES-256 encryption. You can request earlier deletion anytime from your account settings.",
   },
 ];
 
