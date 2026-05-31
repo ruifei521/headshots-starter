@@ -34,9 +34,7 @@ export default function HeroSection() {
             Turn Your Selfies Into <span className="text-primary">Studio-Quality Headshots</span>
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto">
-            Upload 4-6 selfies, and our AI will generate 40-100 professional headshots.
-            Powered by <strong>Flux AI</strong> for the best quality — corporate, LinkedIn, resume, and more.
-            Starting at <strong className="text-primary">$29</strong>.
+            Professional enough for LinkedIn. Natural enough to still be you.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/#pricing" className="w-full sm:w-auto">
