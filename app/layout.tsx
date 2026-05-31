@@ -10,6 +10,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "@/components/homepage/theme-provider"
 import { validateConfig } from "@/lib/config";
 import { HashAuthHandler } from "@/components/HashAuthHandler";
+import { getSiteWideJsonLd } from "@/lib/json-ld";
 
 // Dynamic import with ssr: false to prevent motion/react from being bundled on every page
 const AnnouncementBar = dynamic(
@@ -81,6 +82,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background">
+        {/* JSON-LD: 全站 Organization + WebSite Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(getSiteWideJsonLd()) }}
+        />
         {/* Skip navigation - accessibility: first focusable element for keyboard users */}
         <a
           href="#main"

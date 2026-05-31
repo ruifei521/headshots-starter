@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Star } from "lucide-react"
 import { reviews } from "@/components/homepage/reviews-data"
+import { getExamplesJsonLd, type ReviewItem } from "@/lib/json-ld"
 
 export const metadata: Metadata = {
   title: "Customer Reviews & Examples | SnapProHead",
@@ -25,8 +26,41 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export default function ExamplesPage() {
+  // 精选 8 条有角色+详情的评价用于 Review Schema
+  const featuredReviews: ReviewItem[] = reviews
+    .filter((r) => r.role && r.text.length > 60)
+    .slice(0, 8)
+    .map((r) => ({
+      name: r.name,
+      role: r.role,
+      rating: r.rating,
+      date: r.date,
+      text: r.text,
+    }));
+
+  // 如果筛选后不足 8 条，补充无角色但有头像的
+  if (featuredReviews.length < 8) {
+    const extras = reviews
+      .filter((r) => !featuredReviews.find((f) => f.name === r.name))
+      .slice(0, 8 - featuredReviews.length)
+      .map((r) => ({
+        name: r.name,
+        rating: r.rating,
+        date: r.date,
+        text: r.text,
+      }));
+    featuredReviews.push(...extras);
+  }
+
   return (
-    <div className="min-h-screen">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(getExamplesJsonLd(featuredReviews)),
+        }}
+      />
+      <div className="min-h-screen">
       {/* Header */}
       <section className="border-b bg-muted/30 py-12 md:py-20">
         <div className="container px-4 md:px-6">
@@ -130,5 +164,6 @@ export default function ExamplesPage() {
         </div>
       </section>
     </div>
+    </>
   )
 }
