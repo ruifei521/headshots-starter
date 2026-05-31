@@ -3,30 +3,31 @@
 import { useRef, useState } from "react"
 import Image from "next/image"
 import { motion, useInView } from "motion/react"
-import { Palette, Camera, Sparkles, Download } from "lucide-react"
+import { Camera, Download, Sparkles } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 const processSteps = [
   {
     number: 1,
-    title: "Upload Your Selfies",
-    description: "Selfies work great! Just 4–6 uploads is all you need. Focus on good lighting, different angles, and one person per photo.",
+    title: "Upload Your Photos",
+    description: "Upload 4+ high-quality selfies: front facing, 1 person in frame, no glasses or hats.",
     icon: <Camera className="h-5 w-5" />,
-    images: ["/homepage/before0001.jpg", "/homepage/before0002.jpg", "/homepage/example0003.jpg"]
+    images: ["/example1.png", "/example2.png", "/example3.png"]
   },
   {
     number: 2,
-    title: "AI Trains on Your Face",
-    description: "Our AI gets to work on your photos. Just wait for your results — we'll email you when your headshots are ready!",
+    title: "Our AI Gets to Work",
+    description: "The AI magic takes ~20 minutes. You'll get an email when it's ready!",
     icon: <Sparkles className="h-5 w-5" />,
+    processingImage: "/blur.png"
   },
   {
     number: 3,
-    title: "Download & Use Anywhere",
-    description: "Receive up to 100 high-quality headshots to use however you want — LinkedIn, resumes, company websites, and more.",
+    title: "Get Amazing Headshots",
+    description: "Once your model is trained, we'll give you amazing headshots!",
     icon: <Download className="h-5 w-5" />,
-    images: ["/homepage/example0005.jpg", "/homepage/example0007.jpg", "/homepage/example0009.jpg"]
+    resultImages: ["/result1.png", "/result2.png", "/result3.png"]
   }
 ]
 
@@ -35,46 +36,56 @@ function ProcessStep({ step, isActive, index }: { step: typeof processSteps[0], 
   const isInView = useInView(ref, { once: true, amount: 0.3 })
 
   const renderVisual = () => {
-    if (index === 2) {
-      // AI Processing step - animated spinner
+    if (index === 0) {
+      return (
+        <div className="grid grid-cols-3 gap-2 p-4">
+          {step.images?.map((img, i) => (
+            <motion.div
+              key={`upload-${i}`}
+              className="aspect-square rounded-lg overflow-hidden bg-muted"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0.5, y: 10 }}
+              transition={{ duration: 0.4, delay: i * 0.1 }}
+            >
+              <img src={img} alt="Upload example" className="w-full h-full object-cover" />
+            </motion.div>
+          ))}
+        </div>
+      )
+    }
+
+    if (index === 1) {
       return (
         <motion.div
-          className="relative w-full aspect-[3/2] rounded-lg bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center"
+          className="relative"
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : { opacity: 0.5 }}
         >
+          <img src={step.processingImage} alt="AI processing" className="rounded-lg w-full" />
           {isInView && (
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full"
-            />
+              className="absolute inset-0 bg-primary/20 flex items-center justify-center rounded-lg"
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            </motion.div>
           )}
-          <p className="absolute bottom-4 text-xs text-muted-foreground">Flux AI processing...</p>
         </motion.div>
       )
     }
 
-    // Image grid for steps 1, 2, 4
     return (
       <div className="grid grid-cols-3 gap-2 p-4">
-        {step.images?.map((img, i) => (
+        {step.resultImages?.map((img, i) => (
           <motion.div
-            key={`step-${index}-${i}`}
-            className="aspect-square rounded-lg overflow-hidden bg-muted relative"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0.5, y: 10 }}
+            key={`result-${i}`}
+            className="aspect-square rounded-lg overflow-hidden bg-muted"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0.5, scale: 0.95 }}
             transition={{ duration: 0.4, delay: i * 0.1 }}
           >
-            <Image
-              src={img}
-              alt={`Step ${index + 1} example`}
-              fill
-              sizes="150px"
-              className="object-cover"
-              loading="lazy"
-              quality={60}
-            />
+            <img src={img} alt="Result example" className="w-full h-full object-cover" />
           </motion.div>
         ))}
       </div>
@@ -126,10 +137,10 @@ export default function ProcessSection() {
           </Badge>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">How It Works</h2>
           <p className="max-w-[700px] text-muted-foreground text-lg">
-            Get your headshots in minutes, not days. It's as easy as 1-2-3-4!
+            Our AI-powered platform transforms your selfies into professional headshots in just three simple steps.
           </p>
         </div>
-        <div className="mt-8 grid gap-8 md:grid-cols-2 md:gap-12">
+        <div className="mt-8 grid gap-8 md:grid-cols-3 md:gap-12">
           {processSteps.map((step, index) => (
             <ProcessStep
               key={step.number}
