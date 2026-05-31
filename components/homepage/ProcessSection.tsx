@@ -57,11 +57,11 @@ function ProcessStep({ step, isActive, index }: { step: typeof processSteps[0], 
     if (index === 1) {
       return (
         <motion.div
-          className="relative"
+          className="relative aspect-video rounded-lg overflow-hidden bg-muted"
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : { opacity: 0.5 }}
         >
-          <Image src={step.processingImage!} alt="AI processing" width={800} height={600} className="rounded-lg w-full h-auto" />
+          <Image src={step.processingImage!} alt="AI processing" fill className="object-cover" />
           {isInView && (
             <motion.div
               className="absolute inset-0 bg-primary/20 flex items-center justify-center rounded-lg"
