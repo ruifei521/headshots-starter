@@ -238,7 +238,7 @@ export function generateProductSchema() {
       ratingValue: "4.9",
       bestRating: "5",
       ratingCount: "50",
-      reviewCount: "6000",
+      reviewCount: "50000",
     },
   };
 }

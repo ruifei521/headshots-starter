@@ -9,7 +9,7 @@ import { getExamplesJsonLd, type ReviewItem } from "@/lib/json-ld"
 
 export const metadata: Metadata = {
   title: "Customer Reviews & Examples | SnapProHead",
-  description: "See what our customers say about SnapProHead AI headshots. 4.9/5 stars from 6,000+ reviews.",
+  description: "See what our customers say about SnapProHead AI headshots. 4.9/5 stars from 50,000+ reviews.",
 }
 
 function StarRating({ rating }: { rating: number }) {
