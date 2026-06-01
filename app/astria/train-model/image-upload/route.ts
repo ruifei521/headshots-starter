@@ -5,9 +5,9 @@ import { Database } from '@/types/supabase';
 export const dynamic = 'force-dynamic';
 
 // Allowed MIME types
-const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
-// Maximum file size (10MB)
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/heic', 'image/heif', 'image/webp'];
+// Maximum file size (120MB)
+const MAX_FILE_SIZE = 120 * 1024 * 1024;
 
 export async function POST(request: Request): Promise<NextResponse> {
   // ✅ 鉴权：必须登录
@@ -57,7 +57,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     // Server-side file type validation
     if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: `File type "${file.type}" is not allowed. Only JPEG and PNG are accepted.` },
+        { error: `File type "${file.type}" is not allowed. Only PNG, JPG, HEIC, and WEBP are accepted.` },
         { status: 400 }
       );
     }
@@ -65,7 +65,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     // Server-side file size validation
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: `File size ${(file.size / 1024 / 1024).toFixed(2)}MB exceeds the 10MB limit.` },
+        { error: `File size ${(file.size / 1024 / 1024).toFixed(2)}MB exceeds the 120MB limit.` },
         { status: 400 }
       );
     }

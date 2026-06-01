@@ -37,8 +37,8 @@ const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
 // Minimum and maximum number of images
 const MIN_IMAGES = 4;
 const MAX_IMAGES = 10;
-// Maximum total size in bytes (4.5MB)
-const MAX_TOTAL_SIZE = 4.5 * 1024 * 1024;
+// Maximum total size in bytes (120MB)
+const MAX_TOTAL_SIZE = 120 * 1024 * 1024;
 
 interface FileObject {
   file: File;
@@ -400,6 +400,9 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
     accept: {
       "image/png": [".png"],
       "image/jpeg": [".jpg", ".jpeg"],
+      "image/heic": [".heic"],
+      "image/heif": [".heif"],
+      "image/webp": [".webp"],
     },
   });
 
@@ -519,8 +522,11 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
               ) : (
                 <div className="flex justify-center flex-col items-center gap-2">
                   <FaImages size={32} className="text-gray-700" />
-                  <p className="self-center">
-                    Drag &apos;n&apos; drop some files here, or click to select files.
+                  <p className="self-center text-center">
+                    Drag &apos;n&apos; drop your photos here, or click to select files.
+                  </p>
+                  <p className="text-xs text-muted-foreground text-center">
+                    PNG、JPG、HEIC、WEBP，最大 120MB
                   </p>
                 </div>
               )}
