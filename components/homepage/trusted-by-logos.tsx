@@ -6,7 +6,7 @@ export default function TrustedByLogos() {
       </p>
       <div className="flex justify-center px-4">
         <img
-          src="https://www.headshotpro.com/_nuxt/img/logo-cloud-horizontal.e5e3772.png"
+          src="/trusted-by-logos.png"
           alt="Trusted by professionals and teams"
           className="max-w-full h-auto opacity-70 hover:opacity-100 transition-opacity"
           loading="lazy"
