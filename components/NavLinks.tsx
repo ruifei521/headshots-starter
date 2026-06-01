@@ -8,7 +8,6 @@ interface NavLinksProps {
 
 export default function NavLinks({ isLoggedIn = false }: NavLinksProps) {
   const links = [
-    { href: "/#how-it-works", label: "How It Works" },
     { href: "/examples", label: "Examples" },
     { href: "/#pricing", label: "Pricing" },
   ];

@@ -53,7 +53,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Build success_url: redirect to train page for the pack, with tier for GA4 tracking
-    const successUrl = `https://snapprohead.com/overview/models/train/${packParam}?tier=${effectiveTier}`;
+    // Use request origin to support both local dev and production
+    const origin = req.headers.get('origin') || req.headers.get('host') || 'https://snapprohead.com';
+    const baseUrl = origin.startsWith('http') ? origin : `https://${origin}`;
+    const successUrl = `${baseUrl}/overview/models/train/${packParam}?tier=${effectiveTier}`;
 
     // Create CREEM checkout
     const response = await fetch(`${CREEM_API_BASE}/checkouts`, {

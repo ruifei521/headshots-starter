@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/overview/', '/packs/'],
+      disallow: ['/api/', '/overview/'],
     },
     sitemap: 'https://snapprohead.com/sitemap.xml',
   }
