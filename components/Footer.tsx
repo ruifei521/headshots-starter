@@ -42,11 +42,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/headshots/speaker" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Speaker Headshots
-                </Link>
-              </li>
-              <li>
                 <Link href="/headshots/actor" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Actor Headshots
                 </Link>
@@ -59,26 +54,6 @@ export default function Footer() {
               <li>
                 <Link href="/headshots/linkedin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   LinkedIn Profile
-                </Link>
-              </li>
-              <li>
-                <Link href="/headshots/resume" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Resume & CV
-                </Link>
-              </li>
-              <li>
-                <Link href="/headshots/team" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Team Page
-                </Link>
-              </li>
-              <li>
-                <Link href="/headshots/dating" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Dating Profile
-                </Link>
-              </li>
-              <li>
-                <Link href="/headshots/business-card" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Business Card
                 </Link>
               </li>
             </ul>
