@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ImageInspectionResult, inspectImage } from '@/lib/imageInspection';
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 
@@ -22,46 +22,63 @@ const CRITICAL_ISSUES = {
 export function ImageInspector({ file, fileId, type, onInspectionComplete }: ImageInspectorProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [issues, setIssues] = useState<string[]>([]);
+  const isMountedRef = useRef(true);
+  const hasCalledCompleteRef = useRef(false);
 
   useEffect(() => {
-    const controller = new AbortController();
+    isMountedRef.current = true;
+    hasCalledCompleteRef.current = false;
 
     const inspect = async () => {
       try {
         setIsLoading(true);
         const result = await inspectImage(file, type);
-        if (!controller.signal.aborted) {
-          // Only show critical issues that affect AI output quality
-          // "Selfie" is expected/normal — NOT a problem
-          // "Full body" is minor — don't alarm the user
-          const detectedIssues: string[] = [];
+        if (!isMountedRef.current) return;
 
-          if (result.includes_multiple_people) {
-            detectedIssues.push(CRITICAL_ISSUES.includes_multiple_people);
-          }
-          if (result.blurry) {
-            detectedIssues.push(CRITICAL_ISSUES.blurry);
-          }
-          if (result.wearing_sunglasses) {
-            detectedIssues.push(CRITICAL_ISSUES.wearing_sunglasses);
-          }
-          if (result.wearing_hat) {
-            detectedIssues.push(CRITICAL_ISSUES.wearing_hat);
-          }
-          if (result.funny_face) {
-            detectedIssues.push(CRITICAL_ISSUES.funny_face);
-          }
+        // Only show critical issues that affect AI output quality
+        // "Selfie" is expected/normal — NOT a problem
+        // "Full body" is minor — don't alarm the user
+        const detectedIssues: string[] = [];
 
-          setIssues(detectedIssues);
+        if (result.includes_multiple_people) {
+          detectedIssues.push(CRITICAL_ISSUES.includes_multiple_people);
+        }
+        if (result.blurry) {
+          detectedIssues.push(CRITICAL_ISSUES.blurry);
+        }
+        if (result.wearing_sunglasses) {
+          detectedIssues.push(CRITICAL_ISSUES.wearing_sunglasses);
+        }
+        if (result.wearing_hat) {
+          detectedIssues.push(CRITICAL_ISSUES.wearing_hat);
+        }
+        if (result.funny_face) {
+          detectedIssues.push(CRITICAL_ISSUES.funny_face);
+        }
+
+        setIssues(detectedIssues);
+        if (!hasCalledCompleteRef.current) {
+          hasCalledCompleteRef.current = true;
           onInspectionComplete(result, fileId);
         }
       } catch (error) {
-        if (!controller.signal.aborted) {
-          // Silently pass — don't block upload
-          setIssues([]);
+        if (!isMountedRef.current) return;
+        // Silently pass — don't block upload
+        setIssues([]);
+        if (!hasCalledCompleteRef.current) {
+          hasCalledCompleteRef.current = true;
+          onInspectionComplete({
+            selfie: false,
+            blurry: false,
+            includes_multiple_people: false,
+            full_body_image_or_longshot: false,
+            funny_face: false,
+            wearing_hat: false,
+            wearing_sunglasses: false,
+          }, fileId);
         }
       } finally {
-        if (!controller.signal.aborted) {
+        if (isMountedRef.current) {
           setIsLoading(false);
         }
       }
@@ -70,9 +87,9 @@ export function ImageInspector({ file, fileId, type, onInspectionComplete }: Ima
     inspect();
 
     return () => {
-      controller.abort();
+      isMountedRef.current = false;
     };
-  }, [file, type]);
+  }, [file, type, fileId, onInspectionComplete]);
 
   if (isLoading) {
     return (
