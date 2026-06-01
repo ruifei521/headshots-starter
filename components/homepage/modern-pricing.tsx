@@ -155,11 +155,25 @@ export default function ModernPricing() {
             🔥 所有套餐8折 — 限时优惠！
           </div>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            Choose Your <span className="text-primary">Perfect Plan</span>
+            Professional headshots for{" "}
+            <span className="text-primary">8x less</span> than a physical
+            photo shoot
           </h2>
-          <p className="max-w-[600px] text-muted-foreground text-lg mx-auto">
-            Professional photoshoots cost $250+ on average. Save time and money with our AI-powered solution.
+          <p className="max-w-[700px] text-muted-foreground text-lg mx-auto">
+            The average cost of professional headshots in the United States is
+            $232*. Our packages start from $29. We won&apos;t let you leave
+            without at least a handful of good headshots
           </p>
+          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground mt-4">
+            <span className="font-semibold text-foreground">
+              50,000+
+            </span>{" "}
+            headshots created for{" "}
+            <span className="font-semibold text-foreground">
+              3,000+
+            </span>{" "}
+            happy customers
+          </div>
         </div>
 
         {/* Three Pricing Cards */}

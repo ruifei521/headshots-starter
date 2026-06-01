@@ -52,7 +52,7 @@ export default async function Navbar() {
           <span>SnapProHead</span>
         </Link>
 
-        <NavLinks />
+        <NavLinks isLoggedIn={!!user} />
 
         <div className="flex items-center gap-4">
           <ThemeToggle />

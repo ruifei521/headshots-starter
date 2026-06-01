@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 
-export default function NavLinks() {
+interface NavLinksProps {
+  isLoggedIn?: boolean;
+}
+
+export default function NavLinks({ isLoggedIn = false }: NavLinksProps) {
   const links = [
     { href: "/#how-it-works", label: "How It Works" },
     { href: "/examples", label: "Examples" },
@@ -20,6 +24,14 @@ export default function NavLinks() {
           {link.label}
         </Link>
       ))}
+      {isLoggedIn && (
+        <Link
+          href="/overview"
+          className="px-3 py-2 inline-flex items-center text-base font-semibold text-primary hover:text-primary/80 transition-colors cursor-pointer"
+        >
+          My Models
+        </Link>
+      )}
     </nav>
   );
 }

@@ -34,7 +34,7 @@ export default function HeroSection() {
             Turn Your Selfies Into <span className="text-primary">Studio-Quality Headshots</span>
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto">
-            Professional enough for LinkedIn. Natural enough to still be you. 8x cheaper than a $500 photoshoot.
+            Professional enough for LinkedIn. Natural enough to still be you. 8x cheaper than a $232 photoshoot.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/#pricing" className="w-full sm:w-auto">
