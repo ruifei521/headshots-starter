@@ -39,7 +39,7 @@ export const TIERS: Record<Tier, TierInfo> = {
     estimatedTime: '~25 min',
     features: [
       '40 HD AI headshots',
-      '10 style scenes',
+      '20+ outfits & backgrounds',
       'Enhanced resolution 1024×1024 (Flux)',
       '~25 min fast delivery',
       'Commercial license',
@@ -59,7 +59,7 @@ export const TIERS: Record<Tier, TierInfo> = {
     badge: 'Most Popular',
     features: [
       '60 HD AI headshots',
-      '15 style scenes',
+      '40+ outfits & backgrounds',
       'Enhanced resolution 1024×1024 (Flux)',
       '~25 min fast delivery',
       'Commercial license',
@@ -79,7 +79,7 @@ export const TIERS: Record<Tier, TierInfo> = {
     badge: 'Best Value',
     features: [
       '100 HD AI headshots',
-      '25 style scenes',
+      '80+ outfits & backgrounds',
       'Enhanced resolution 1024×1024 (Flux)',
       '~25 min fast delivery',
       'Commercial license',

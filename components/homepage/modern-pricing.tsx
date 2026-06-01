@@ -156,24 +156,14 @@ export default function ModernPricing() {
           </div>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
             Professional headshots for{" "}
-            <span className="text-primary">8x less</span> than a physical
-            photo shoot
+            <span className="text-primary">8x less</span>
+            <br />
+            than a physical photo shoot
           </h2>
           <p className="max-w-[700px] text-muted-foreground text-lg mx-auto">
             The average cost of professional headshots in the United States is
-            $232*. Our packages start from $29. We won&apos;t let you leave
-            without at least a handful of good headshots
+            $232. Our packages start from $29.
           </p>
-          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground mt-4">
-            <span className="font-semibold text-foreground">
-              50,000+
-            </span>{" "}
-            headshots created for{" "}
-            <span className="font-semibold text-foreground">
-              3,000+
-            </span>{" "}
-            happy customers
-          </div>
         </div>
 
         {/* Three Pricing Cards */}
@@ -286,7 +276,7 @@ export default function ModernPricing() {
                   <td className="px-4 py-3 text-center">
                     <span className="flex items-center justify-center gap-1.5">
                       <Check className="h-4 w-4 text-green-500" />
-                      <span className="font-medium">25+ style scenes</span>
+                      <span className="font-medium">80+ outfits & backgrounds</span>
                     </span>
                   </td>
                   <td className="px-4 py-3 text-center text-muted-foreground">

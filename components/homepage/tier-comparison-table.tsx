@@ -26,8 +26,8 @@ export default function TierComparisonTable() {
       values: { starter: "40", professional: "60", executive: "100" },
     },
     {
-      label: "Style scenes",
-      values: { starter: "10", professional: "15", executive: "25" },
+      label: "Outfits & backgrounds",
+      values: { starter: "20+", professional: "40+", executive: "80+" },
     },
     {
       label: "Resolution",
