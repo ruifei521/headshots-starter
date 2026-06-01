@@ -189,22 +189,37 @@ export async function POST(request: Request) {
     );
 
     // ⭐ 更新 models.images_generated（累加本次保存的图片数）
+    // 容错：如果列不存在（migration 未执行），跳过进度更新但不影响图片保存
     if (savedCount > 0) {
-      const { data: currentModel } = await supabase
-        .from("models")
-        .select("images_generated")
-        .eq("id", Number(model.id))
-        .single();
+      let newCount = savedCount; // fallback: 仅算本次
+      let progressUpdated = false;
+      try {
+        const { data: currentModel, error: selectError } = await supabase
+          .from("models")
+          .select("images_generated")
+          .eq("id", Number(model.id))
+          .single();
 
-      const newCount = (currentModel?.images_generated || 0) + savedCount;
-      const { error: updateError } = await supabase
-        .from("models")
-        .update({ images_generated: newCount })
-        .eq("id", Number(model.id));
+        if (!selectError && currentModel) {
+          newCount = (currentModel?.images_generated || 0) + savedCount;
+          const { error: updateError } = await supabase
+            .from("models")
+            .update({ images_generated: newCount })
+            .eq("id", Number(model.id));
 
-      if (updateError) {
-        logger.error(`Prompt webhook: failed to update images_generated for model ${model.id}:`, updateError);
-      } else {
+          if (updateError) {
+            logger.error(`Prompt webhook: failed to update images_generated for model ${model.id}:`, updateError);
+          } else {
+            progressUpdated = true;
+            logger.log(`Prompt webhook: model ${model.id} progress ${newCount}/${model.total_images || '?'}`);
+          }
+        }
+      } catch (progressErr: any) {
+        // 列不存在等情况 — 不影响核心流程
+        logger.warn(`Prompt webhook: images_generated column not available, skipping progress tracking: ${progressErr?.message}`);
+      }
+
+      if (progressUpdated) {
         logger.log(`Prompt webhook: model ${model.id} progress ${newCount}/${model.total_images || '?'}`);
 
         // ⭐ 完成检测：达标时标记 model.status = "completed" + 发送邮件

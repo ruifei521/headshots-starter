@@ -47,9 +47,7 @@ export default async function Index() {
     const { data: models } = await supabase
       .from("models")
       .select(
-        `*, samples (
-        *
-      )`
+        `id, name, type, status, tier, created_at, user_id, modelId, samples (*)`
       )
       .eq("user_id", user.id);
 

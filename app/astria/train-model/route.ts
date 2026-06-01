@@ -192,17 +192,31 @@ export async function POST(request: Request) {
   const totalImages = promptTemplatesForCount.reduce((s, t) => s + t.num_images, 0);
 
   // create a model row in supabase — ⭐ 写入 tier + 进度字段
+  // 先检查 images_generated 列是否存在（migration add_training_progress.sql 可能未执行）
+  let hasProgressColumns = false;
+  try {
+    const { data: colCheck, error: colCheckError } = await supabase
+      .from("models")
+      .select("images_generated")
+      .limit(0);
+    hasProgressColumns = !colCheckError;
+  } catch { hasProgressColumns = false; }
+
+  const insertPayload: Record<string, any> = {
+    user_id: user.id,
+    name,
+    type,
+    tier: userTier,           // ⭐ 记录训练时的 tier
+    status: 'processing',     // 显式设置初始状态
+  };
+  if (hasProgressColumns) {
+    insertPayload.images_generated = 0;
+    insertPayload.total_images = totalImages;
+  }
+  
   const { error: modelError, data } = await supabase
     .from("models")
-    .insert({
-      user_id: user.id,
-      name,
-      type,
-      tier: userTier,           // ⭐ 记录训练时的 tier
-      status: 'processing',     // 显式设置初始状态
-      images_generated: 0,      // 初始 0
-      total_images: totalImages, // 预计总图片数
-    })
+    .insert(insertPayload)
     .select("id")
     .single();
 
