@@ -35,7 +35,27 @@ export function fillPromptTemplate(template: string, type: string): string {
 
 /** ��ȡĳ��λĳ�Ա������ prompt�����滻 {type} ռλ�� */
 export function getTierPrompts(tier: Tier, type: string): PromptTemplate[] {
-  const gender = type === 'woman' ? 'woman' : type === 'man' ? 'man' : (Math.random() < 0.5 ? 'man' : 'woman');
+  // Plan A: Unisex (person) -> 50% man + 50% woman, interleaved
+  if (type === 'person') {
+    const manSrc = TIER_PROMPT_TEMPLATES[tier]['man'];
+    const womanSrc = TIER_PROMPT_TEMPLATES[tier]['woman'];
+    const half = Math.floor(manSrc.length / 2); // 20/30/50 for starter/professional/executive
+    const result: PromptTemplate[] = [];
+    for (let i = 0; i < half; i++) {
+      result.push({
+        text: fillPromptTemplate(manSrc[i].text, 'man'),
+        num_images: manSrc[i].num_images,
+      });
+      result.push({
+        text: fillPromptTemplate(womanSrc[i].text, 'woman'),
+        num_images: womanSrc[i].num_images,
+      });
+    }
+    return result;
+  }
+
+  // man / woman: use respective templates
+  const gender = type === 'woman' ? 'woman' : 'man';
   const templates = TIER_PROMPT_TEMPLATES[tier][gender];
   return templates.map(t => ({
     text: fillPromptTemplate(t.text, type),
