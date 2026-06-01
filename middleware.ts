@@ -2,7 +2,63 @@ import { createServerClient, parseCookieHeader } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+// Rate limiting store (in-memory, per-region, resets on cold start)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const CLEANUP_INTERVAL = 60_000;
+let lastCleanup = Date.now();
+
+function getRateLimitKey(request: NextRequest): string {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || request.headers.get('x-real-ip')
+    || 'unknown';
+  const route = request.nextUrl.pathname;
+  return `${ip}:${route}`;
+}
+
+function getRateLimitConfig(pathname: string): { maxRequests: number; windowMs: number } {
+  if (pathname.startsWith('/api/')) return { maxRequests: 60, windowMs: 60_000 };
+  if (pathname.startsWith('/auth/')) return { maxRequests: 10, windowMs: 60_000 };
+  return { maxRequests: 120, windowMs: 60_000 };
+}
+
+function checkRateLimit(request: NextRequest): { allowed: boolean; retryAfter?: number } {
+  const now = Date.now();
+  if (now - lastCleanup > CLEANUP_INTERVAL) {
+    rateLimitStore.forEach((entry, key) => {
+      if (now > entry.resetTime) rateLimitStore.delete(key);
+    });
+    lastCleanup = now;
+  }
+  const key = getRateLimitKey(request);
+  const config = getRateLimitConfig(request.nextUrl.pathname);
+  const entry = rateLimitStore.get(key);
+  if (!entry || now > entry.resetTime) {
+    rateLimitStore.set(key, { count: 1, resetTime: now + config.windowMs });
+    return { allowed: true };
+  }
+  entry.count++;
+  if (entry.count > config.maxRequests) {
+    return { allowed: false, retryAfter: Math.ceil((entry.resetTime - now) / 1000) };
+  }
+  return { allowed: true };
+}
+
 export async function middleware(request: NextRequest) {
+  // Rate limiting — check before any processing
+  const rateLimitResult = checkRateLimit(request);
+  if (!rateLimitResult.allowed) {
+    return new NextResponse(
+      JSON.stringify({ error: 'Too many requests. Please try again later.' }),
+      {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': String(rateLimitResult.retryAfter || 60),
+        },
+      }
+    );
+  }
+
   // 判断是否为 localhost 环境
   const isLocalhost = request.nextUrl.hostname === 'localhost' || request.nextUrl.hostname === '127.0.0.1';
 

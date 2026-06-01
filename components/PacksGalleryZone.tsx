@@ -27,12 +27,13 @@ export default function PacksGalleryZone() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const fetchPacks = async (): Promise<void> => {
+  const fetchPacks = async (signal?: AbortSignal): Promise<void> => {
     try {
       setLoading(true);
-      const response = await axios.get<Pack[]>('/astria/packs');
+      const response = await axios.get<Pack[]>('/astria/packs', { signal });
       setPacks(response.data);
     } catch (err: unknown) {
+      if (axios.isCancel(err)) return;
       if (err instanceof Error) {
         toast({
           title: "Error fetching packs",
@@ -52,7 +53,9 @@ export default function PacksGalleryZone() {
   };
 
   useEffect(() => {
-    fetchPacks();
+    const controller = new AbortController();
+    fetchPacks(controller.signal);
+    return () => controller.abort();
   }, []);
 
   if (loading) {

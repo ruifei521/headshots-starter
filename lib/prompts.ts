@@ -35,7 +35,7 @@ export function fillPromptTemplate(template: string, type: string): string {
 
 /** ��ȡĳ��λĳ�Ա������ prompt�����滻 {type} ռλ�� */
 export function getTierPrompts(tier: Tier, type: string): PromptTemplate[] {
-  const gender = type === 'woman' ? 'woman' : 'man';
+  const gender = type === 'woman' ? 'woman' : type === 'man' ? 'man' : (Math.random() < 0.5 ? 'man' : 'woman');
   const templates = TIER_PROMPT_TEMPLATES[tier][gender];
   return templates.map(t => ({
     text: fillPromptTemplate(t.text, type),

@@ -1,1 +1,20 @@
-{"buildCommand":"rm -rf .next && next build","installCommand":"npm install"}
+{
+  "buildCommand": "rm -rf .next && next build",
+  "installCommand": "npm install",
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "X-RateLimit-Limit", "value": "60" },
+        { "key": "X-RateLimit-Duration", "value": "60" }
+      ]
+    },
+    {
+      "source": "/auth/(.*)",
+      "headers": [
+        { "key": "X-RateLimit-Limit", "value": "10" },
+        { "key": "X-RateLimit-Duration", "value": "60" }
+      ]
+    }
+  ]
+}

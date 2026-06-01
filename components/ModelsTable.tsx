@@ -109,14 +109,14 @@ export default function ModelsTable({ models }: ModelsTableProps) {
               <TableCell>{model.type}</TableCell>
               <TableCell>
                 <div className="flex gap-2 flex-shrink-0 items-center">
-                  {model.samples.slice(0, 3).map((sample) => (
+                  {(model.samples || []).slice(0, 3).map((sample) => (
                     <Avatar key={sample.id}>
                       <AvatarImage src={sample.uri} className="object-cover" />
                     </Avatar>
                   ))}
-                  {model.samples.length > 3 && (
+                  {(model.samples || []).length > 3 && (
                     <Badge className="rounded-full h-10" variant={"outline"}>
-                      +{model.samples.length - 3}
+                      +{(model.samples || []).length - 3}
                     </Badge>
                   )}
                 </div>

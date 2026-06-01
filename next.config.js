@@ -1,5 +1,7 @@
 /** @type {import("next").NextConfig} */
-module.exports = {
+const { withSentryConfig } = require("@sentry/nextjs");
+
+const nextConfig = {
   env: {
     PACK_QUERY_TYPE: 'both',
     NEXT_PUBLIC_TUNE_TYPE: 'packs',
@@ -23,7 +25,7 @@ module.exports = {
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: https: blob:; " +
               "font-src 'self'; " +
-              "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com; " +
+              "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://*.sentry.io; " +
               "frame-src 'none';",
           },
         ],
@@ -85,3 +87,14 @@ module.exports = {
 
   // Static page generation where possible
 };
+
+// Sentry configuration
+module.exports = withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  tunnelRoute: "/monitoring",
+  disableLogger: true,
+  automaticVercelMonitors: true,
+});

@@ -38,8 +38,12 @@ export default async function Navbar() {
       }
     );
 
-    const { data } = await supabase.auth.getUser();
-    user = data.user;
+    try {
+      const { data } = await supabase.auth.getUser();
+      user = data.user;
+    } catch {
+      user = null;
+    }
   }
 
 

@@ -24,6 +24,6 @@ export async function GET(req: NextRequest) {
       email: user?.email || null,
     });
   } catch (e) {
-    return NextResponse.json({ authenticated: false, error: String(e) });
+    return NextResponse.json({ authenticated: false, error: 'Session check failed' });
   }
 }

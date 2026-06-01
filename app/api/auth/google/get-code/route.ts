@@ -8,9 +8,13 @@ export async function GET(req: NextRequest) {
   const error = url.searchParams.get('error');
 
   if (error) {
-    return new Response(`<html><body><h2>Error: ${error}</h2></body></html>`, {
-      status: 200, headers: { 'content-type': 'text/html' }
-    });
+    const errorMessages: Record<string, string> = {
+      'access_denied': 'Google authorization was denied. Please try again and grant the requested permissions.',
+    };
+    const userMessage = errorMessages[error] || `Google authorization failed (${error}). Please try again.`;
+    return NextResponse.redirect(
+      `${url.origin}/login?error=${encodeURIComponent(userMessage)}`
+    );
   }
 
   if (code) {
