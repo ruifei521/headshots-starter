@@ -30,11 +30,16 @@ export default async function RootLayout({
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) {
+    if (!user) {
+      redirect('/login');
+    }
+  } catch {
+    // Supabase 临时不可用 → 重定向到登录页让用户重试
     redirect('/login');
   }
 

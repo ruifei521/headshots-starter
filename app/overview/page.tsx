@@ -4,6 +4,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Metadata } from 'next'
+import { logger } from "@/lib/logger";
 
 export const metadata: Metadata = {
   title: 'Your AI Headshots Dashboard',
@@ -34,22 +35,28 @@ export default async function Index() {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) {
-    return redirect("/login");
+    if (!user) {
+      return redirect("/login");
+    }
+
+    const { data: models } = await supabase
+      .from("models")
+      .select(
+        `*, samples (
+        *
+      )`
+      )
+      .eq("user_id", user.id);
+
+    return <ClientSideModelsList serverModels={models ?? []} />;
+  } catch (e) {
+    // Supabase 临时不可用时优雅降级，防止触发 error.tsx 错误边界
+    logger.error("Overview page: Supabase query failed, showing empty state:", e);
+    return <ClientSideModelsList serverModels={[]} />;
   }
-
-  const { data: models } = await supabase
-    .from("models")
-    .select(
-      `*, samples (
-      *
-    )`
-    )
-    .eq("user_id", user.id);
-
-  return <ClientSideModelsList serverModels={models ?? []} />;
 }

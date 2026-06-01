@@ -326,6 +326,26 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
 
       if (!response.ok) {
         loadingToast.dismiss();
+        
+        // ⭐ 402 = 未付费，引导用户去购买
+        if (response.status === 402) {
+          let message = "You don't have enough credits to start training.";
+          try {
+            const data = await response.json();
+            message = data.message || message;
+          } catch {}
+          toast({
+            title: "No Credits",
+            description: message,
+            duration: 6000,
+          });
+          // 跳转到首页定价区
+          setTimeout(() => {
+            router.push("/#pricing");
+          }, 2000);
+          return;
+        }
+
         let responseMessage = `HTTP error! status: ${response.status}`;
         let responseDetails = '';
         try {
@@ -515,11 +535,11 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
             <div className="outline-dashed outline-2 outline-gray-100 hover:outline-blue-500 w-full min-h-[280px] rounded-md p-8 flex justify-center items-center">
               <input {...getInputProps()} />
               {isDragActive ? (
-                <p className="self-center text-lg font-medium">Upload Photos</p>
+                <p className="self-center text-lg font-medium">Upload Your Photos</p>
               ) : (
                 <div className="flex justify-center flex-col items-center gap-3">
                   <FaImages size={48} className="text-gray-400" />
-                  <p className="text-lg font-medium">Upload Photos</p>
+                  <p className="text-lg font-medium">Upload Your Photos</p>
                   <p className="text-xs text-muted-foreground text-center">
                     PNG、JPG、HEIC、WEBP，最大 120MB · 4-10 images
                   </p>

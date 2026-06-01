@@ -157,18 +157,20 @@ export async function POST(request: Request) {
 
       return NextResponse.json(
         {
+          error: "no_credits",
           message:
-            "Not enough credits, please purchase some credits and try again.",
+            "No credits available. Please purchase a plan to start training.",
         },
-        { status: 500 }
+        { status: 402 }
       );
     } else if (credits[0]?.credits < 1) {
       return NextResponse.json(
         {
+          error: "no_credits",
           message:
-            "Not enough credits, please purchase some credits and try again.",
+            "You've used all your credits. Please purchase more to continue.",
         },
-        { status: 500 }
+        { status: 402 }
       );
     } else {
       // ⭐ 读取用户 tier（向后兼容：无 tier 字段默认 starter）
