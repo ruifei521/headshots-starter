@@ -71,8 +71,6 @@ const nextConfig = {
     ],
     // Allow Next.js Image optimization for local images
     dangerouslyAllowSVG: true,
-    contentDispositionType: 'attachment',
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   compiler: {
