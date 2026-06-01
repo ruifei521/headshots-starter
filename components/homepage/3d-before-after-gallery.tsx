@@ -85,12 +85,12 @@ export default function ThreeDBeforeAfterGallery() {
   return (
     <div className="w-full">
       <div className="text-center mb-8">
-        <div className="mb-6 mx-auto max-w-3xl">
+        <div className="mb-6 mx-auto max-w-5xl rounded-lg border-2 border-sky-100 bg-[#FAFAFA] px-6 py-5 shadow-[0px_0px_75px_0px_rgba(0,0,0,0.07)] sm:px-8">
           <Image
             src="/steps-hero.png"
-            alt="Steps"
-            width={768}
-            height={343}
+            alt="3 simple steps to professional AI headshots: Upload selfies, AI processes photos, Download 100+ headshots"
+            width={956}
+            height={48}
             className="w-full h-auto"
             priority
             unoptimized
