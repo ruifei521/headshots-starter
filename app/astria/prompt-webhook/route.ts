@@ -76,26 +76,23 @@ export async function POST(request: Request) {
     );
   }
 
-  if (user_id) {
-    const expectedToken = crypto
-      .createHmac("sha256", appWebhookSecret)
-      .update(`${user_id}:${model_id}`)
-      .digest("hex");
-
-    if (webhook_token !== expectedToken) {
-      return NextResponse.json(
-        { message: "Unauthorized!" },
-        { status: 401 }
-      );
-    }
-  }
-
   if (!user_id) {
     return NextResponse.json(
-      {
-        message: "Malformed URL, no user_id detected!",
-      },
+      { message: "Malformed URL, no user_id detected!" },
       { status: 500 }
+    );
+  }
+
+  // Verify HMAC token — always verify regardless of user_id state
+  const expectedToken = crypto
+    .createHmac("sha256", appWebhookSecret)
+    .update(`${user_id}:${model_id}`)
+    .digest("hex");
+
+  if (webhook_token !== expectedToken) {
+    return NextResponse.json(
+      { message: "Unauthorized!" },
+      { status: 401 }
     );
   }
 

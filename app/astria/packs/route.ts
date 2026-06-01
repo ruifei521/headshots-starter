@@ -71,9 +71,9 @@ export async function GET(request: Request) {
       endpoints.push(`${DOMAIN}/gallery/packs`);
     }
 
-    // Make concurrent requests
+    // Make concurrent requests with timeout
     const responses = await Promise.all(
-      endpoints.map((url) => axios.get(url, { headers }))
+      endpoints.map((url) => axios.get(url, { headers, timeout: 10000 }))
     );
 
     // Combine the data from both responses

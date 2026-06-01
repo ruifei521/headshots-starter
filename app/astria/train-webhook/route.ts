@@ -74,26 +74,23 @@ export async function POST(request: Request) {
     );
   }
 
-  if (user_id) {
-    const expectedToken = crypto
-      .createHmac("sha256", appWebhookSecret)
-      .update(`${user_id}:${model_id}`)
-      .digest("hex");
-
-    if (webhook_token !== expectedToken) {
-      return NextResponse.json(
-        { message: "Unauthorized!" },
-        { status: 401 }
-      );
-    }
-  }
-
   if (!user_id) {
     return NextResponse.json(
-      {
-        message: "Malformed URL, no user_id detected!",
-      },
+      { message: "Malformed URL, no user_id detected!" },
       { status: 500 }
+    );
+  }
+
+  // Verify HMAC token — always verify regardless of user_id state
+  const expectedToken = crypto
+    .createHmac("sha256", appWebhookSecret)
+    .update(`${user_id}:${model_id}`)
+    .digest("hex");
+
+  if (webhook_token !== expectedToken) {
+    return NextResponse.json(
+      { message: "Unauthorized!" },
+      { status: 401 }
     );
   }
 
@@ -206,28 +203,23 @@ export async function POST(request: Request) {
     // ⭐ 3. 扣减 credits（确保只有训练成功才扣）
     // 之前 credit 扣减在 train-model 中，超时场景会导致扣了但请求可能未到达 Astria
     // 现在统一由 train-webhook 回调确认训练成功后扣减
+    // 使用原子 UPDATE 避免竞态条件：两个 webhook 并发时不会重复扣减
     const paymentIsConfigured = !!(process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true" || process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true");
     if (paymentIsConfigured) {
       try {
-        const { data: currentCredits, error: creditFetchError } = await supabase
-          .from("credits")
-          .select("credits")
-          .eq("user_id", user_id)
-          .single();
+        // Atomic: only decrement if credits > 0
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: updatedCredits, error: updateCreditError } = await (supabase.rpc as any)(
+          'decrement_credits',
+          { p_user_id: user_id }
+        );
 
-        if (!creditFetchError && currentCredits && currentCredits.credits > 0) {
-          const { error: updateCreditError } = await supabase
-            .from("credits")
-            .update({ credits: currentCredits.credits - 1 })
-            .eq("user_id", user_id);
-
-          if (updateCreditError) {
-            logger.error("train-webhook: Failed to deduct credits:", updateCreditError);
-          } else {
-            logger.log(`train-webhook: Credit deducted for user ${user_id}, remaining: ${currentCredits.credits - 1}`);
-          }
+        if (updateCreditError) {
+          logger.error("train-webhook: Failed to deduct credits:", updateCreditError);
+        } else if (updatedCredits !== null && updatedCredits !== undefined) {
+          logger.log(`train-webhook: Credit deducted for user ${user_id}, remaining: ${updatedCredits}`);
         } else {
-          logger.warn(`train-webhook: No credits to deduct for user ${user_id} (credits=${currentCredits?.credits})`);
+          logger.warn(`train-webhook: No credits to deduct for user ${user_id}`);
         }
       } catch (creditErr) {
         // 不阻塞主流程：model 状态已更新，credits 扣减失败仅记录日志

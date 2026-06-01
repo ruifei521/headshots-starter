@@ -396,17 +396,19 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
     } catch (error: any) {
       setIsLoading(false);
       loadingToast.dismiss();
-      // 显示尽可能详细的错误信息
+      // fetch() throws Error with message string; Axios errors have response.data
       const message = error?.response?.data?.message 
         || error?.response?.data?.error 
         || error?.message 
         || "Upload failed";
-      // 在控制台打印完整错误对象，方便 Vercel 日志排查
-      logger.error("=== TRAIN MODEL CATCH ===");
-      logger.error("Error message:", error?.message);
-      logger.error("Error response status:", error?.response?.status);
-      logger.error("Error response data:", error?.response?.data);
-      logger.error("Full error object:", error);
+      // Log full error for Vercel debugging
+      console.error("=== TRAIN MODEL CATCH ===");
+      console.error("Error message:", error?.message);
+      if (error?.response) {
+        console.error("Error response status:", error.response.status);
+        console.error("Error response data:", error.response.data);
+      }
+      console.error("Full error:", error);
       
       toast({
         title: "Train Failed",
