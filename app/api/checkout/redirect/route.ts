@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { logger } from "@/lib/logger";
 
 const CREEM_API_KEY = process.env.CREEM_API_KEY!;
 const CREEM_API_BASE = 'https://api.creem.io/v1';
@@ -48,7 +49,7 @@ export async function GET(req: NextRequest) {
 
     if (!res.ok) {
       const err = await res.text();
-      console.error('CREEM error:', res.status, err);
+      logger.error('CREEM error:', res.status, err);
       return NextResponse.redirect(new URL(`/packs/${pack}.html?error=payment_error`, req.url));
     }
 
@@ -88,7 +89,7 @@ export async function GET(req: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Checkout redirect error:', error);
+    logger.error('Checkout redirect error:', error);
     return NextResponse.redirect(new URL('/packs?error=server_error', req.url));
   }
 }

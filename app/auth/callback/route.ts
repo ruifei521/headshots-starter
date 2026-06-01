@@ -1,5 +1,6 @@
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 
 export async function GET(req: NextRequest) {
   const requestUrl = new URL(req.url);
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
 
   // 如果 Supabase 直接返回错误
   if (error) {
-    console.error("Supabase error:", error, errorDescription);
+    logger.error("Supabase error:", error, errorDescription);
     return NextResponse.redirect(
       `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
     );
@@ -68,12 +69,12 @@ export async function GET(req: NextRequest) {
       name.includes('code-verifier') || name.includes('code_verifier')
     );
     if (!hasCodeVerifier) {
-      console.warn("⚠️ code_verifier cookie NOT found! This will likely cause PKCE exchange to fail.");
-      console.warn("Possible causes:");
-      console.warn("  - Link opened in a different browser/in-app browser");
-      console.warn("  - Browser cookies were cleared");
-      console.warn("  - Incognito/private window");
-      console.warn("  - Middleware cleared the cookie (should be fixed by skipping /auth/ in middleware)");
+      logger.warn("⚠️ code_verifier cookie NOT found! This will likely cause PKCE exchange to fail.");
+      logger.warn("Possible causes:");
+      logger.warn("  - Link opened in a different browser/in-app browser");
+      logger.warn("  - Browser cookies were cleared");
+      logger.warn("  - Incognito/private window");
+      logger.warn("  - Middleware cleared the cookie (should be fixed by skipping /auth/ in middleware)");
     }
 
     const { supabase, res } = createSupabaseClient();
@@ -81,8 +82,8 @@ export async function GET(req: NextRequest) {
     const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
     if (exchangeError) {
-      console.error("PKCE exchange failed:", exchangeError.message);
-      console.error("Error details:", JSON.stringify({
+      logger.error("PKCE exchange failed:", exchangeError.message);
+      logger.error("Error details:", JSON.stringify({
         message: exchangeError.message,
         status: exchangeError.status,
         name: exchangeError.name,
@@ -92,11 +93,11 @@ export async function GET(req: NextRequest) {
       let userMessage = 'Login link expired or invalid. Please try again.';
       if (exchangeError.message.includes('code challenge') || exchangeError.message.includes('code verifier')) {
         userMessage = 'Your login session has expired. Please request a new magic link.';
-        console.error("Root cause: PKCE code verifier cookie was lost or expired. This can happen if:");
-        console.error("  - The link was opened in a different browser");
-        console.error("  - Browser cookies were cleared between sending the link and clicking it");
-        console.error("  - The link was opened in an incognito/private window");
-        console.error("  - Cookie SameSite settings blocked the verifier cookie");
+        logger.error("Root cause: PKCE code verifier cookie was lost or expired. This can happen if:");
+        logger.error("  - The link was opened in a different browser");
+        logger.error("  - Browser cookies were cleared between sending the link and clicking it");
+        logger.error("  - The link was opened in an incognito/private window");
+        logger.error("  - Cookie SameSite settings blocked the verifier cookie");
       }
 
       return NextResponse.redirect(
@@ -121,7 +122,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (verifyError) {
-      console.error("verifyOtp (email+token) failed:", verifyError.message);
+      logger.error("verifyOtp (email+token) failed:", verifyError.message);
       return NextResponse.redirect(
         `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
       );
@@ -140,7 +141,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (verifyError) {
-      console.error("token_hash verify failed:", verifyError.message);
+      logger.error("token_hash verify failed:", verifyError.message);
       return NextResponse.redirect(
         `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
       );
@@ -159,7 +160,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (verifyError) {
-      console.error("plain token verify failed:", verifyError.message);
+      logger.error("plain token verify failed:", verifyError.message);
       return NextResponse.redirect(
         `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
       );

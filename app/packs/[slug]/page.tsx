@@ -1,6 +1,7 @@
 "use client"; // v5 - male/female cover selection + single $29 price → direct checkout
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -152,12 +153,16 @@ function GenderCoverCard({ title, img, count, packSlug, gender }: {
     <div className="group relative flex flex-col rounded-2xl border bg-white overflow-hidden shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 max-w-xs w-full">
       {/* Cover image */}
       <div className="relative overflow-hidden">
-        <img
-          src={`/packs/${img}`}
-          alt={`${title} headshot preview`}
-          className="w-full aspect-[3/4] object-cover transition-transform duration-300 group-hover:scale-105"
-          onError={(e) => { (e.target as HTMLImageElement).src = `/packs/${packSlug}_1.webp`; }}
-        />
+        <div className="relative w-full aspect-[3/4]">
+          <Image
+            src={`/packs/${img}`}
+            alt={`${title} headshot preview`}
+            fill
+            sizes="(max-width: 768px) 100vw, 300px"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={(e) => { (e.target as HTMLImageElement).src = `/packs/${packSlug}_1.webp`; }}
+          />
+        </div>
         {/* Gender label overlay */}
         <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-4 pb-3 pt-8">
           <span className="text-white text-lg font-semibold">{title}</span>
@@ -271,13 +276,15 @@ export default function PackDetail({ params }: { params: { slug: string } }) {
                 }
                 return imgs.map((src, i) => (
                   <div key={i} className="rounded-xl overflow-hidden shadow-sm">
-                    <img
-                      src={src}
-                      alt={`Preview ${i + 1}`}
-                      className="w-full aspect-[3/4] object-cover"
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    <div className="relative w-full aspect-[3/4]">
+                      <Image
+                        src={src}
+                        alt={`Preview ${i + 1}`}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 200px"
+                        className="object-cover"
+                      />
+                    </div>
                   </div>
                 ));
               })()}

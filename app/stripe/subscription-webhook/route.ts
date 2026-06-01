@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { streamToString } from "@/lib/utils";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +14,11 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl) {
-  console.warn("MISSING NEXT_PUBLIC_SUPABASE_URL - stripe-webhook will not function.");
+  logger.warn("MISSING NEXT_PUBLIC_SUPABASE_URL - stripe-webhook will not function.");
 }
 
 if (!supabaseServiceRoleKey) {
-  console.warn("MISSING SUPABASE_SERVICE_ROLE_KEY - stripe-webhook will not function.");
+  logger.warn("MISSING SUPABASE_SERVICE_ROLE_KEY - stripe-webhook will not function.");
 }
 
 const oneCreditPriceId = process.env.STRIPE_PRICE_ID_ONE_CREDIT as string;
@@ -76,7 +77,7 @@ export async function POST(request: Request) {
     event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret!);
   } catch (err) {
     const error = err as Error;
-    console.log("Error verifying webhook signature: " + error.message);
+    logger.log("Error verifying webhook signature: " + error.message);
     return NextResponse.json(
       {
         message: `Webhook Error: ${error?.message}`,
@@ -138,7 +139,7 @@ export async function POST(request: Request) {
           .eq("user_id", userId);
 
         if (error) {
-          console.log(error);
+          logger.log(error);
           return NextResponse.json(
             {
               message: `Error updating credits: ${JSON.stringify(error)}. data=${data}`,
@@ -163,7 +164,7 @@ export async function POST(request: Request) {
         });
 
         if (error) {
-          console.log(error);
+          logger.log(error);
           return NextResponse.json(
             {
               message: `Error creating credits: ${error}\n ${data}`,

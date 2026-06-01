@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import * as crypto from "crypto";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -13,24 +14,27 @@ const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const appWebhookSecret = process.env.APP_WEBHOOK_SECRET;
 
 if (!resendApiKey) {
-  console.warn(
+  logger.warn(
     "We detected that the RESEND_API_KEY is missing from your environment variables. The app should still work but email notifications will not be sent. Please add your RESEND_API_KEY to your environment variables if you want to enable email notifications."
   );
 }
 
 if (!supabaseUrl) {
-  console.warn("MISSING NEXT_PUBLIC_SUPABASE_URL - prompt-webhook will not function.");
+  logger.warn("MISSING NEXT_PUBLIC_SUPABASE_URL - prompt-webhook will not function.");
 }
 
 if (!supabaseServiceRoleKey) {
-  console.warn("MISSING SUPABASE_SERVICE_ROLE_KEY - prompt-webhook will not function.");
-}
-
-if (!appWebhookSecret) {
-  console.warn("MISSING APP_WEBHOOK_SECRET - prompt-webhook will not function.");
+  logger.warn("MISSING SUPABASE_SERVICE_ROLE_KEY - prompt-webhook will not function.");
 }
 
 export async function POST(request: Request) {
+  // ⭐ 强制鉴权：webhook 必须配置 APP_WEBHOOK_SECRET，防止外部攻击者伪造回调
+  if (!appWebhookSecret) {
+    return NextResponse.json(
+      { message: "Server misconfigured: APP_WEBHOOK_SECRET is not set." },
+      { status: 500 }
+    );
+  }
   type PromptData = {
     id: number;
     text: string;
@@ -48,7 +52,7 @@ export async function POST(request: Request) {
 
   const { prompt } = incomingData;
 
-  console.log(`Prompt webhook: prompt_id=${prompt.id}, tune_id=${prompt.tune_id}, images=${prompt.images?.length || 0}`);
+  logger.log(`Prompt webhook: prompt_id=${prompt.id}, tune_id=${prompt.tune_id}, images=${prompt.images?.length || 0}`);
 
   const urlObj = new URL(request.url);
   const user_id = urlObj.searchParams.get("user_id");
@@ -64,27 +68,25 @@ export async function POST(request: Request) {
    );
   }  
 
-  // HMAC 验证
-  if (appWebhookSecret) {
-    if (!webhook_token) {
+  // ⭐ HMAC 签名验证（强制，appWebhookSecret 已在 POST 入口保证存在）
+  if (!webhook_token) {
+    return NextResponse.json(
+      { message: "Malformed URL, no webhook_token detected!" },
+      { status: 500 }
+    );
+  }
+
+  if (user_id) {
+    const expectedToken = crypto
+      .createHmac("sha256", appWebhookSecret)
+      .update(`${user_id}:${model_id}`)
+      .digest("hex");
+
+    if (webhook_token !== expectedToken) {
       return NextResponse.json(
-        { message: "Malformed URL, no webhook_token detected!" },
-        { status: 500 }
+        { message: "Unauthorized!" },
+        { status: 401 }
       );
-    }
-
-    if (user_id) {
-      const expectedToken = crypto
-        .createHmac("sha256", appWebhookSecret)
-        .update(`${user_id}:${model_id}`)
-        .digest("hex");
-
-      if (webhook_token !== expectedToken) {
-        return NextResponse.json(
-          { message: "Unauthorized!" },
-          { status: 401 }
-        );
-      }
     }
   }
 
@@ -145,7 +147,7 @@ export async function POST(request: Request) {
       .single();
 
     if (modelError) {
-      console.error({ modelError });
+      logger.error({ modelError });
       return NextResponse.json(
         {
           message: "Something went wrong!",
@@ -169,7 +171,7 @@ export async function POST(request: Request) {
             .maybeSingle();
 
           if (existing) {
-            console.log(`Prompt webhook: skipping duplicate image for model ${model.id}`);
+            logger.log(`Prompt webhook: skipping duplicate image for model ${model.id}`);
             return; // 已存在，跳过
           }
 
@@ -179,12 +181,12 @@ export async function POST(request: Request) {
           });
 
           if (imageError) {
-            console.error(`Prompt webhook: failed to insert image for model ${model.id}:`, imageError);
+            logger.error(`Prompt webhook: failed to insert image for model ${model.id}:`, imageError);
           } else {
             savedCount++;
           }
         } catch (err) {
-          console.error(`Prompt webhook: error processing image for model ${model.id}:`, err);
+          logger.error(`Prompt webhook: error processing image for model ${model.id}:`, err);
         }
       })
     );
@@ -204,9 +206,9 @@ export async function POST(request: Request) {
         .eq("id", Number(model.id));
 
       if (updateError) {
-        console.error(`Prompt webhook: failed to update images_generated for model ${model.id}:`, updateError);
+        logger.error(`Prompt webhook: failed to update images_generated for model ${model.id}:`, updateError);
       } else {
-        console.log(`Prompt webhook: model ${model.id} progress ${newCount}/${model.total_images || '?'}`);
+        logger.log(`Prompt webhook: model ${model.id} progress ${newCount}/${model.total_images || '?'}`);
 
         // ⭐ 完成检测：达标时标记 model.status = "completed" + 发送邮件
         // 幂等保护：model.status 已是 "completed" 时跳过，避免重复发邮件
@@ -221,12 +223,12 @@ export async function POST(request: Request) {
             .eq("id", Number(model.id));
 
           if (completeError) {
-            console.error(
+            logger.error(
               `Prompt webhook: failed to mark model ${model.id} as completed:`,
               completeError
             );
           } else {
-            console.log(
+            logger.log(
               `Prompt webhook: model ${model.id} COMPLETED — ${newCount}/${model.total_images} images ready!`
             );
 
@@ -241,7 +243,7 @@ export async function POST(request: Request) {
                   html: `<h2>Great news! Your ${newCount} AI headshots have been generated successfully.</h2><p>Visit your <a href="https://snapprohead.com/overview">dashboard</a> to view and download your headshots.</p>`,
                 });
               } catch (emailErr) {
-                console.error(
+                logger.error(
                   `Prompt webhook: failed to send completion email for model ${model.id}:`,
                   emailErr
                 );
@@ -259,7 +261,7 @@ export async function POST(request: Request) {
       { status: 200, statusText: "Success" }
     );
   } catch (e) {
-    console.error(e);
+    logger.error(e);
     return NextResponse.json(
       {
         message: "Something went wrong!",

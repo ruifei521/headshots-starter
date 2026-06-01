@@ -4,6 +4,7 @@ import { Database } from "@/types/supabase";
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { logger } from "@/lib/logger";
 
 /**
  * Handles Supabase auth redirects that land on the root URL.
@@ -60,7 +61,7 @@ export function HashAuthHandler() {
         try {
           const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) {
-            console.error("[HashAuthHandler] ✗ PKCE exchange error:", exchangeError);
+            logger.error("[HashAuthHandler] ✗ PKCE exchange error:", exchangeError);
             window.location.href = `/login?error=${encodeURIComponent("Login link expired or invalid. Please try again.")}`;
             return;
           }
@@ -69,7 +70,7 @@ export function HashAuthHandler() {
           router.push(getPostLoginUrl());
           return;
         } catch (err) {
-          console.error("[HashAuthHandler] ✗ PKCE exchange unexpected error:", err);
+          logger.error("[HashAuthHandler] ✗ PKCE exchange unexpected error:", err);
           window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
           return;
         } finally {
@@ -89,7 +90,7 @@ export function HashAuthHandler() {
       const error = hashParams.get("error");
       const errorDescription = hashParams.get("error_description");
       if (error) {
-        console.error("[HashAuthHandler] ✗ Auth error in hash:", error, errorDescription);
+        logger.error("[HashAuthHandler] ✗ Auth error in hash:", error, errorDescription);
         window.location.hash = "";
         router.push(`/login?error=${encodeURIComponent(errorDescription || error)}`);
         return;
@@ -112,7 +113,7 @@ export function HashAuthHandler() {
         });
 
         if (sessionError) {
-          console.error("[HashAuthHandler] ✗ Set session error:", sessionError);
+          logger.error("[HashAuthHandler] ✗ Set session error:", sessionError);
           window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
           return;
         }
@@ -120,7 +121,7 @@ export function HashAuthHandler() {
         window.location.hash = "";
         router.push(getPostLoginUrl());
       } catch (err) {
-        console.error("[HashAuthHandler] ✗ Unexpected error:", err);
+        logger.error("[HashAuthHandler] ✗ Unexpected error:", err);
         window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
         return;
       } finally {

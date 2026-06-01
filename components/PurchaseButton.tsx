@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Loader2, CreditCard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type Tier, isTier } from "@/lib/tiers";
+import { logger } from "@/lib/logger";
 
 interface PurchaseButtonProps {
   packSlug: string;
@@ -49,12 +50,12 @@ export default function PurchaseButton({ packSlug, tier, gender }: PurchaseButto
         // Redirect to Creem checkout
         window.location.href = data.url;
       } else {
-        console.error("No checkout URL returned");
+        logger.error("No checkout URL returned");
         // Fallback: go directly to train page
         router.push(`/overview/models/train/${packSlug}`);
       }
     } catch (err) {
-      console.error("Purchase error:", err);
+      logger.error("Purchase error:", err);
       router.push(`/overview/models/train/${packSlug}`);
     }
   }

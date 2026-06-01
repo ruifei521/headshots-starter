@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { getCreemProductId, isTier, type Tier } from '@/lib/tiers';
+import { logger } from "@/lib/logger";
 
 const CREEM_API_KEY = process.env.CREEM_API_KEY!;
 const CREEM_API_BASE = 'https://api.creem.io/v1';
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error('CREEM checkout API error:', response.status, errorBody);
+      logger.error('CREEM checkout API error:', response.status, errorBody);
       return NextResponse.json(
         { error: 'CREEM API error' },
         { status: 502 }
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
     const checkoutUrl = data.checkout_url || data.url;
     
     if (!checkoutUrl) {
-      console.error('CREEM checkout response missing URL:', JSON.stringify(data));
+      logger.error('CREEM checkout response missing URL:', JSON.stringify(data));
       return NextResponse.json(
         { error: 'CREEM did not return a checkout URL' },
         { status: 502 }
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: checkoutUrl });
 
   } catch (error) {
-    console.error('Checkout error:', error);
+    logger.error('Checkout error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

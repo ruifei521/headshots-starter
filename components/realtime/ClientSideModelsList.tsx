@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FaImages } from "react-icons/fa";
 import ModelsTable from "../ModelsTable";
+import { logger } from "@/lib/logger";
 
 const packsIsEnabled = false; // ⭐ 不再使用 Pack 选择，直接进入训练
 
@@ -30,7 +31,7 @@ export default function ClientSideModelsList({
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
     } catch (e) {
-      console.error("Failed to create Supabase client:", e);
+      logger.error("Failed to create Supabase client:", e);
       setError("Failed to connect to database. Please try again later.");
       return null;
     }
@@ -63,13 +64,13 @@ export default function ClientSideModelsList({
               return [...dedupedModels, newModel];
             });
           } catch (e) {
-            console.error("Realtime update error:", e);
+            logger.error("Realtime update error:", e);
           }
         }
       )
       .subscribe((status, err) => {
         if (err) {
-          console.error("Realtime subscription error:", err);
+          logger.error("Realtime subscription error:", err);
         }
       });
 

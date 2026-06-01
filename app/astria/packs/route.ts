@@ -3,6 +3,7 @@ import axios from "axios";
 import { Database } from "@/types/supabase";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
+import { logger } from "@/lib/logger";
 
 // Set dynamic route handling
 export const dynamic = "force-dynamic";
@@ -15,7 +16,7 @@ const DOMAIN = "https://api.astria.ai";
 // Check if API Key is missing (runtime check to avoid build failure)
 export async function GET(request: Request) {
   if (!API_KEY) {
-    console.error("MISSING ASTRIA_API_KEY - packs endpoint unavailable");
+    logger.error("MISSING ASTRIA_API_KEY - packs endpoint unavailable");
     return NextResponse.json(
       { message: "Service unavailable" },
       { status: 503 }
@@ -102,7 +103,7 @@ export async function GET(request: Request) {
       tag: pack.tag_category || '',
     })));
   } catch (error) {
-    console.error("Error fetching packs:", error);
+    logger.error("Error fetching packs:", error);
 
     // Return error response
     return NextResponse.json(

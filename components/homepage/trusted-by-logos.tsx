@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function TrustedByLogos() {
   return (
     <div className="w-full py-6">
@@ -5,11 +7,13 @@ export default function TrustedByLogos() {
         Trusted by professionals and teams
       </p>
       <div className="flex justify-center px-4">
-        <img
+        <Image
           src="/trusted-by-logos.png"
           alt="Trusted by professionals and teams"
+          width={800}
+          height={80}
           className="max-w-full h-auto opacity-70 hover:opacity-100 transition-opacity"
-          loading="lazy"
+          priority
         />
       </div>
     </div>

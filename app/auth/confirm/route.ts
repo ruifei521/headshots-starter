@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { logger } from "@/lib/logger";
 
 export const dynamic = 'force-dynamic';
 
@@ -34,14 +35,14 @@ export async function GET(req: NextRequest) {
     });
 
     if (error) {
-      console.error('Email verification failed:', error.message);
+      logger.error('Email verification failed:', error.message);
       return NextResponse.redirect(new URL('/login?error=verification_failed', req.url));
     }
 
     // Success — redirect to overview
     return NextResponse.redirect(new URL('/overview', req.url));
   } catch (e) {
-    console.error('Auth confirm error:', e);
+    logger.error('Auth confirm error:', e);
     return NextResponse.redirect(new URL('/login?error=server_error', req.url));
   }
 }

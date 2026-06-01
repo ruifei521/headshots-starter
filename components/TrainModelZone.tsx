@@ -28,6 +28,7 @@ import { ImageInspectionResult, aggregateCharacteristics } from "@/lib/imageInsp
 import { TIERS, isTier, type Tier } from "@/lib/tiers";
 import { createBrowserClient } from "@supabase/ssr";
 import Image from "next/image";
+import { logger } from "@/lib/logger";
 
 type FormInput = z.infer<typeof fileUploadFormSchema>;
 
@@ -247,7 +248,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       }
     } catch (e) {
       // Credit check failed — continue anyway (server will validate)
-      console.warn("Credit pre-check failed, will validate server-side:", e);
+      logger.warn("Credit pre-check failed, will validate server-side:", e);
     }
 
     setIsLoading(true);
@@ -381,11 +382,11 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         || error?.message 
         || "Upload failed";
       // 在控制台打印完整错误对象，方便 Vercel 日志排查
-      console.error("=== TRAIN MODEL CATCH ===");
-      console.error("Error message:", error?.message);
-      console.error("Error response status:", error?.response?.status);
-      console.error("Error response data:", error?.response?.data);
-      console.error("Full error object:", error);
+      logger.error("=== TRAIN MODEL CATCH ===");
+      logger.error("Error message:", error?.message);
+      logger.error("Error response status:", error?.response?.status);
+      logger.error("Error response data:", error?.response?.data);
+      logger.error("Full error object:", error);
       
       toast({
         title: "Train Failed",

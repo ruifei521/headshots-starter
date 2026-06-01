@@ -4,6 +4,7 @@ import { Database } from "@/types/supabase";
 import { creditsRow } from "@/types/utils";
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useRef, useState } from "react";
+import { logger } from "@/lib/logger";
 
 export const revalidate = 0;
 
@@ -29,7 +30,7 @@ export default function ClientSideCredits({
       supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
       supabaseRef.current = supabase;
     } catch (e) {
-      console.error("Failed to create Supabase client for credits:", e);
+      logger.error("Failed to create Supabase client for credits:", e);
       return;
     }
 
@@ -44,7 +45,7 @@ export default function ClientSideCredits({
       )
       .subscribe((status, err) => {
         if (err) {
-          console.error("Credits subscription error:", err);
+          logger.error("Credits subscription error:", err);
         }
       });
 

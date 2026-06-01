@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getTrainingConfig, isTier } from "@/lib/tiers";
 import { getTierPrompts } from "@/lib/prompts";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30; // Extend Vercel timeout for Astria API call
@@ -20,7 +21,7 @@ const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
 const paymentIsConfigured = stripeIsConfigured || creemIsConfigured;
 
 if (!appWebhookSecret) {
-  console.warn("MISSING APP_WEBHOOK_SECRET - train-model webhook will not function.");
+  logger.warn("MISSING APP_WEBHOOK_SECRET - train-model webhook will not function.");
 }
 
 /** 生成 HMAC-SHA256 webhook token，避免明文 secret 出现在 URL 中 */
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
   try {
     payload = await request.json();
   } catch (e) {
-    console.error("Failed to parse request JSON:", e);
+    logger.error("Failed to parse request JSON:", e);
     return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
   }
   
@@ -125,7 +126,7 @@ export async function POST(request: Request) {
       .eq("user_id", user.id);
 
     if (creditError) {
-      console.error({ creditError });
+      logger.error({ creditError });
       return NextResponse.json(
         {
           message: "Something went wrong!",
@@ -145,7 +146,7 @@ export async function POST(request: Request) {
         });
 
       if (errorCreatingCredits) {
-        console.error({ errorCreatingCredits });
+        logger.error({ errorCreatingCredits });
         return NextResponse.json(
           {
             message: "Something went wrong!",
@@ -172,14 +173,14 @@ export async function POST(request: Request) {
     } else {
       // ⭐ 读取用户 tier（向后兼容：无 tier 字段默认 starter）
       userTier = credits[0]?.tier || 'starter';
-      console.log(`User ${user.id} tier: ${userTier}`);
+      logger.log(`User ${user.id} tier: ${userTier}`);
     }
   }
 
   // ⭐ 根据 tier 决定训练配置
   const trainingConfig = getTrainingConfig(isTier(userTier) ? userTier : 'starter');
 
-  console.log(`Training config: branch=${trainingConfig.branch}, tier=${userTier}`);
+  logger.log(`Training config: branch=${trainingConfig.branch}, tier=${userTier}`);
 
   // ⭐ 计算 total_images（从 prompts 数量得出）
   // 这里先算一次用于 model.insert，正式值后面 promptsAttributes 生成后对齐
@@ -204,7 +205,7 @@ export async function POST(request: Request) {
     .single();
 
   if (modelError) {
-    console.error("modelError: ", modelError);
+    logger.error("modelError: ", modelError);
     return NextResponse.json(
       {
         message: modelError.message || "Failed to create model record.",
@@ -248,7 +249,7 @@ export async function POST(request: Request) {
       num_images: t.num_images,
     }));
 
-    console.log(`Creating tune with ${promptsAttributes.length} prompts for tier=${effectiveTierForCount} (${totalImages} images)`);
+    logger.log(`Creating tune with ${promptsAttributes.length} prompts for tier=${effectiveTierForCount} (${totalImages} images)`);
 
     // Create a fine tuned model using Astria tune API
     // Flux 使用 LoRA 微调
@@ -287,7 +288,7 @@ export async function POST(request: Request) {
     const { status, data: astriaData } = response;
 
     if (status !== 201) {
-      console.error("Astria API error - status:", status, "response:", astriaData);
+      logger.error("Astria API error - status:", status, "response:", astriaData);
       // Rollback: Delete the created model if something goes wrong
       if (modelId) {
         await supabase.from("models").delete().eq("id", modelId);
@@ -310,7 +311,7 @@ export async function POST(request: Request) {
     );
 
     if (samplesError) {
-      console.error("samplesError: ", samplesError);
+      logger.error("samplesError: ", samplesError);
       return NextResponse.json(
         {
           message: samplesError.message || "Failed to save image samples.",
@@ -322,11 +323,11 @@ export async function POST(request: Request) {
     // ⭐ credits 扣减移到 train-webhook（确保只有训练成功才扣）
     // 之前在此处扣减，但超时场景下 Astria 可能实际排队了但响应未到
   } catch (e: any) {
-    console.error("Train model error:", e);
+    logger.error("Train model error:", e);
     // ⭐ Axios 超时（ECONNABORTED）：请求已发出但 Astria 响应慢，Vercel Hobby 10s 限制
     // 保留 model 行，标记为 pending — train-webhook 回调时会更新为 finished + 扣 credits
     if (e?.code === 'ECONNABORTED' || e?.message?.includes('timeout')) {
-      console.warn("Astria request timed out (likely queued successfully) — setting status=pending");
+      logger.warn("Astria request timed out (likely queued successfully) — setting status=pending");
       if (modelId) {
         await supabase
           .from("models")
@@ -340,8 +341,8 @@ export async function POST(request: Request) {
     }
     // 🔍 Astria 422/400 等错误 — 打印完整响应体用于排查
     if (e?.response) {
-      console.error("Astria response status:", e.response.status);
-      console.error("Astria response data:", JSON.stringify(e.response.data, null, 2));
+      logger.error("Astria response status:", e.response.status);
+      logger.error("Astria response data:", JSON.stringify(e.response.data, null, 2));
     }
     // Rollback: Delete the created model if something goes wrong
     if (modelId) {

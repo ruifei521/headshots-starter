@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import { Database } from '@/types/supabase';
+import { logger } from "@/lib/logger";
 
 export const dynamic = 'force-dynamic';
 
@@ -84,7 +85,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       });
 
     if (error) {
-      console.error('Storage upload error:', error);
+      logger.error('Storage upload error:', error);
       return NextResponse.json(
         { error: `Upload failed: ${error.message}` },
         { status: 500 }
@@ -101,7 +102,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       path: data.path,
     });
   } catch (error) {
-    console.error('Upload error:', error);
+    logger.error('Upload error:', error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 }

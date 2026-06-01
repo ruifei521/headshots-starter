@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from "next/image";
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
 
@@ -34,19 +35,19 @@ export default async function Index({
             <h4 className="font-bold text-lg mb-3">Good examples</h4>
             <div className="flex gap-3 mb-4">
               <div className="relative">
-                <img src="/howto/good-1.avif" alt="Good example" className="max-w-full h-auto rounded max-h-36" />
+                <Image src="/howto/good-1.avif" alt="Good example" width={200} height={144} className="max-w-full h-auto rounded max-h-36" />
                 <svg className="absolute top-1 left-1 w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div className="relative">
-                <img src="/howto/good-2.avif" alt="Good example" className="max-w-full h-auto rounded max-h-36" />
+                <Image src="/howto/good-2.avif" alt="Good example" width={200} height={144} className="max-w-full h-auto rounded max-h-36" />
                 <svg className="absolute top-1 left-1 w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div className="relative">
-                <img src="/howto/good-3.avif" alt="Good example" className="max-w-full h-auto rounded max-h-36" />
+                <Image src="/howto/good-3.avif" alt="Good example" width={200} height={144} className="max-w-full h-auto rounded max-h-36" />
                 <svg className="absolute top-1 left-1 w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -116,19 +117,19 @@ export default async function Index({
             <h4 className="font-bold text-lg mb-3">Bad examples</h4>
             <div className="flex gap-3 mb-4">
               <div className="relative">
-                <img src="/howto/cropped.avif" alt="Bad example" className="max-w-full h-auto rounded max-h-36" />
+                <Image src="/howto/cropped.avif" alt="Bad example" width={200} height={144} className="max-w-full h-auto rounded max-h-36" />
                 <svg className="absolute top-1 left-1 w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div className="relative">
-                <img src="/howto/funny-faces.avif" alt="Bad example" className="max-w-full h-auto rounded max-h-36" />
+                <Image src="/howto/funny-faces.avif" alt="Bad example" width={200} height={144} className="max-w-full h-auto rounded max-h-36" />
                 <svg className="absolute top-1 left-1 w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div className="relative">
-                <img src="/howto/sunglasses.avif" alt="Bad example" className="max-w-full h-auto rounded max-h-36" />
+                <Image src="/howto/sunglasses.avif" alt="Bad example" width={200} height={144} className="max-w-full h-auto rounded max-h-36" />
                 <svg className="absolute top-1 left-1 w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -198,16 +199,16 @@ export default async function Index({
           <div>
             <h4 className="font-bold text-base mb-2">Good examples</h4>
             <div className="flex gap-2 mb-2">
-              <img src="/howto/good-1.avif" alt="" className="max-w-full h-auto rounded max-h-20" />
-              <img src="/howto/good-2.avif" alt="" className="max-w-full h-auto rounded max-h-20" />
-              <img src="/howto/good-3.avif" alt="" className="max-w-full h-auto rounded max-h-20" />
+              <Image src="/howto/good-1.avif" alt="" width={100} height={80} className="max-w-full h-auto rounded max-h-20" />
+              <Image src="/howto/good-2.avif" alt="" width={100} height={80} className="max-w-full h-auto rounded max-h-20" />
+              <Image src="/howto/good-3.avif" alt="" width={100} height={80} className="max-w-full h-auto rounded max-h-20" />
             </div>
           </div>
           <div>
             <h4 className="font-bold text-base mb-2">Bad examples</h4>
             <div className="flex gap-2 mb-2">
-              <img src="/howto/funny-faces.avif" alt="" className="max-w-full h-auto rounded max-h-20" />
-              <img src="/howto/sunglasses.avif" alt="" className="max-w-full h-auto rounded max-h-20" />
+              <Image src="/howto/funny-faces.avif" alt="" width={100} height={80} className="max-w-full h-auto rounded max-h-20" />
+              <Image src="/howto/sunglasses.avif" alt="" width={100} height={80} className="max-w-full h-auto rounded max-h-20" />
             </div>
           </div>
         </div>

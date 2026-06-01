@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import https from "https";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -90,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(resultObj);
   } catch (error: any) {
-    console.error("Moderation API error:", error?.message || error);
+    logger.error("Moderation API error:", error?.message || error);
     return NextResponse.json(
       {
         id: "mod-error",

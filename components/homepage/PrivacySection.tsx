@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card"
 
 const features = [
@@ -42,7 +43,7 @@ export default function PrivacySection() {
           {features.map(({ icon, title, description }) => (
             <Card key={title} className="flex flex-col items-center text-center p-6 shadow-md">
               <div className="mb-4">
-                <img src={icon} alt="" className="h-12 w-12" />
+                <Image src={icon} alt="" width={48} height={48} className="h-12 w-12" />
               </div>
               <CardContent className="p-0 space-y-2">
                 <h3 className="text-lg font-bold">{title}</h3>

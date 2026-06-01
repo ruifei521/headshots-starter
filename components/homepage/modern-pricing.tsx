@@ -152,7 +152,7 @@ export default function ModernPricing() {
         <div className="text-center space-y-4">
           {/* 20% off banner */}
           <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-1.5 text-sm font-semibold text-white">
-            🔥 所有套餐8折 — 限时优惠！
+            🔥 20% off all plans — Limited time!
           </div>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
             Professional headshots for{" "}

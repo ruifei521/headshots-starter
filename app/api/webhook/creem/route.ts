@@ -3,6 +3,7 @@ import { Database } from '@/types/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 import * as crypto from 'crypto';
 import { tierFromProductId, maxTier, isTier } from '@/lib/tiers';
+import { logger } from "@/lib/logger";
 
 // 向后兼容：旧 product_id 的 credit 映射
 const CREDITS_PER_PRODUCT: Record<string, number> = {
@@ -25,7 +26,7 @@ function verifySignature(payload: string, signature: string): boolean {
 export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text();
-    console.log('CREEM webhook received');
+    logger.log('CREEM webhook received');
 
     // Verify signature
     const signature = req.headers.get('creem-signature') || '';
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
     try {
       body = JSON.parse(rawBody);
     } catch {
-      console.error('Invalid JSON body');
+      logger.error('Invalid JSON body');
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
@@ -64,15 +65,15 @@ export async function POST(req: NextRequest) {
 
     // Only process checkout.completed events
     if (eventType !== 'checkout.completed') {
-      console.log(`Skipping non-checkout event: ${eventType}`);
+      logger.log(`Skipping non-checkout event: ${eventType}`);
       return NextResponse.json({ received: true });
     }
 
     if (!isValid) {
-      console.error('CREEM webhook signature verification failed — rejecting request');
+      logger.error('CREEM webhook signature verification failed — rejecting request');
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
-    console.log('Webhook signature verified ✓');
+    logger.log('Webhook signature verified ✓');
 
     // Extract user ID from request_id
     let referenceId: string | null = null;
@@ -83,7 +84,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!referenceId) {
-      console.warn('No request_id found in webhook payload');
+      logger.warn('No request_id found in webhook payload');
       return NextResponse.json({ received: true });
     }
 
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     // ⭐ product_id → tier 映射（利用 lib/tiers.ts 统一映射）
     const tier = tierFromProductId(productId);
-    console.log(`Product ${productId} → tier: ${tier}`);
+    logger.log(`Product ${productId} → tier: ${tier}`);
 
     // 向后兼容：旧 product_id 仍使用 CREDITS_PER_PRODUCT
     const creditsToAdd = CREDITS_PER_PRODUCT[productId] || 1;
@@ -134,10 +135,10 @@ export async function POST(req: NextRequest) {
         .eq('user_id', referenceId);
       
       if (error) {
-        console.error('Error updating credits:', error);
+        logger.error('Error updating credits:', error);
         return NextResponse.json({ error: 'Failed to update credits' }, { status: 500 });
       }
-      console.log(`Updated credits for ${referenceId}: ${newCredits} credits, tier=${resolvedTier}`);
+      logger.log(`Updated credits for ${referenceId}: ${newCredits} credits, tier=${resolvedTier}`);
     } else {
       const { error } = await supabase
         .from('credits')
@@ -148,10 +149,10 @@ export async function POST(req: NextRequest) {
         });
       
       if (error) {
-        console.error('Error creating credits:', error);
+        logger.error('Error creating credits:', error);
         return NextResponse.json({ error: 'Failed to create credits' }, { status: 500 });
       }
-      console.log(`Created credits for ${referenceId}: ${creditsToAdd} credits, tier=${tier}`);
+      logger.log(`Created credits for ${referenceId}: ${creditsToAdd} credits, tier=${tier}`);
     }
 
     // ⭐ 2. 写入 orders 表（审计记录）
@@ -173,18 +174,18 @@ export async function POST(req: NextRequest) {
     if (orderError) {
       // 如果是因为重复 creem_checkout_id 导致的错误，不视为失败
       if (orderError.code === '23505') {
-        console.log(`Duplicate checkout_id ${checkoutId}, skipping orders insert`);
+        logger.log(`Duplicate checkout_id ${checkoutId}, skipping orders insert`);
       } else {
-        console.error('Error inserting order:', orderError);
+        logger.error('Error inserting order:', orderError);
         // 不阻塞主流程：credits 已成功更新
       }
     } else {
-      console.log(`Order recorded: checkout=${checkoutId}, tier=${tier}, amount=${amountCents} ${currency}`);
+      logger.log(`Order recorded: checkout=${checkoutId}, tier=${tier}, amount=${amountCents} ${currency}`);
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Webhook error:', error);
+    logger.error('Webhook error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

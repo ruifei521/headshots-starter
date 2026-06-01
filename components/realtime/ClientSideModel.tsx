@@ -9,6 +9,7 @@ import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { Progress } from "../ui/progress";
 import { getTierInfo } from "@/lib/tiers";
+import { logger } from "@/lib/logger";
 
 export const revalidate = 0;
 
@@ -116,7 +117,7 @@ export default function ClientSideModel({
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
     } catch (e) {
-      console.error("ClientSideModel: Failed to create Supabase client:", e);
+      logger.error("ClientSideModel: Failed to create Supabase client:", e);
       return null;
     }
   }, []);

@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import * as crypto from "crypto";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -13,24 +14,27 @@ const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const appWebhookSecret = process.env.APP_WEBHOOK_SECRET;
 
 if (!resendApiKey) {
-  console.warn(
+  logger.warn(
     "We detected that the RESEND_API_KEY is missing from your environment variables. The app should still work but email notifications will not be sent. Please add your RESEND_API_KEY to your environment variables if you want to enable email notifications."
   );
 }
 
 if (!supabaseUrl) {
-  console.warn("MISSING NEXT_PUBLIC_SUPABASE_URL - train-webhook will not function.");
+  logger.warn("MISSING NEXT_PUBLIC_SUPABASE_URL - train-webhook will not function.");
 }
 
 if (!supabaseServiceRoleKey) {
-  console.warn("MISSING SUPABASE_SERVICE_ROLE_KEY - train-webhook will not function.");
-}
-
-if (!appWebhookSecret) {
-  console.warn("MISSING APP_WEBHOOK_SECRET - train-webhook will not function.");
+  logger.warn("MISSING SUPABASE_SERVICE_ROLE_KEY - train-webhook will not function.");
 }
 
 export async function POST(request: Request) {
+  // ⭐ 强制鉴权：webhook 必须配置 APP_WEBHOOK_SECRET，防止外部攻击者伪造回调
+  if (!appWebhookSecret) {
+    return NextResponse.json(
+      { message: "Server misconfigured: APP_WEBHOOK_SECRET is not set." },
+      { status: 500 }
+    );
+  }
   type TuneData = {
     id: number;
     title: string;
@@ -62,27 +66,25 @@ export async function POST(request: Request) {
   }
  
 
-  // HMAC 验证（仅当 appWebhookSecret 配置时）
-  if (appWebhookSecret) {
-    if (!webhook_token) {
+  // ⭐ HMAC 签名验证（强制，appWebhookSecret 已在 POST 入口保证存在）
+  if (!webhook_token) {
+    return NextResponse.json(
+      { message: "Malformed URL, no webhook_token detected!" },
+      { status: 500 }
+    );
+  }
+
+  if (user_id) {
+    const expectedToken = crypto
+      .createHmac("sha256", appWebhookSecret)
+      .update(`${user_id}:${model_id}`)
+      .digest("hex");
+
+    if (webhook_token !== expectedToken) {
       return NextResponse.json(
-        { message: "Malformed URL, no webhook_token detected!" },
-        { status: 500 }
+        { message: "Unauthorized!" },
+        { status: 401 }
       );
-    }
-
-    if (user_id) {
-      const expectedToken = crypto
-        .createHmac("sha256", appWebhookSecret)
-        .update(`${user_id}:${model_id}`)
-        .digest("hex");
-
-      if (webhook_token !== expectedToken) {
-        return NextResponse.json(
-          { message: "Unauthorized!" },
-          { status: 401 }
-        );
-      }
     }
   }
 
@@ -134,17 +136,34 @@ export async function POST(request: Request) {
     // ⭐ 1. 读取 model 信息（仅用于日志）
     const { data: modelData, error: modelFetchError } = await supabase
       .from("models")
-      .select("id, tier, type")
+      .select("id, tier, type, status")
       .eq("id", Number(model_id))
       .single();
 
     if (modelFetchError) {
-      console.error("Error fetching model:", modelFetchError);
+      logger.error("Error fetching model:", modelFetchError);
+    }
+
+    if (!modelData) {
+      logger.error(`Train webhook: Model ${model_id} not found`);
+      return NextResponse.json(
+        { message: "Model not found." },
+        { status: 404 }
+      );
     }
 
     const modelTier: string = modelData?.tier || 'starter';
     const modelType: string = modelData?.type || 'person';
-    console.log(`Train webhook: model_id=${model_id}, tier=${modelTier}, type=${modelType}`);
+    logger.log(`Train webhook: model_id=${model_id}, tier=${modelTier}, type=${modelType}`);
+
+    // ⭐ 幂等保护：如果 model 已经是 finished，说明 webhook 被重复回调，跳过积分扣减
+    if (modelData?.status === 'finished') {
+      logger.log(`Train webhook: Model ${model_id} already finished, skipping (idempotent)`);
+      return NextResponse.json(
+        { message: "success", idempotent: true },
+        { status: 200 }
+      );
+    }
 
     if (resendApiKey) {
       const resend = new Resend(resendApiKey);
@@ -170,7 +189,7 @@ export async function POST(request: Request) {
       .select();
 
     if (modelUpdatedError) {
-      console.error({ modelUpdatedError });
+      logger.error({ modelUpdatedError });
       return NextResponse.json(
         {
           message: "Something went wrong!",
@@ -180,8 +199,8 @@ export async function POST(request: Request) {
     }
 
     if (!modelUpdated) {
-      console.error("No model updated!");
-      console.error({ modelUpdated });
+      logger.error("No model updated!");
+      logger.error({ modelUpdated });
     }
 
     // ⭐ 3. 扣减 credits（确保只有训练成功才扣）
@@ -203,16 +222,16 @@ export async function POST(request: Request) {
             .eq("user_id", user_id);
 
           if (updateCreditError) {
-            console.error("train-webhook: Failed to deduct credits:", updateCreditError);
+            logger.error("train-webhook: Failed to deduct credits:", updateCreditError);
           } else {
-            console.log(`train-webhook: Credit deducted for user ${user_id}, remaining: ${currentCredits.credits - 1}`);
+            logger.log(`train-webhook: Credit deducted for user ${user_id}, remaining: ${currentCredits.credits - 1}`);
           }
         } else {
-          console.warn(`train-webhook: No credits to deduct for user ${user_id} (credits=${currentCredits?.credits})`);
+          logger.warn(`train-webhook: No credits to deduct for user ${user_id} (credits=${currentCredits?.credits})`);
         }
       } catch (creditErr) {
         // 不阻塞主流程：model 状态已更新，credits 扣减失败仅记录日志
-        console.error("train-webhook: Credit deduction error:", creditErr);
+        logger.error("train-webhook: Credit deduction error:", creditErr);
       }
     }
 
@@ -223,7 +242,7 @@ export async function POST(request: Request) {
       { status: 200, statusText: "Success" }
     );
   } catch (e) {
-    console.error(e);
+    logger.error(e);
     return NextResponse.json(
       {
         message: "Something went wrong!",
