@@ -510,24 +510,18 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
           </div>
           <div
             {...getRootProps()}
-            className=" rounded-md justify-center align-middle cursor-pointer flex flex-col gap-4"
+            className="rounded-md justify-center align-middle cursor-pointer flex flex-col gap-4"
           >
-            <FormDescription>
-              Upload 4-10 images of the person you want to generate headshots
-              for.
-            </FormDescription>
-            <div className="outline-dashed outline-2 outline-gray-100 hover:outline-blue-500 w-full h-full rounded-md p-4 flex justify-center align-middle">
+            <div className="outline-dashed outline-2 outline-gray-100 hover:outline-blue-500 w-full min-h-[280px] rounded-md p-8 flex justify-center items-center">
               <input {...getInputProps()} />
               {isDragActive ? (
-                <p className="self-center">Drop the files here ...</p>
+                <p className="self-center text-lg font-medium">Upload Photos</p>
               ) : (
-                <div className="flex justify-center flex-col items-center gap-2">
-                  <FaImages size={32} className="text-gray-700" />
-                  <p className="self-center text-center">
-                    Drag &apos;n&apos; drop your photos here, or click to select files.
-                  </p>
+                <div className="flex justify-center flex-col items-center gap-3">
+                  <FaImages size={48} className="text-gray-400" />
+                  <p className="text-lg font-medium">Upload Photos</p>
                   <p className="text-xs text-muted-foreground text-center">
-                    PNG、JPG、HEIC、WEBP，最大 120MB
+                    PNG、JPG、HEIC、WEBP，最大 120MB · 4-10 images
                   </p>
                 </div>
               )}
