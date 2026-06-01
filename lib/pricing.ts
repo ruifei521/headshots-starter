@@ -23,9 +23,9 @@ export type { Tier, TierInfo } from './tiers';
 
 // 向后兼容：保留单包价格（最低档 Basic）
 export const PRICING = {
-  single: { price: 0.01 },       // Basic
-  professional: { price: 0.01 },
-  executive: { price: 0.01 },
+  single: { price: 1 },       // Basic
+  professional: { price: 1 },
+  executive: { price: 1 },
 } as const;
 
 // 向后兼容：默认产品 ID（旧代码引用 single）
