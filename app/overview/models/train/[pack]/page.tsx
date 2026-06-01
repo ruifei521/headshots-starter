@@ -152,18 +152,18 @@ export default async function Index({
                   <div className="flex flex-col gap-3">
                     <div className="grid grid-cols-3 gap-3">
                       <div className="rounded-lg border p-3 text-center">
-                        <div className="font-bold text-lg">$29</div>
+                        <div className="font-bold text-lg">$0.01</div>
                         <div className="text-xs text-muted-foreground">Starter</div>
                         <div className="text-xs">40 headshots</div>
                       </div>
                       <div className="rounded-lg border-2 border-primary p-3 text-center relative">
                         <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full">Popular</div>
-                        <div className="font-bold text-lg">$39</div>
+                        <div className="font-bold text-lg">$0.01</div>
                         <div className="text-xs text-muted-foreground">Professional</div>
                         <div className="text-xs">60 headshots</div>
                       </div>
                       <div className="rounded-lg border p-3 text-center">
-                        <div className="font-bold text-lg">$59</div>
+                        <div className="font-bold text-lg">$0.01</div>
                         <div className="text-xs text-muted-foreground">Executive</div>
                         <div className="text-xs">100 headshots</div>
                       </div>
