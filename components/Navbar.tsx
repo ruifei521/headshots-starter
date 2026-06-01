@@ -11,30 +11,36 @@ import NavLinks from "./NavLinks";
 export const dynamic = "force-dynamic";
 
 export default async function Navbar() {
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookies().getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            try {
-              cookies().set(name, value, options);
-            } catch {
-              // The `set` method was called from a Server Component.
-            }
-          });
-        },
-      },
-    }
-  );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const isSupabaseConfigured = supabaseUrl && supabaseUrl !== 'your-project-url' && supabaseAnonKey && supabaseAnonKey !== 'your-anon-key'
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null
+  if (isSupabaseConfigured) {
+    const supabase = createServerClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        cookies: {
+          getAll() {
+            return cookies().getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              try {
+                cookies().set(name, value, options);
+              } catch {
+                // The `set` method was called from a Server Component.
+              }
+            });
+          },
+        },
+      }
+    );
+
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  }
 
 
 

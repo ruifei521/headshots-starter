@@ -19,10 +19,6 @@ const WhyAIHeadshotsSection = dynamic(
   () => import("@/components/homepage/WhyAIHeadshotsSection"),
   { ssr: false }
 )
-const ProcessSection = dynamic(
-  () => import("@/components/homepage/ProcessSection"),
-  { ssr: false }
-)
 const PricingSection = dynamic(
   () => import("@/components/homepage/PricingSection"),
   { ssr: false }
@@ -43,33 +39,35 @@ const PrivacySection = dynamic(
 export const revalidate = 3600
 
 export default async function Index() {
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookies().getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookies().set(name, value, options)
-            })
-          } catch {
-            // The `set` method was called from a Server Component.
-          }
-        },
-      },
-    }
-  )
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const isSupabaseConfigured = supabaseUrl && supabaseUrl !== 'your-project-url' && supabaseAnonKey && supabaseAnonKey !== 'your-anon-key'
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  if (isSupabaseConfigured) {
+    const supabase = createServerClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        cookies: {
+          getAll() {
+            return cookies().getAll()
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => {
+                cookies().set(name, value, options)
+              })
+            } catch {
+              // The `set` method was called from a Server Component.
+            }
+          },
+        },
+      }
+    )
 
-  if (user) {
-    // Logged-in users can still view the landing page
+    const { data } = await supabase.auth.getUser()
+    user = data.user
   }
 
   return (
@@ -83,7 +81,6 @@ export default async function Index() {
         <div id="pricing" className="scroll-mt-16">
           <PricingSection />
         </div>
-        <ProcessSection />
         <ExamplesSection />
         <TestimonialsSection />
         <ClosingCtaSection />
