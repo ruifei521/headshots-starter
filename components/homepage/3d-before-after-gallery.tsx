@@ -102,7 +102,7 @@ export default function ThreeDBeforeAfterGallery() {
         </h2>
       </div>
 
-      <div className="relative mx-auto max-w-2xl">
+      <div className="relative mx-auto max-w-xl">
         <div
           ref={containerRef}
           onMouseEnter={() => setIsHovered(true)}
