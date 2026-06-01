@@ -19,7 +19,11 @@ export default function TierComparisonTable() {
   const rows: ComparisonRow[] = [
     {
       label: "Price",
-      values: { starter: "$29 (was $39)", professional: "$39 (was $54)", executive: "$59 (was $79)" },
+      values: {
+        starter: `$${TIERS.starter.price} (was $${TIERS.starter.originalPrice})`,
+        professional: `$${TIERS.professional.price} (was $${TIERS.professional.originalPrice})`,
+        executive: `$${TIERS.executive.price} (was $${TIERS.executive.originalPrice})`,
+      },
     },
     {
       label: "Headshots",
