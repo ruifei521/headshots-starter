@@ -39,6 +39,7 @@ function MarqueeRow({ images, direction = "left", speed = 40 }: { images: string
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               quality={55}
               loading="lazy"
+              unoptimized
             />
             <div className="absolute bottom-0 inset-x-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />
             <div className="absolute bottom-1.5 left-1.5 right-1.5">
