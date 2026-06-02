@@ -346,32 +346,37 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
           return;
         }
 
-        let responseMessage = `HTTP error! status: ${response.status}`;
-        let responseDetails = '';
-        try {
-          const responseData = await response.json();
-          responseMessage = responseData.message || responseMessage;
-          responseDetails = responseData.details || '';
-        } catch {
-          responseMessage = 'Server timeout or error — please try again.';
+        // ⭐ 非 JSON 响应（如 HTML 500 页）防护
+        const contentType = response.headers.get("content-type") || "";
+        let responseMessage = `Server error (HTTP ${response.status})`;
+        let responseDetails = "";
+        
+        if (contentType.includes("application/json")) {
+          try {
+            const responseData = await response.json();
+            responseMessage = responseData.message || responseMessage;
+            responseDetails = responseData.details || "";
+          } catch {
+            responseMessage = "Server error — please try again.";
+          }
+        } else {
+          // HTML 或其他非 JSON 响应
+          try {
+            const text = await response.text();
+            // 尝试从 HTML 中提取错误信息（可选）
+            const match = text.match(/<pre>(.*?)<\/pre>/s) || text.match(/<h1>(.*?)<\/h1>/);
+            responseMessage = match ? match[1].replace(/<[^>]+>/g, "").trim() : `Server error (HTTP ${response.status})`;
+          } catch {
+            responseMessage = `Server error (HTTP ${response.status}) — please try again.`;
+          }
         }
         
-        // 显示详细错误信息
-        const detailedMessage = (
-          <div className="flex flex-col gap-4">
-            <div>{responseMessage}</div>
-            {responseDetails && (
-              <div className="text-sm text-gray-500">
-                Details: {responseDetails}
-              </div>
-            )}
-
-          </div>
-        );
+        // ⭐ 用字符串而非 JSX 作为 description，避免 React 渲染导致 insertBefore 错误
+        const detailText = responseDetails ? `${responseMessage}\nDetails: ${responseDetails}` : responseMessage;
         
         toast({
           title: "Error",
-          description: detailedMessage,
+          description: detailText.substring(0, 300),
           duration: 8000,
         });
         return;
