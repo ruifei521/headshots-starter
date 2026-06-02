@@ -5,6 +5,7 @@ const nextConfig = {
   env: {
     PACK_QUERY_TYPE: 'both',
     NEXT_PUBLIC_TUNE_TYPE: 'packs',
+    NEXT_PUBLIC_GA_ID: 'G-CEBQCJJXYN',
   },
 
   async headers() {
@@ -21,11 +22,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value:
               "default-src 'self'; " +
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; " +
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://www.googletagmanager.com https://www.google-analytics.com; " +
               "style-src 'self' 'unsafe-inline'; " +
-              "img-src 'self' data: https: blob:; " +
+              "img-src 'self' data: https: blob: https://www.google-analytics.com; " +
               "font-src 'self'; " +
-              "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://*.sentry.io; " +
+              "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://*.sentry.io https://www.google-analytics.com https://*.google-analytics.com; " +
               "frame-src 'none';",
           },
         ],
