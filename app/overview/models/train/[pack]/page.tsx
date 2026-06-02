@@ -28,6 +28,9 @@ const TrainModelZone = nextDynamic(() => import("@/components/TrainModelZone"), 
   ),
 });
 
+// ⭐ 隔离错误边界 — 即使 TrainModelZone 崩溃也不影响页面其他部分
+import { TrainModelZoneErrorBoundary } from "@/components/TrainModelZoneErrorBoundary";
+
 export default async function Index({
   params,
   searchParams,
@@ -203,7 +206,9 @@ export default async function Index({
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-3 px-3 pb-3">
-                  <TrainModelZone packSlug={params.pack} />
+                  <TrainModelZoneErrorBoundary>
+                    <TrainModelZone packSlug={params.pack} />
+                  </TrainModelZoneErrorBoundary>
                 </CardContent>
               </Card>
             )}
