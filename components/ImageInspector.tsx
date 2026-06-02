@@ -24,10 +24,12 @@ export function ImageInspector({ file, fileId, type, onInspectionComplete }: Ima
   const [issues, setIssues] = useState<string[]>([]);
   const isMountedRef = useRef(true);
   const hasCalledCompleteRef = useRef(false);
+  // ⭐ 用 ref 存 callback，避免 onInspectionComplete 引用变化导致 effect 重跑
+  const onInspectionCompleteRef = useRef(onInspectionComplete);
+  onInspectionCompleteRef.current = onInspectionComplete;
 
   useEffect(() => {
     isMountedRef.current = true;
-    hasCalledCompleteRef.current = false;
 
     const inspect = async () => {
       try {
@@ -59,7 +61,7 @@ export function ImageInspector({ file, fileId, type, onInspectionComplete }: Ima
         setIssues(detectedIssues);
         if (!hasCalledCompleteRef.current) {
           hasCalledCompleteRef.current = true;
-          onInspectionComplete(result, fileId);
+          onInspectionCompleteRef.current(result, fileId);
         }
       } catch (error) {
         if (!isMountedRef.current) return;
@@ -67,7 +69,7 @@ export function ImageInspector({ file, fileId, type, onInspectionComplete }: Ima
         setIssues([]);
         if (!hasCalledCompleteRef.current) {
           hasCalledCompleteRef.current = true;
-          onInspectionComplete({
+          onInspectionCompleteRef.current({
             selfie: false,
             blurry: false,
             includes_multiple_people: false,
@@ -84,12 +86,14 @@ export function ImageInspector({ file, fileId, type, onInspectionComplete }: Ima
       }
     };
 
+    // ⭐ 只在 file 变化时重新检测。type（man/woman/person）不影响 Astria 检测结果。
+    // onInspectionComplete 通过 ref 访问，不在依赖中，避免父组件渲染导致重检。
     inspect();
 
     return () => {
       isMountedRef.current = false;
     };
-  }, [file, type, fileId, onInspectionComplete]);
+  }, [file, fileId]);
 
   if (isLoading) {
     return (
