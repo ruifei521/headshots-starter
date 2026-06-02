@@ -13,7 +13,7 @@ import { logger } from "@/lib/logger";
 
 export const revalidate = 0;
 
-function TrainingProgressBanner({ model }: { model: modelRow }) {
+function TrainingProgressBanner({ model }: { model: Omit<modelRow, 'images_generated' | 'total_images'> & { images_generated?: number | null; total_images?: number | null } }) {
   const [progress, setProgress] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   const ESTIMATED = 30; // minutes
@@ -97,7 +97,7 @@ function TierBadge({ tier }: { tier?: string }) {
 }
 
 type ClientSideModelProps = {
-  serverModel: modelRow;
+  serverModel: Omit<modelRow, 'images_generated' | 'total_images'>;
   serverImages: imageRow[];
   samples: sampleRow[];
 };
@@ -107,7 +107,7 @@ export default function ClientSideModel({
   serverImages,
   samples,
 }: ClientSideModelProps) {
-  const [model, setModel] = useState<modelRow>(serverModel);
+  const [model, setModel] = useState<Omit<modelRow, 'images_generated' | 'total_images'>>(serverModel);
 
   // ✅ 使用 createBrowserClient（SSR 兼容），而非 createClient + process.env
   const supabase = useMemo(() => {
