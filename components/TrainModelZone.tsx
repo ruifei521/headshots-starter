@@ -58,6 +58,12 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
   const characteristicsMapRef = useRef<Map<string, ImageInspectionResult>>(new Map());
   // Keep a ref to fileObjects for cleanup (avoids stale closure)
   const fileObjectsRef = useRef<FileObject[]>([]);
+  // ⭐ 追踪组件是否已挂载，防止卸载后更新状态导致 insertBefore DOM 错误
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   const form = useForm<FormInput>({
     resolver: zodResolver(fileUploadFormSchema),
@@ -293,6 +299,9 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
 
       const storageUrls = await Promise.all(uploadPromises);
 
+      // ⭐ 组件卸载后不再继续
+      if (!mountedRef.current) return;
+
       // Update toast to step 2
       loadingToast.update({
         id: loadingToast.id,
@@ -322,6 +331,8 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         body: JSON.stringify(payload),
       });
 
+      // ⭐ 组件卸载后不再继续
+      if (!mountedRef.current) return;
       setIsLoading(false);
 
       if (!response.ok) {
@@ -341,6 +352,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
           });
           // 跳转到首页定价区
           setTimeout(() => {
+            if (!mountedRef.current) return;
             router.push("/#pricing");
           }, 2000);
           return;
@@ -395,10 +407,13 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       });
 
       setTimeout(() => {
+        if (!mountedRef.current) return;
         loadingToast.dismiss();
         router.push("/overview");
       }, 1000);
     } catch (error: any) {
+      // ⭐ 组件卸载后不再继续
+      if (!mountedRef.current) return;
       setIsLoading(false);
       loadingToast.dismiss();
       // fetch() throws Error with message string; Axios errors have response.data
