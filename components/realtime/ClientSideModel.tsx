@@ -10,6 +10,7 @@ import { Badge } from "../ui/badge";
 import { Progress } from "../ui/progress";
 import { getTierInfo } from "@/lib/tiers";
 import { logger } from "@/lib/logger";
+import JSZip from "jszip";
 
 export const revalidate = 0;
 
@@ -111,6 +112,8 @@ export default function ClientSideModel({
   samples,
 }: ClientSideModelProps) {
   const [model, setModel] = useState<Omit<modelRow, 'images_generated' | 'total_images'>>(serverModel);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
 
   // ✅ 使用 createBrowserClient（SSR 兼容），而非 createClient + process.env
   const supabase = useMemo(() => {
@@ -198,19 +201,49 @@ export default function ClientSideModel({
                   <h1 className="text-xl">Results</h1>
                   <button
                     onClick={async () => {
-                      for (const img of serverImages) {
-                        try {
-                          const a = document.createElement('a');
-                          a.href = img.uri;
-                          a.download = img.uri.split('/').pop() || 'headshot.jpg';
-                          a.click();
-                          await new Promise(r => setTimeout(r, 500));
-                        } catch {}
+                      if (!serverImages?.length || downloading) return;
+                      setDownloading(true);
+                      setDownloadProgress(0);
+                      try {
+                        const zip = new JSZip();
+                        const total = serverImages.length;
+                        // Fetch all images and add to zip
+                        for (let i = 0; i < total; i++) {
+                          const img = serverImages[i];
+                          try {
+                            const res = await fetch(img.uri);
+                            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                            const blob = await res.blob();
+                            const ext = img.uri.split('.').pop()?.split('?')[0] || 'jpg';
+                            zip.file(`headshot-${i + 1}.${ext}`, blob);
+                            setDownloadProgress(Math.round(((i + 1) / total) * 100));
+                          } catch (e) {
+                            logger.warn(`Failed to fetch image ${i + 1}:`, e);
+                          }
+                        }
+                        // Generate zip and trigger download
+                        const zipBlob = await zip.generateAsync({ type: "blob" });
+                        const url = URL.createObjectURL(zipBlob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `headshots-${Date.now()}.zip`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                      } catch (e) {
+                        logger.error("Download all failed:", e);
+                      } finally {
+                        setDownloading(false);
+                        setDownloadProgress(0);
                       }
                     }}
-                    className="text-xs text-primary hover:underline"
+                    disabled={downloading}
+                    className="text-xs text-primary hover:underline disabled:text-muted-foreground disabled:cursor-not-allowed"
                   >
-                    Download All ({serverImages?.length || 0})
+                    {downloading
+                      ? `Packing... ${downloadProgress}%`
+                      : `Download All${serverImages?.length ? ` (${serverImages.length})` : ''}`}
                   </button>
                 </div>
                 <div className="flex flex-row flex-wrap gap-4">
