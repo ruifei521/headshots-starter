@@ -18,6 +18,20 @@ export default function GlobalError({
       digest: error.digest,
     });
     console.error('=== GLOBAL ERROR BOUNDARY ===', error);
+
+    // TEMP: 发送错误到捕获端点用于调试
+    fetch('/api/capture-error', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        source: 'app/global-error.tsx',
+        error: error instanceof Error
+          ? { name: error.name, message: error.message, stack: error.stack, digest: (error as any).digest }
+          : JSON.stringify(error),
+        url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+      }),
+    }).catch(() => {}); // 静默失败
   }, [error]);
 
   return (

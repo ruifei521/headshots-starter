@@ -27,6 +27,20 @@ export default function Error({
     }
     // 浏览器 console 也打印一份
     console.error("=== GLOBAL ERROR BOUNDARY ===", error);
+
+    // TEMP: 发送错误到捕获端点用于调试
+    fetch('/api/capture-error', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        source: 'app/error.tsx',
+        error: error instanceof Error
+          ? { name: error.name, message: error.message, stack: error.stack, digest: (error as any).digest }
+          : JSON.stringify(error),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+      }),
+    }).catch(() => {}); // 静默失败
   }, [error]);
 
   return (
