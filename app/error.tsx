@@ -1,8 +1,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { logger } from "@/lib/logger";
+import { useEffect } from "react";
 
 export default function Error({
   error,
@@ -11,43 +10,13 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  // TEMP DEBUG: 强制错误页面停留至少 5 秒，方便查看错误详情
-  const [minDisplayTime, setMinDisplayTime] = useState(true);
   useEffect(() => {
-    const timer = setTimeout(() => setMinDisplayTime(false), 5000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const errorData = {
-      timestamp: new Date().toISOString(),
-      source: 'app/error.tsx',
+    console.error("Global error boundary caught:", {
       name: error instanceof Error ? error.name : 'Unknown',
       message: error instanceof Error ? error.message : JSON.stringify(error),
-      stack: error instanceof Error ? error.stack : undefined,
       digest: (error as any).digest,
       url: window.location.href,
-      userAgent: navigator.userAgent,
-    };
-
-    // 打印完整错误信息用于 Vercel 日志排查
-    logger.error("Global error boundary caught:", errorData);
-    console.error("=== GLOBAL ERROR BOUNDARY ===", errorData);
-
-    // 持久化到 localStorage，防止闪烁来不及看
-    try {
-      const errors = JSON.parse(localStorage.getItem('__error_boundary_log') || '[]');
-      errors.push(errorData);
-      if (errors.length > 20) errors.shift(); // 最多保留20条
-      localStorage.setItem('__error_boundary_log', JSON.stringify(errors));
-    } catch {}
-
-    // TEMP: 发送错误到捕获端点用于调试
-    fetch('/api/capture-error', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(errorData),
-    }).catch(() => {});
+    });
   }, [error]);
 
   return (
@@ -73,10 +42,9 @@ export default function Error({
           An unexpected error occurred. Please try again or contact support if the problem persists.
         </p>
 
-        {/* Debug: show actual error for troubleshooting */}
         <details className="text-left w-full">
           <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
-            Error details (for debugging)
+            Error details
           </summary>
           <pre className="mt-2 p-3 bg-muted rounded-md text-xs overflow-auto max-h-48 whitespace-pre-wrap break-all">
             {error instanceof Error

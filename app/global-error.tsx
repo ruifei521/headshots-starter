@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 export default function GlobalError({
   error,
@@ -11,35 +10,11 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    const errorData = {
-      timestamp: new Date().toISOString(),
-      source: 'app/global-error.tsx',
+    console.error('Global error boundary caught:', {
       name: error instanceof Error ? error.name : 'Unknown',
       message: error instanceof Error ? error.message : JSON.stringify(error),
-      stack: error instanceof Error ? error.stack : undefined,
       digest: (error as any).digest,
-      url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
-    };
-
-    logger.error('Global error boundary caught:', errorData);
-    console.error('=== GLOBAL ERROR BOUNDARY ===', errorData);
-
-    // 持久化到 localStorage，防止闪烁来不及看
-    try {
-      const errors = JSON.parse(localStorage.getItem('__error_boundary_log') || '[]');
-      errors.push(errorData);
-      if (errors.length > 20) errors.shift();
-      localStorage.setItem('__error_boundary_log', JSON.stringify(errors));
-      (window as any).__lastError = errorData;
-      (window as any).__errorLog = errors;
-    } catch {}
-
-    fetch('/api/capture-error', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(errorData),
-    }).catch(() => {});
+    });
   }, [error]);
 
   return (
@@ -67,7 +42,7 @@ export default function GlobalError({
           </p>
           <details className="text-left w-full">
             <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
-              Error details (for debugging)
+              Error details
             </summary>
             <pre className="mt-2 p-3 bg-muted rounded-md text-xs overflow-auto max-h-48 whitespace-pre-wrap break-all">
               {error instanceof Error

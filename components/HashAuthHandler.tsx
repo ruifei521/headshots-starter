@@ -2,7 +2,6 @@
 
 import { Database } from "@/types/supabase";
 import { createBrowserClient } from "@supabase/ssr";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { logger } from "@/lib/logger";
 
@@ -21,7 +20,6 @@ import { logger } from "@/lib/logger";
  * that can access both hash fragments and query parameters.
  */
 export function HashAuthHandler() {
-  const router = useRouter();
   const [processing, setProcessing] = useState(false);
   const [hasRun, setHasRun] = useState(false);
 
@@ -66,8 +64,10 @@ export function HashAuthHandler() {
             return;
           }
 
-          setProcessing(false);
-          router.push(getPostLoginUrl());
+          // 使用 window.location.href 而非 router.push()
+          // router.push() 在 React 渲染周期中触发客户端导航会导致 removeChild DOM 错误
+          // 因为 React reconcile 当前组件树时 DOM 已被导航改变
+          window.location.href = getPostLoginUrl();
           return;
         } catch (err) {
           logger.error("[HashAuthHandler] ✗ PKCE exchange unexpected error:", err);
@@ -89,8 +89,7 @@ export function HashAuthHandler() {
       const errorDescription = hashParams.get("error_description");
       if (error) {
         logger.error("[HashAuthHandler] ✗ Auth error in hash:", error, errorDescription);
-        window.location.hash = "";
-        router.push(`/login?error=${encodeURIComponent(errorDescription || error)}`);
+        window.location.href = `/login?error=${encodeURIComponent(errorDescription || error)}`;
         return;
       }
 
@@ -117,7 +116,8 @@ export function HashAuthHandler() {
         }
 
         setProcessing(false);
-        router.push(getPostLoginUrl());
+        // 使用 window.location.href 避免 React reconcile 冲突
+        window.location.href = getPostLoginUrl();
       } catch (err) {
         logger.error("[HashAuthHandler] ✗ Unexpected error:", err);
         window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
@@ -126,7 +126,7 @@ export function HashAuthHandler() {
     };
 
     handleAuth();
-  }, [supabase, router]);
+  }, [supabase]);
 
   if (!processing) return null;
 
