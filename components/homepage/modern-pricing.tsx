@@ -30,6 +30,7 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
       const supabase = getSupabase();
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
+        setLoading(false);
         router.push(`/login?redirect=/#pricing`);
         return;
       }
@@ -45,17 +46,25 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
       });
       const data = await res.json();
       if (data.url) {
-        // GA4: track begin_checkout event
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-          const priceNum = parseFloat(info.priceLabel.replace(/[^0-9.]/g, '')) || 0;
-          (window as any).gtag('event', 'begin_checkout', {
-            currency: 'USD',
-            value: priceNum,
-            items: [{ item_id: info.tier, item_name: info.name, price: priceNum }],
-          });
+        // GA4: track begin_checkout event (wrapped in try-catch to prevent errors)
+        try {
+          if (typeof window !== 'undefined' && (window as any).gtag) {
+            const priceNum = parseFloat(info.priceLabel.replace(/[^0-9.]/g, '')) || 0;
+            (window as any).gtag('event', 'begin_checkout', {
+              currency: 'USD',
+              value: priceNum,
+              items: [{ item_id: info.tier, item_name: info.name, price: priceNum }],
+            });
+          }
+        } catch {
+          // GA4 failure should never block checkout
         }
-        // Navigate away immediately — no state updates (avoid error boundary flash)
-        window.location.href = data.url;
+        // Defer navigation to next macrotask — lets React fully flush all pending renders
+        // before browser navigation tears down the component tree
+        const checkoutUrl = data.url;
+        setTimeout(() => {
+          window.location.href = checkoutUrl;
+        }, 0);
         return;
       } else {
         alert('Failed to create checkout: ' + (data.error || 'Unknown error'));
