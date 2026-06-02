@@ -11,27 +11,35 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    logger.error('Global error boundary caught:', {
-      message: error.message,
-      name: error.name,
-      stack: error.stack,
-      digest: error.digest,
-    });
-    console.error('=== GLOBAL ERROR BOUNDARY ===', error);
+    const errorData = {
+      timestamp: new Date().toISOString(),
+      source: 'app/global-error.tsx',
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : JSON.stringify(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      digest: (error as any).digest,
+      url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+    };
 
-    // TEMP: 发送错误到捕获端点用于调试
+    logger.error('Global error boundary caught:', errorData);
+    console.error('=== GLOBAL ERROR BOUNDARY ===', errorData);
+
+    // 持久化到 localStorage，防止闪烁来不及看
+    try {
+      const errors = JSON.parse(localStorage.getItem('__error_boundary_log') || '[]');
+      errors.push(errorData);
+      if (errors.length > 20) errors.shift();
+      localStorage.setItem('__error_boundary_log', JSON.stringify(errors));
+      (window as any).__lastError = errorData;
+      (window as any).__errorLog = errors;
+    } catch {}
+
     fetch('/api/capture-error', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        source: 'app/global-error.tsx',
-        error: error instanceof Error
-          ? { name: error.name, message: error.message, stack: error.stack, digest: (error as any).digest }
-          : JSON.stringify(error),
-        url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
-      }),
-    }).catch(() => {}); // 静默失败
+      body: JSON.stringify(errorData),
+    }).catch(() => {});
   }, [error]);
 
   return (

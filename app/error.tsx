@@ -12,35 +12,35 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
+    const errorData = {
+      timestamp: new Date().toISOString(),
+      source: 'app/error.tsx',
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : JSON.stringify(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      digest: (error as any).digest,
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+    };
+
     // 打印完整错误信息用于 Vercel 日志排查
-    if (error instanceof Error) {
-      logger.error("Global error boundary caught:", {
-        message: error.message,
-        name: error.name,
-        stack: error.stack,
-        digest: error.digest,
-        cause: error.cause,
-      });
-    } else {
-      // 某些库可能抛出 plain object
-      logger.error("Global error boundary caught (non-Error):", JSON.stringify(error));
-    }
-    // 浏览器 console 也打印一份
-    console.error("=== GLOBAL ERROR BOUNDARY ===", error);
+    logger.error("Global error boundary caught:", errorData);
+    console.error("=== GLOBAL ERROR BOUNDARY ===", errorData);
+
+    // 持久化到 localStorage，防止闪烁来不及看
+    try {
+      const errors = JSON.parse(localStorage.getItem('__error_boundary_log') || '[]');
+      errors.push(errorData);
+      if (errors.length > 20) errors.shift(); // 最多保留20条
+      localStorage.setItem('__error_boundary_log', JSON.stringify(errors));
+    } catch {}
 
     // TEMP: 发送错误到捕获端点用于调试
     fetch('/api/capture-error', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        source: 'app/error.tsx',
-        error: error instanceof Error
-          ? { name: error.name, message: error.message, stack: error.stack, digest: (error as any).digest }
-          : JSON.stringify(error),
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-      }),
-    }).catch(() => {}); // 静默失败
+      body: JSON.stringify(errorData),
+    }).catch(() => {});
   }, [error]);
 
   return (
