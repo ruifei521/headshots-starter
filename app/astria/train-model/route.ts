@@ -185,23 +185,20 @@ export async function POST(request: Request) {
   logger.log(`Training config: branch=${trainingConfig.branch}, tier=${userTier}`);
 
   // ⭐ 计算 total_images（从 prompts 数量得出）
-  // 这里先算一次用于 model.insert，正式值后面 promptsAttributes 生成后对齐
-  // 使用 getTierPrompts 预计算（后面正式生成时复用）
   const effectiveTierForCount = isTier(userTier) ? userTier : 'starter';
   const promptTemplatesForCount = getTierPrompts(effectiveTierForCount, type);
   const totalImages = promptTemplatesForCount.reduce((s, t) => s + t.num_images, 0);
 
-  // create a model row in supabase — ⭐ 写入 tier + 进度字段
-  // images_generated/total_images 仅在 add_training_progress.sql migration 执行后存在
-  // 此处不写入这两个字段，避免列不存在时 schema cache miss 导致 500
+  // create a model row in supabase — ⭐ 写入 tier + 进度字段 + total_images
   const { error: modelError, data } = await supabase
     .from("models")
     .insert({
       user_id: user.id,
       name,
       type,
-      tier: userTier,           // ⭐ 记录训练时的 tier
-      status: 'processing',     // 显式设置初始状态
+      tier: userTier,
+      status: 'processing',
+      total_images: totalImages,   // ⭐ 写入预计总图片数（prompt-webhook 用于判断完成）
     })
     .select("id")
     .single();

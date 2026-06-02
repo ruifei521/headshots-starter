@@ -19,7 +19,7 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_constraint 
-    WHERE conname = 'images_modelId_uri_key' 
+    WHERE lower(conname) = 'images_modelid_uri_key' 
     AND conrelid = 'images'::regclass
   ) THEN
     ALTER TABLE images ADD CONSTRAINT images_modelId_uri_key UNIQUE ("modelId", uri);
