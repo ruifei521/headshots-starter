@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
@@ -12,7 +12,21 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    logger.error("Global error boundary caught:", error);
+    // 打印完整错误信息用于 Vercel 日志排查
+    if (error instanceof Error) {
+      logger.error("Global error boundary caught:", {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+        digest: error.digest,
+        cause: error.cause,
+      });
+    } else {
+      // 某些库可能抛出 plain object
+      logger.error("Global error boundary caught (non-Error):", JSON.stringify(error));
+    }
+    // 浏览器 console 也打印一份
+    console.error("=== GLOBAL ERROR BOUNDARY ===", error);
   }, [error]);
 
   return (
