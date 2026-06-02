@@ -79,33 +79,28 @@
 /* ============================================
    Mobile Responsiveness Fixes
    WCAG 2.5.8: Touch targets >= 44x44px
-   Minimum readable font size: 14px
    ============================================ */
 
 @media (max-width: 768px) {
-  /* Minimum touch target size for interactive elements */
-  button,
-  a[href],
+  /* Touch target minimums for clickable controls (exclude inline links) */
+  button:not(.inline-link),
+  .btn:not(.btn-sm),
+  [role="button"]:not(.nav-link),
   input[type="submit"],
-  input[type="button"],
-  [role="button"],
-  .btn {
-    min-height: 44px !important;
-    min-width: 44px !important;
+  input[type="button"] {
+    min-height: 44px;
+    min-width: 44px;
   }
 
-  /* Ensure buttons have proper padding */
-  button,
-  .btn {
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
+  /* Prevent horizontal overflow */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
   }
 
-  /* Minimum readable font size for body text */
-  p,
-  li,
-  .text-sm,
-  .text-xs {
-    font-size: max(14px, 1rem) !important;
+  /* Ensure images don't overflow */
+  img, video {
+    max-width: 100%;
+    height: auto;
   }
 }

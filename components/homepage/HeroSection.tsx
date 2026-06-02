@@ -25,7 +25,7 @@ const ScrollingGallery = dynamic(
 export default function HeroSection() {
   return (
     <section className="relative overflow-hidden py-10 md:py-16">
-      <div className="container px-4 md:px-6 pt-2">
+      <div className="container px-4 md:px-6 pt-2 overflow-x-hidden">
         <div className="mx-auto max-w-3xl text-center mb-8">
           <Badge className="mb-3 text-sm px-4 py-1.5 font-semibold tracking-wide border-blue-200/20 bg-blue-50/30" variant="outline">
             The #1 AI Headshot Generator for Professional Headshots

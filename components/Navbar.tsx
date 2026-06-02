@@ -7,6 +7,7 @@ import { Button } from "./ui/button";
 import { ThemeToggle } from "./homepage/theme-toggle";
 import UserDropdown from "./UserDropdown";
 import NavLinks from "./NavLinks";
+import MobileNavSheet from "./MobileNavSheet";
 
 export const dynamic = "force-dynamic";
 
@@ -56,27 +57,34 @@ export default async function Navbar() {
           <span>SnapProHead</span>
         </Link>
 
-        <NavLinks isLoggedIn={!!user} />
+        {/* Desktop NavLinks — hidden on mobile */}
+        <div className="hidden md:flex">
+          <NavLinks isLoggedIn={!!user} />
+        </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <ThemeToggle />
 
+          {/* Desktop Login/CTA — hidden on mobile */}
           {!user && (
-            <>
-              <Link href="/login" className="hidden sm:block text-base font-semibold hover:text-primary transition-colors py-2">
+            <div className="hidden sm:flex items-center gap-4">
+              <Link href="/login" className="text-base font-semibold hover:text-primary transition-colors py-2">
                 Login
               </Link>
               <Link href="/#pricing">
                 <Button>Create headshots</Button>
               </Link>
-            </>
+            </div>
           )}
 
           {user && (
-            <div className="flex items-center gap-4">
+            <div className="hidden sm:flex items-center gap-4">
               <UserDropdown user={user} />
             </div>
           )}
+
+          {/* Mobile hamburger menu */}
+          <MobileNavSheet isLoggedIn={!!user} />
         </div>
       </div>
     </header>

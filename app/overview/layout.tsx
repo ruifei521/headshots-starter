@@ -47,7 +47,7 @@ export default async function RootLayout({
 
   // Updated to ensure compatibility with new layout
   return (
-    <div className="flex w-full flex-col px-4 lg:px-40 py-6">
+    <div className="flex w-full flex-col px-4 md:px-8 lg:px-40 py-6">
       {children}
     </div>
   );

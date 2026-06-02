@@ -13,7 +13,7 @@ export default function NavLinks({ isLoggedIn = false }: NavLinksProps) {
   ];
 
   return (
-    <nav className="flex gap-4 sm:gap-6 items-center text-sm sm:text-base">
+    <nav className="hidden md:flex gap-4 sm:gap-6 items-center text-sm sm:text-base">
       {links.map((link) => (
         <Link
           key={link.href}
