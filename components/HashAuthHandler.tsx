@@ -67,14 +67,13 @@ export function HashAuthHandler() {
           }
 
           window.history.replaceState({}, '', window.location.pathname);
+          setProcessing(false);
           router.push(getPostLoginUrl());
           return;
         } catch (err) {
           logger.error("[HashAuthHandler] ✗ PKCE exchange unexpected error:", err);
           window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
           return;
-        } finally {
-          setProcessing(false);
         }
       }
 
@@ -119,13 +118,12 @@ export function HashAuthHandler() {
         }
 
         window.location.hash = "";
+        setProcessing(false);
         router.push(getPostLoginUrl());
       } catch (err) {
         logger.error("[HashAuthHandler] ✗ Unexpected error:", err);
         window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
         return;
-      } finally {
-        setProcessing(false);
       }
     };
 
