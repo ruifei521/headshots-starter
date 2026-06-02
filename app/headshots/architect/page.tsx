@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   },
 }
 
-export default function architectHeadshotsPage() {
+export default function ArchitectHeadshotsPage() {
   return (
     <div className="container px-4 md:px-6 py-16 md:py-24">
       {/* Hero */}
@@ -68,7 +68,7 @@ export default function architectHeadshotsPage() {
         </Link>
       </div>
 
-      {/* FAQ Schema */}
+      {/* FAQ */}
       <div className="max-w-3xl mx-auto mb-8">
         <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
         <div className="space-y-4">
