@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { logger } from "@/lib/logger";
 
 export default function Error({
@@ -11,6 +11,13 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // TEMP DEBUG: 强制错误页面停留至少 5 秒，方便查看错误详情
+  const [minDisplayTime, setMinDisplayTime] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => setMinDisplayTime(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     const errorData = {
       timestamp: new Date().toISOString(),
