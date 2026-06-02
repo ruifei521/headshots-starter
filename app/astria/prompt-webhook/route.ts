@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 const resendApiKey = process.env.RESEND_API_KEY;
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const astriaApiKey = process.env.ASTRIA_API_KEY;
 
 const appWebhookSecret = process.env.APP_WEBHOOK_SECRET;
 
@@ -25,6 +26,52 @@ if (!supabaseUrl) {
 
 if (!supabaseServiceRoleKey) {
   logger.warn("MISSING SUPABASE_SERVICE_ROLE_KEY - prompt-webhook will not function.");
+}
+
+/**
+ * ⭐ 从 Astria CDN 下载图片并上传到 Supabase Storage
+ * Astria CDN (mp.astria.ai) 对匿名请求返回 403，需 API key 认证下载。
+ * 转存到 Supabase Storage 后返回公开 URL，避免 CDN 封锁问题。
+ */
+async function downloadAndUploadToStorage(
+  astriaUrl: string,
+  modelId: number,
+  imageIndex: number
+): Promise<string> {
+  const BUCKET = 'headshots';
+  
+  // Step 1: Download from Astria CDN with API key
+  const downloadRes = await fetch(astriaUrl, {
+    headers: { Authorization: `Bearer ${astriaApiKey}` },
+  });
+  
+  if (!downloadRes.ok) {
+    throw new Error(`Download failed: ${downloadRes.status} ${downloadRes.statusText}`);
+  }
+  
+  const buffer = Buffer.from(await downloadRes.arrayBuffer());
+  
+  // Step 2: Upload to Supabase Storage
+  const fileName = `model-${modelId}/${imageIndex}-${Date.now()}.jpg`;
+  const uploadUrl = `${supabaseUrl}/storage/v1/object/${BUCKET}/${fileName}`;
+  
+  const uploadRes = await fetch(uploadUrl, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${supabaseServiceRoleKey}`,
+      'Content-Type': 'image/jpeg',
+      'x-upsert': 'true',
+    },
+    body: buffer,
+  });
+  
+  if (!uploadRes.ok) {
+    const errBody = await uploadRes.text();
+    throw new Error(`Upload failed: ${uploadRes.status} ${errBody}`);
+  }
+  
+  // Return public URL
+  return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${fileName}`;
 }
 
 export async function POST(request: Request) {
@@ -153,18 +200,28 @@ export async function POST(request: Request) {
       );
     }
 
-    // ⭐ 幂等保护：逐张 upsert，单张失败不影响其他
-    // 用 modelId + uri 作为唯一键防重复写入
+    // ⭐ 幂等保护：逐张处理 — 下载 → 转存 Supabase → 写入 DB
     let savedCount = 0;
     await Promise.all(
-      allHeadshots.map(async (image) => {
+      allHeadshots.map(async (image, idx) => {
         try {
-          // 先检查是否已存在（幂等）
+          let storageUrl: string;
+          
+          // Step 1: 尝试下载并上传到 Supabase Storage
+          try {
+            storageUrl = await downloadAndUploadToStorage(image, Number(model.id), idx);
+            logger.log(`Prompt webhook: image ${idx} uploaded to Supabase Storage`);
+          } catch (uploadErr: any) {
+            logger.error(`Prompt webhook: failed to upload image ${idx} to storage, falling back to Astria URL: ${uploadErr?.message}`);
+            storageUrl = image; // fallback: 直接存 Astria URL（可能不可访问）
+          }
+          
+          // Step 2: 检查幂等（用 Supabase URL 检查，因为 Astria URL 可能重复）
           const { data: existing } = await supabase
             .from("images")
             .select("id")
             .eq("modelId", Number(model.id))
-            .eq("uri", image)
+            .eq("uri", storageUrl)
             .maybeSingle();
 
           if (existing) {
@@ -174,7 +231,7 @@ export async function POST(request: Request) {
 
           const { error: imageError } = await supabase.from("images").insert({
             modelId: Number(model.id),
-            uri: image,
+            uri: storageUrl,
           });
 
           if (imageError) {
