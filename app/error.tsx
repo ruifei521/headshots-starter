@@ -31,7 +31,7 @@ export default function Error({
 
   return (
     <div className="flex items-center justify-center min-h-[60vh] px-4">
-      <div className="flex flex-col items-center gap-4 text-center max-w-md">
+      <div className="flex flex-col items-center gap-4 text-center max-w-lg w-full">
         <div className="rounded-full bg-destructive/10 p-4">
           <svg
             className="h-8 w-8 text-destructive"
@@ -51,6 +51,18 @@ export default function Error({
         <p className="text-sm text-muted-foreground">
           An unexpected error occurred. Please try again or contact support if the problem persists.
         </p>
+
+        {/* Debug: show actual error for troubleshooting */}
+        <details className="text-left w-full">
+          <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+            Error details (for debugging)
+          </summary>
+          <pre className="mt-2 p-3 bg-muted rounded-md text-xs overflow-auto max-h-48 whitespace-pre-wrap break-all">
+            {error instanceof Error
+              ? `${error.name}: ${error.message}${error.stack ? '\n\n' + error.stack : ''}${error.digest ? '\n\nDigest: ' + error.digest : ''}`
+              : JSON.stringify(error, null, 2)}
+          </pre>
+        </details>
 
         <div className="flex gap-3 mt-2">
           <Button variant="outline" onClick={() => reset()}>
