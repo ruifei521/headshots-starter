@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 import https from "https";
-import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -8,6 +8,8 @@ export const runtime = "nodejs";
 // Try env first, fall back to hardcoded key
 const rawKey = (process.env.CREEM_API_KEY || "").replace(/["'\s]/g, "");
 const CREEM_API_KEY = rawKey;
+
+const isDev = process.env.NODE_ENV === "development";
 
 /**
  * Call CREEM moderation API using Node https module (bypasses any proxy/redirect issues)
@@ -47,6 +49,25 @@ function callCreemModeration(
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check: only authenticated users can call moderation
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll(); },
+          setAll() {},
+        },
+      }
+    );
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Not authenticated", code: "AUTH_REQUIRED" },
+        { status: 401 }
+      );
+    }
+
     const { prompt } = await request.json();
 
     if (!prompt || typeof prompt !== "string") {
@@ -91,7 +112,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(resultObj);
   } catch (error: any) {
-    logger.error("Moderation API error:", error?.message || error);
+    if (isDev) console.error("Moderation API error:", error?.message || error);
     return NextResponse.json(
       {
         id: "mod-error",

@@ -28,7 +28,6 @@ import { ImageInspectionResult, aggregateCharacteristics } from "@/lib/imageInsp
 import { TIERS, isTier, type Tier } from "@/lib/tiers";
 import { createBrowserClient } from "@supabase/ssr";
 import Image from "next/image";
-import { logger } from "@/lib/logger";
 
 type FormInput = z.infer<typeof fileUploadFormSchema>;
 
@@ -38,8 +37,8 @@ const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
 // Minimum and maximum number of images
 const MIN_IMAGES = 4;
 const MAX_IMAGES = 10;
-// Maximum total size in bytes (120MB)
-const MAX_TOTAL_SIZE = 120 * 1024 * 1024;
+// Maximum total size in bytes (4.5MB)
+const MAX_TOTAL_SIZE = 4.5 * 1024 * 1024;
 
 interface FileObject {
   file: File;
@@ -58,12 +57,6 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
   const characteristicsMapRef = useRef<Map<string, ImageInspectionResult>>(new Map());
   // Keep a ref to fileObjects for cleanup (avoids stale closure)
   const fileObjectsRef = useRef<FileObject[]>([]);
-  // ⭐ 追踪组件是否已挂载，防止卸载后更新状态导致 insertBefore DOM 错误
-  const mountedRef = useRef(true);
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => { mountedRef.current = false; };
-  }, []);
 
   const form = useForm<FormInput>({
     resolver: zodResolver(fileUploadFormSchema),
@@ -254,7 +247,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       }
     } catch (e) {
       // Credit check failed — continue anyway (server will validate)
-      logger.warn("Credit pre-check failed, will validate server-side:", e);
+      if (process.env.NODE_ENV === 'development') console.warn("Credit pre-check failed, will validate server-side:", e);
     }
 
     setIsLoading(true);
@@ -299,9 +292,6 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
 
       const storageUrls = await Promise.all(uploadPromises);
 
-      // ⭐ 组件卸载后不再继续
-      if (!mountedRef.current) return;
-
       // Update toast to step 2
       loadingToast.update({
         id: loadingToast.id,
@@ -331,64 +321,36 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         body: JSON.stringify(payload),
       });
 
-      // ⭐ 组件卸载后不再继续
-      if (!mountedRef.current) return;
       setIsLoading(false);
 
       if (!response.ok) {
         loadingToast.dismiss();
-        
-        // ⭐ 402 = 未付费，引导用户去购买
-        if (response.status === 402) {
-          let message = "You don't have enough credits to start training.";
-          try {
-            const data = await response.json();
-            message = data.message || message;
-          } catch {}
-          toast({
-            title: "No Credits",
-            description: message,
-            duration: 6000,
-          });
-          // 跳转到首页定价区
-          setTimeout(() => {
-            if (!mountedRef.current) return;
-            router.push("/#pricing");
-          }, 2000);
-          return;
+        let responseMessage = `HTTP error! status: ${response.status}`;
+        let responseDetails = '';
+        try {
+          const responseData = await response.json();
+          responseMessage = responseData.message || responseMessage;
+          responseDetails = responseData.details || '';
+        } catch {
+          responseMessage = 'Server timeout or error — please try again.';
         }
+        
+        // 显示详细错误信息
+        const detailedMessage = (
+          <div className="flex flex-col gap-4">
+            <div>{responseMessage}</div>
+            {responseDetails && (
+              <div className="text-sm text-gray-500">
+                Details: {responseDetails}
+              </div>
+            )}
 
-        // ⭐ 非 JSON 响应（如 HTML 500 页）防护
-        const contentType = response.headers.get("content-type") || "";
-        let responseMessage = `Server error (HTTP ${response.status})`;
-        let responseDetails = "";
-        
-        if (contentType.includes("application/json")) {
-          try {
-            const responseData = await response.json();
-            responseMessage = responseData.message || responseMessage;
-            responseDetails = responseData.details || "";
-          } catch {
-            responseMessage = "Server error — please try again.";
-          }
-        } else {
-          // HTML 或其他非 JSON 响应
-          try {
-            const text = await response.text();
-            // 尝试从 HTML 中提取错误信息（可选）
-            const match = text.match(/<pre>(.*?)<\/pre>/s) || text.match(/<h1>(.*?)<\/h1>/);
-            responseMessage = match ? match[1].replace(/<[^>]+>/g, "").trim() : `Server error (HTTP ${response.status})`;
-          } catch {
-            responseMessage = `Server error (HTTP ${response.status}) — please try again.`;
-          }
-        }
-        
-        // ⭐ 用字符串而非 JSX 作为 description，避免 React 渲染导致 insertBefore 错误
-        const detailText = responseDetails ? `${responseMessage}\nDetails: ${responseDetails}` : responseMessage;
+          </div>
+        );
         
         toast({
           title: "Error",
-          description: detailText.substring(0, 300),
+          description: detailedMessage,
           duration: 8000,
         });
         return;
@@ -407,28 +369,25 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
       });
 
       setTimeout(() => {
-        if (!mountedRef.current) return;
         loadingToast.dismiss();
         router.push("/overview");
       }, 1000);
     } catch (error: any) {
-      // ⭐ 组件卸载后不再继续
-      if (!mountedRef.current) return;
       setIsLoading(false);
       loadingToast.dismiss();
-      // fetch() throws Error with message string; Axios errors have response.data
+      // 显示尽可能详细的错误信息
       const message = error?.response?.data?.message 
         || error?.response?.data?.error 
         || error?.message 
         || "Upload failed";
-      // Log full error for Vercel debugging
-      console.error("=== TRAIN MODEL CATCH ===");
-      console.error("Error message:", error?.message);
-      if (error?.response) {
-        console.error("Error response status:", error.response.status);
-        console.error("Error response data:", error.response.data);
+      // 在控制台打印完整错误对象，方便开发环境排查（生产中通过 Vercel 日志收集）
+      if (process.env.NODE_ENV === 'development') {
+        console.error("=== TRAIN MODEL CATCH ===");
+        console.error("Error message:", error?.message);
+        console.error("Error response status:", error?.response?.status);
+        console.error("Error response data:", error?.response?.data);
+        console.error("Full error object:", error);
       }
-      console.error("Full error:", error);
       
       toast({
         title: "Train Failed",
@@ -443,9 +402,6 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
     accept: {
       "image/png": [".png"],
       "image/jpeg": [".jpg", ".jpeg"],
-      "image/heic": [".heic"],
-      "image/heif": [".heif"],
-      "image/webp": [".webp"],
     },
   });
 
@@ -552,18 +508,21 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
           </div>
           <div
             {...getRootProps()}
-            className="rounded-md justify-center align-middle cursor-pointer flex flex-col gap-4"
+            className=" rounded-md justify-center align-middle cursor-pointer flex flex-col gap-4"
           >
-            <div className="outline-dashed outline-2 outline-gray-100 hover:outline-blue-500 w-full min-h-[280px] rounded-md p-8 flex justify-center items-center">
+            <FormDescription>
+              Upload 4-10 images of the person you want to generate headshots
+              for.
+            </FormDescription>
+            <div className="outline-dashed outline-2 outline-gray-100 hover:outline-blue-500 w-full h-full rounded-md p-4 flex justify-center align-middle">
               <input {...getInputProps()} />
               {isDragActive ? (
-                <p className="self-center text-lg font-medium">Upload Your Photos</p>
+                <p className="self-center">Drop the files here ...</p>
               ) : (
-                <div className="flex justify-center flex-col items-center gap-3">
-                  <FaImages size={48} className="text-gray-400" />
-                  <p className="text-lg font-medium">Upload Your Photos</p>
-                  <p className="text-xs text-muted-foreground text-center">
-                    PNG、JPG、HEIC、WEBP，最大 120MB · 4-10 images
+                <div className="flex justify-center flex-col items-center gap-2">
+                  <FaImages size={32} className="text-gray-700" />
+                  <p className="self-center">
+                    Drag &apos;n&apos; drop some files here, or click to select files.
                   </p>
                 </div>
               )}

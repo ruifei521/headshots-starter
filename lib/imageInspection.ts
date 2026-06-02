@@ -33,7 +33,7 @@ export async function inspectImage(file: File, type: string): Promise<ImageInspe
     });
     return response.data;
   } catch (error) {
-    console.warn('Image inspection failed, returning defaults:', error);
+    if (process.env.NODE_ENV === 'development') console.warn('Image inspection failed, returning defaults:', error);
     // Return default pass result so upload flow is not blocked
     return {
       selfie: false,

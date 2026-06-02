@@ -6,6 +6,8 @@ export const config = {
   deploymentUrl: process.env.DEPLOYMENT_URL || '',
 } as const;
 
+const isDev = process.env.NODE_ENV === 'development';
+
 function isVercelPreviewUrl(url: string): boolean {
   return url.includes('.vercel.app') &&
     (url.includes('-git-') ||
@@ -17,16 +19,16 @@ export function validateConfig() {
   const validTuneTypes = ['packs', 'tune'];
 
   if (!validPackQueryTypes.includes(config.packQueryType)) {
-    console.warn(`Invalid PACK_QUERY_TYPE: ${config.packQueryType}, falling back to 'both'`);
+    if (isDev) console.warn(`Invalid PACK_QUERY_TYPE: ${config.packQueryType}, falling back to 'both'`);
   }
 
   if (!validTuneTypes.includes(config.tuneType)) {
-    console.warn(`Invalid NEXT_PUBLIC_TUNE_TYPE: ${config.tuneType}, falling back to 'packs'`);
+    if (isDev) console.warn(`Invalid NEXT_PUBLIC_TUNE_TYPE: ${config.tuneType}, falling back to 'packs'`);
   }
 
   // Deployment URL 验证（仅当 URL 存在时检查）
   if (config.deploymentUrl && isVercelPreviewUrl(config.deploymentUrl)) {
-    console.warn(
+    if (isDev) console.warn(
       'Invalid DEPLOYMENT_URL: Preview URLs cannot be used for webhooks.\n' +
       'Please use either:\n' +
       '1. Your production domain (e.g., your-app.com)\n' +

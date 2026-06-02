@@ -54,15 +54,16 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
             items: [{ item_id: info.tier, item_name: info.name, price: priceNum }],
           });
         }
+        // Navigate away immediately — no state updates (avoid error boundary flash)
         window.location.href = data.url;
+        return;
       } else {
         alert('Failed to create checkout: ' + (data.error || 'Unknown error'));
       }
     } catch {
       alert('Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (
