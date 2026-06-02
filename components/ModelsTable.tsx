@@ -20,46 +20,52 @@ type ModelsTableProps = {
   models: modelRowWithSamples[];
 };
 
-const ESTIMATED_TRAINING_MS = 30 * 60 * 1000; // 30 minutes
+const ESTIMATED_TRAINING_MIN = 20; // minutes for Flux model training
 
 function TrainingProgress({ model }: { model: modelRowWithSamples }) {
   const [progress, setProgress] = useState(0);
   const [label, setLabel] = useState("");
 
-  // ⭐ 优先使用真实进度（images_generated / total_images）
+  // ⭐ 优先使用真实进度 — 只有真正开始出图时才切换（generated > 0）
   const generated = (model as any).images_generated ?? 0;
   const total = (model as any).total_images ?? 0;
-  const hasRealProgress = total > 0;
+  const isGenerating = total > 0 && generated > 0;
 
   useEffect(() => {
-    if (hasRealProgress) {
+    if (isGenerating) {
       const pct = Math.round((generated / total) * 100);
       setProgress(pct);
       setLabel(`${generated}/${total}`);
       return;
     }
 
-    // Fallback: 基于时间的估算
+    // Fallback: 基于时间的估算（训练阶段）
     const update = () => {
       if (!model.created_at) return;
       const start = new Date(model.created_at).getTime();
       const now = Date.now();
       const elapsedMs = now - start;
-      const pct = Math.min(Math.round((elapsedMs / ESTIMATED_TRAINING_MS) * 100), 95);
-      setProgress(pct);
       const mins = Math.floor(elapsedMs / 60000);
-      setLabel(mins < 1 ? "<1m" : `${mins}m`);
+      // 训练阶段进度上限 80%，上限 20 分钟
+      const pct = Math.min(Math.round((mins / ESTIMATED_TRAINING_MIN) * 100), 80);
+      setProgress(pct);
+      // 超过预估时间不再显示具体分钟数
+      if (mins > ESTIMATED_TRAINING_MIN) {
+        setLabel(`>${ESTIMATED_TRAINING_MIN}m`);
+      } else {
+        setLabel(mins < 1 ? "<1m" : `${mins}m`);
+      }
     };
     update();
     const interval = setInterval(update, 5000);
     return () => clearInterval(interval);
-  }, [model.created_at, hasRealProgress, generated, total]);
+  }, [model.created_at, isGenerating, generated, total]);
 
   return (
     <div className="flex items-center gap-2 min-w-[120px]">
       <Progress value={progress} className="h-2 w-20" />
       <span className="text-xs text-muted-foreground whitespace-nowrap">
-        {hasRealProgress ? label : `${label} / ~30m`}
+        {isGenerating ? label : `${label} / ~${ESTIMATED_TRAINING_MIN}m`}
       </span>
     </div>
   );
