@@ -154,12 +154,19 @@ describe('TIER_PROMPT_TEMPLATES structure', () => {
 // ============================================
 describe('getTierPrompts', () => {
   it('should return prompts with {type} replaced', () => {
-    for (const type of ['man', 'woman', 'person'] as const) {
+    for (const type of ['man', 'woman'] as const) {
       const prompts = getTierPrompts('starter', type);
       for (const p of prompts) {
         expect(p.text).not.toContain('{type}');
         expect(p.text).toContain(type);
       }
+    }
+    // person type: prompts contain 'man' or 'woman', not 'person'
+    const personPrompts = getTierPrompts('starter', 'person');
+    for (const p of personPrompts) {
+      expect(p.text).not.toContain('{type}');
+      const hasManOrWoman = p.text.includes('man') || p.text.includes('woman');
+      expect(hasManOrWoman).toBe(true);
     }
   });
 
@@ -178,10 +185,15 @@ describe('getTierPrompts', () => {
   });
 
   it('should handle all type values', () => {
-    for (const type of ['man', 'woman', 'person'] as const) {
+    for (const type of ['man', 'woman'] as const) {
       const prompts = getTierPrompts('starter', type);
       expect(prompts.length).toBeGreaterThan(0);
       expect(prompts[0].text).toContain(type);
     }
+    // person: should have interleaved man/woman prompts
+    const personPrompts = getTierPrompts('starter', 'person');
+    expect(personPrompts.length).toBe(40);
+    expect(personPrompts[0].text).toContain('man');
+    expect(personPrompts[1].text).toContain('woman');
   });
 });

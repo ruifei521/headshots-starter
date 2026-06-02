@@ -35,7 +35,9 @@ export function fillPromptTemplate(template: string, type: string): string {
 
 /** ��ȡĳ��λĳ�Ա������ prompt�����滻 {type} ռλ�� */
 export function getTierPrompts(tier: Tier, type: string): PromptTemplate[] {
-  // Plan A: Unisex (person) -> 50% man + 50% woman, interleaved
+  // ⭐ 三个分支完全独立，杜绝 fallthrough 导致 promt 数量错误
+
+  // Unisex (person) -> 50% man + 50% woman, interleaved
   if (type === 'person') {
     const manSrc = TIER_PROMPT_TEMPLATES[tier]['man'];
     const womanSrc = TIER_PROMPT_TEMPLATES[tier]['woman'];
@@ -54,11 +56,28 @@ export function getTierPrompts(tier: Tier, type: string): PromptTemplate[] {
     return result;
   }
 
-  // man / woman: use respective templates
-  const gender = type === 'woman' ? 'woman' : 'man';
-  const templates = TIER_PROMPT_TEMPLATES[tier][gender];
+  // Man: 取全部男模板（不打折）
+  if (type === 'man') {
+    const templates = TIER_PROMPT_TEMPLATES[tier]['man'];
+    return templates.map(t => ({
+      text: fillPromptTemplate(t.text, 'man'),
+      num_images: t.num_images,
+    }));
+  }
+
+  // Woman: 取全部女模板（不打折）
+  if (type === 'woman') {
+    const templates = TIER_PROMPT_TEMPLATES[tier]['woman'];
+    return templates.map(t => ({
+      text: fillPromptTemplate(t.text, 'woman'),
+      num_images: t.num_images,
+    }));
+  }
+
+  // 兜底：未知类型按 man 处理
+  const templates = TIER_PROMPT_TEMPLATES[tier]['man'];
   return templates.map(t => ({
-    text: fillPromptTemplate(t.text, type),
+    text: fillPromptTemplate(t.text, 'man'),
     num_images: t.num_images,
   }));
 }
