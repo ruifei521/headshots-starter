@@ -31,7 +31,7 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         setLoading(false);
-        router.push(`/login?redirect=/#pricing`);
+        router.push(`/login?redirect=${encodeURIComponent('/#pricing')}`);
         return;
       }
 

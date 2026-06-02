@@ -66,7 +66,6 @@ export function HashAuthHandler() {
             return;
           }
 
-          window.history.replaceState({}, '', window.location.pathname);
           setProcessing(false);
           router.push(getPostLoginUrl());
           return;
@@ -117,7 +116,6 @@ export function HashAuthHandler() {
           return;
         }
 
-        window.location.hash = "";
         setProcessing(false);
         router.push(getPostLoginUrl());
       } catch (err) {
