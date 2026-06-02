@@ -159,6 +159,17 @@ export default function ClientSideModel({
         {(model.status === "processing" || model.status === "pending" || model.status === "finished") && (
           <TrainingProgressBanner model={model} />
         )}
+        {model.status === "failed" && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+            <div className="flex items-center gap-2">
+              <span className="text-destructive text-lg">&#10007;</span>
+              <span className="font-medium text-sm text-destructive">Training Failed</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              The AI training did not complete. This can happen if the training images are too similar or low quality. Please try again with different or higher quality photos.
+            </p>
+          </div>
+        )}
         {/* ⭐ Display tier info */}
         <TierBadge tier={modelTier} />
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-0">

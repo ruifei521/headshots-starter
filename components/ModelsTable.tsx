@@ -100,9 +100,9 @@ export default function ModelsTable({ models }: ModelsTableProps) {
                 <div className="flex flex-col gap-1">
                   <Badge
                     className="flex gap-2 items-center w-min"
-                    variant={(model.status === "finished" || model.status === "completed") ? "default" : "secondary"}
+                    variant={model.status === "failed" ? "destructive" : (model.status === "finished" || model.status === "completed") ? "default" : "secondary"}
                   >
-                    {model.status === "processing" ? "training" : model.status === "pending" ? "queued" : model.status}
+                    {model.status === "processing" ? "training" : model.status === "pending" ? "queued" : model.status === "failed" ? "failed" : model.status}
                     {(model.status === "processing" || model.status === "pending") && (
                       <Icons.spinner className="h-4 w-4 animate-spin" />
                     )}
