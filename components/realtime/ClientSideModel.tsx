@@ -16,39 +16,42 @@ export const revalidate = 0;
 function TrainingProgressBanner({ model }: { model: Omit<modelRow, 'images_generated' | 'total_images'> & { images_generated?: number | null; total_images?: number | null } }) {
   const [progress, setProgress] = useState(0);
   const [elapsed, setElapsed] = useState(0);
-  const ESTIMATED = 30; // minutes
 
   // ⭐ 优先使用真实进度（images_generated / total_images）
+  // 但只在真正有图片生成时才切换（generated > 0），否则训练阶段用时间估算
   const generated = model.images_generated ?? 0;
   const total = model.total_images ?? 0;
-  const hasRealProgress = total > 0;
+  // 训练阶段约 20 分钟，生成阶段约 5 分钟（Flux）
+  const ESTIMATED_TRAINING = 20; // minutes for model training
+  const isGenerating = total > 0 && generated > 0;
 
   useEffect(() => {
-    if (hasRealProgress) {
+    if (isGenerating) {
       // 真实进度：基于已生成图片数
       const pct = Math.round((generated / total) * 100);
       setProgress(pct);
       return; // 不需要 interval，由 realtime 订阅驱动
     }
 
-    // Fallback: 基于时间的估算
+    // Fallback: 基于时间的估算（训练阶段）
     const update = () => {
       if (!model.created_at) return;
       const start = new Date(model.created_at).getTime();
       const elapsedMs = Date.now() - start;
       const mins = Math.floor(elapsedMs / 60000);
-      const pct = Math.min(Math.round((mins / ESTIMATED) * 100), 95);
+      // 训练阶段非线性：前 80% 时间训练，进度上限 80%
+      const pct = Math.min(Math.round((mins / ESTIMATED_TRAINING) * 100), 80);
       setProgress(pct);
       setElapsed(mins);
     };
     update();
     const interval = setInterval(update, 5000);
     return () => clearInterval(interval);
-  }, [model.created_at, hasRealProgress, generated, total]);
+  }, [model.created_at, isGenerating, generated, total]);
 
-  const remaining = hasRealProgress 
+  const remaining = isGenerating 
     ? total - generated 
-    : Math.max(ESTIMATED - elapsed, 0);
+    : Math.max(ESTIMATED_TRAINING - elapsed, 0);
 
   return (
     <div className="rounded-lg border bg-card p-4">
@@ -60,20 +63,20 @@ function TrainingProgressBanner({ model }: { model: Omit<modelRow, 'images_gener
             <span className="text-green-500">&#10003;</span>
           )}
           <span className="font-medium text-sm">
-            {hasRealProgress 
+            {isGenerating 
               ? `Generating Images (${generated}/${total})`
               : "Training in Progress"}
           </span>
         </div>
         <span className="text-xs text-muted-foreground">
-          {hasRealProgress
+          {isGenerating
             ? `${remaining} images remaining`
             : `~${remaining} min remaining`}
         </span>
       </div>
       <Progress value={progress} className="h-3" />
       <p className="text-xs text-muted-foreground mt-2">
-        {hasRealProgress
+        {isGenerating
           ? `AI is generating your headshots. ${generated} of ${total} images ready — you can close this page.`
           : "AI is learning your facial features. You can close this page — we'll email you when it's done."}
       </p>
