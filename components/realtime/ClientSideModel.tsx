@@ -156,7 +156,7 @@ export default function ClientSideModel({
   return (
     <div id="train-model-container" className="w-full h-full">
       <div className="flex flex-col w-full mt-4 gap-8">
-        {(model.status === "processing" || model.status === "pending") && (
+        {(model.status === "processing" || model.status === "pending" || model.status === "finished") && (
           <TrainingProgressBanner model={model} />
         )}
         {/* ⭐ Display tier info */}
@@ -181,7 +181,7 @@ export default function ClientSideModel({
             </div>
           )}
           <div className="flex flex-col w-full lg:w-1/2 rounded-md">
-            {model.status === "finished" && (
+            {(model.status === "finished" || model.status === "completed") && (
               <div className="flex flex-1 flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <h1 className="text-xl">Results</h1>

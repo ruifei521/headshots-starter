@@ -71,7 +71,7 @@ export default async function Index({ params }: { params: { id: string } }) {
           <h1 className="text-xl">{model.name}</h1>
           <div>
             <Badge
-              variant={model.status === "finished" ? "default" : "secondary"}
+              variant={(model.status === "finished" || model.status === "completed") ? "default" : "secondary"}
               className="text-xs font-medium"
             >
               {model.status === "processing" ? "training" : model.status === "pending" ? "queued" : model.status }
