@@ -1,4 +1,4 @@
-import TrainModelZone from "@/components/TrainModelZone";
+import nextDynamic from "next/dynamic";
 import PurchaseTracker from "@/components/PurchaseTracker";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,16 @@ import { cookies } from "next/headers";
 import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
+
+// ⭐ 完全客户端渲染，避免 SSR hydration mismatch 导致 insertBefore DOM 错误
+const TrainModelZone = nextDynamic(() => import("@/components/TrainModelZone"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex justify-center items-center py-20">
+      <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+    </div>
+  ),
+});
 
 export default async function Index({
   params,
