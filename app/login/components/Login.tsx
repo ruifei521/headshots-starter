@@ -41,19 +41,6 @@ export const Login = ({
     );
   }, []);
 
-  // Google OAuth 专用客户端 - 使用 implicit flow
-  // ⚠️ 微信/WebView 浏览器会拦截第三方 cookie，PKCE flow 的 code_verifier cookie
-  // 无法在 supabase.co 域名上存活，导致 OAuth 回调失败报 "让输入有效目标"
-  // implicit flow 将 token 直接放在 URL hash 中，不依赖跨域 cookie，
-  // 在所有浏览器（包括微信内置浏览器）中都能可靠工作
-  const oAuthClient = useMemo(() => {
-    return createBrowserClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { auth: { flowType: 'implicit' } }
-    );
-  }, []);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMagicLinkSent, setIsMagicLinkSent] = useState(false);
   const { toast } = useToast();
@@ -135,34 +122,15 @@ export const Login = ({
     }
   }, [redirectAfterLogin]);
 
-  const signInWithGoogle = async () => {
-    // 使用 implicit flow：token 走 URL hash，不依赖跨域 cookie
-    // 微信等 WebView 浏览器中 PKCE 的 code_verifier cookie 会被拦截
-    // redirectTo 设为根路径，由 HashAuthHandler（全局布局组件）读取 hash 并建立 session
-    const { data, error } = await oAuthClient.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        queryParams: {
-          access_type: 'online',
-        },
-        redirectTo: `${protocol}://${host}`,
-      },
-    });
-
-    if (error) {
-      toast({
-        title: 'Google Login Error',
-        variant: 'destructive',
-        description: error.message,
-        duration: 5000,
-      });
-      return;
+  const signInWithGoogle = () => {
+    // OAuth 在 snapprohead.com 完成，Google 会显示「继续前往 snapprohead.com」
+    // 不再经 *.supabase.co 中转（signInWithOAuth 会显示 Supabase 子域名）
+    const params = new URLSearchParams();
+    if (redirectAfterLogin) {
+      params.set('redirect', redirectAfterLogin);
     }
-
-    // implicit flow 返回 URL，Supabase 不会自动跳转，需要手动跳转
-    if (data?.url) {
-      hardNavigate(data.url);
-    }
+    const qs = params.toString();
+    hardNavigate(`/api/auth/google${qs ? `?${qs}` : ''}`);
   };
 
   if (isMagicLinkSent) {
