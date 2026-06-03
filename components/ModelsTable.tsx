@@ -12,7 +12,6 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Icons } from "./icons";
-import { useRouter } from "next/navigation";
 import { modelRowWithSamples } from "@/types/utils";
 import { useEffect, useState } from "react";
 
@@ -72,9 +71,8 @@ function TrainingProgress({ model }: { model: modelRowWithSamples }) {
 }
 
 export default function ModelsTable({ models }: ModelsTableProps) {
-  const router = useRouter();
   const handleRedirect = (id: number) => {
-    router.push(`/overview/models/${id}`);
+    window.location.href = `/overview/models/${id}`;
   };
 
   return (

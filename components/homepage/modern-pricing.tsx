@@ -5,7 +5,6 @@ import { Check, Clock, Shield, ArrowRight, Zap, Star, Loader2, X, DollarSign, Ca
 import { Button } from "@/components/ui/button"
 import { TIERS, type Tier, type TierInfo } from "@/lib/tiers"
 import { createBrowserClient } from "@supabase/ssr"
-import { useRouter } from "next/navigation"
 
 // Default pack used when user clicks directly from pricing card
 const DEFAULT_PACK = 'corporate-headshots'
@@ -22,8 +21,6 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
   const isPopular = info.badge === "Most Popular";
   const isBest = info.badge === "Best Value";
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-
   const handleCheckout = async () => {
     setLoading(true);
     try {
@@ -31,7 +28,7 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         setLoading(false);
-        router.push(`/login?redirect=${encodeURIComponent('/#pricing')}`);
+        window.location.href = `/login?redirect=${encodeURIComponent('/#pricing')}`;
         return;
       }
 

@@ -16,7 +16,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useCallback, useState, useEffect, useRef } from "react";
 import { useDropzone } from "react-dropzone";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -52,7 +51,6 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [userTier, setUserTier] = useState<Tier>('starter'); // ⭐ 用户当前套餐
   const { toast } = useToast();
-  const router = useRouter();
   // Track characteristics by file ID to avoid race conditions
   const characteristicsMapRef = useRef<Map<string, ImageInspectionResult>>(new Map());
   // Keep a ref to fileObjects for cleanup (avoids stale closure)
@@ -370,7 +368,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
 
       setTimeout(() => {
         loadingToast.dismiss();
-        router.push("/overview");
+        window.location.href = "/overview";
       }, 1000);
     } catch (error: any) {
       setIsLoading(false);
@@ -395,7 +393,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         duration: 8000,
       });
     }
-  }, [form, packSlug, toast, router]);
+  }, [form, packSlug, toast]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
