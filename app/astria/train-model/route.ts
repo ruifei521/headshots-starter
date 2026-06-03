@@ -10,7 +10,7 @@ import { getTierPrompts } from "@/lib/prompts";
 import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 30; // Extend Vercel timeout for Astria API call
+// maxDuration no longer needed: training is non-blocking (fire-and-forget)
 
 const astriaApiKey = process.env.ASTRIA_API_KEY;
 const astriaTestModeIsOn = process.env.ASTRIA_TEST_MODE === "true";
@@ -107,10 +107,10 @@ export async function POST(request: Request) {
     );
   }
 
-  if (images?.length < 4) {
+  if (images?.length < 3) {
     return NextResponse.json(
       {
-        message: "Upload at least 4 sample images",
+        message: "Upload at least 3 sample images",
       },
       { status: 500 }
     );
@@ -189,7 +189,8 @@ export async function POST(request: Request) {
   const promptTemplatesForCount = getTierPrompts(effectiveTierForCount, type);
   const totalImages = promptTemplatesForCount.reduce((s, t) => s + t.num_images, 0);
 
-  // create a model row in supabase — ⭐ 写入 tier + 进度字段 + total_images
+  // create a model row in supabase — ⭐ 非阻塞模式：初始状态为 'training'
+  // 后续由 train-webhook 回调更新为 'finished'，或由前端实时订阅感知状态变化
   const { error: modelError, data } = await supabase
     .from("models")
     .insert({
@@ -197,7 +198,7 @@ export async function POST(request: Request) {
       name,
       type,
       tier: userTier,
-      status: 'processing',
+      status: 'training',
       total_images: totalImages,   // ⭐ 写入预计总图片数（prompt-webhook 用于判断完成）
     })
     .select("id")
@@ -217,7 +218,23 @@ export async function POST(request: Request) {
   const modelId = data?.id;
 
   try {
-    // ⭐ 使用 VERCEL_URL 作为 fallback（Vercel 自动注入）
+    // ⭐ 1. 先保存 samples（不依赖 Astria 响应，提前完成以减少阻塞）
+    const { error: samplesError } = await supabase.from("samples").insert(
+      images.map((sample: string) => ({
+        modelId: modelId,
+        uri: sample,
+      }))
+    );
+
+    if (samplesError) {
+      logger.error("samplesError: ", samplesError);
+      return NextResponse.json(
+        { message: samplesError.message || "Failed to save image samples." },
+        { status: 500 }
+      );
+    }
+
+    // ⭐ 2. 构建 webhook URLs
     const deploymentUrl = process.env.DEPLOYMENT_URL || process.env.VERCEL_URL || '';
     const baseUrl = deploymentUrl.startsWith('http://') || deploymentUrl.startsWith('https://') 
       ? deploymentUrl 
@@ -234,13 +251,8 @@ export async function POST(request: Request) {
       ? `${promptWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_token=${webhookToken}`
       : `${promptWebhook}?user_id=${user.id}&model_id=${modelId}`;
 
-    const API_KEY = astriaApiKey;
-    const DOMAIN = "https://api.astria.ai";
-
-    // ⭐ 根据 tier 决定 branch
+    // ⭐ 3. 构建 Astria 请求体
     const branch = astriaTestModeIsOn ? "fast" : trainingConfig.branch;
-
-    // ⭐ 复用已计算的 prompts（与 model.insert 时一致）
     const promptTemplates = promptTemplatesForCount;
     const promptsAttributes = promptTemplates.map(t => ({
       text: t.text,
@@ -248,10 +260,8 @@ export async function POST(request: Request) {
       num_images: t.num_images,
     }));
 
-    logger.log(`Creating tune with ${promptsAttributes.length} prompts for tier=${effectiveTierForCount} (${totalImages} images)`);
+    logger.log(`Firing tune with ${promptsAttributes.length} prompts (non-blocking), tier=${effectiveTierForCount} (${totalImages} images)`);
 
-    // Create a fine tuned model using Astria tune API
-    // Flux 使用 LoRA 微调
     const tuneBody: Record<string, any> = {
       tune: {
         title: name,
@@ -265,105 +275,70 @@ export async function POST(request: Request) {
       },
     };
 
-    // ⭐ 只有 non-empty characteristics 才发给 Astria（避免空对象导致 422）
     if (characteristics && typeof characteristics === 'object' && Object.keys(characteristics).length > 0) {
       tuneBody.tune.characteristics = characteristics;
     }
 
-    // ⭐ POST /tunes + prompts_attributes：一次调用完成训练 + 出图
-    // Vercel Hobby plan 函数超时 10s，设置 axios 9s 防止被 Vercel 杀掉
-    const response = await axios.post(
-      DOMAIN + "/tunes",
-      tuneBody,
+    // ⭐ 4. 非阻塞模式：fire-and-forget Astria API 调用
+    // - 不 await Astria 响应 → Vercel Hobby 10s 限制不再阻塞训练
+    // - 成功路径：train-webhook 回调负责更新模型状态 + 扣减 credits
+    // - 失败路径：.catch() 将模型标记为 failed
+    const API_KEY = astriaApiKey;
+    const DOMAIN = "https://api.astria.ai";
+
+    axios.post(DOMAIN + "/tunes", tuneBody, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_KEY}`,
+      },
+      timeout: 30000, // 30s 给后台请求本身（不影响 HTTP 响应）
+    })
+      .then(async (response) => {
+        if (response.status === 201) {
+          const astriaId = (response.data as any)?.id;
+          logger.log(`Astria tune accepted: model_id=${modelId}, astria_id=${astriaId}`);
+          if (astriaId) {
+            await supabase
+              .from("models")
+              .update({ modelId: `${astriaId}` })
+              .eq("id", modelId);
+          }
+        } else {
+          logger.error(`Astria rejected model ${modelId}: status ${response.status}`);
+          await supabase.from("models").update({ status: "failed" }).eq("id", modelId);
+        }
+      })
+      .catch(async (e: any) => {
+        const statusCode = e?.response?.status;
+        // 4xx = 请求格式错误（不可恢复）→ 标记 failed
+        // 5xx / timeout = 服务端暂时不可用 → 保留 training 状态，train-webhook 可能仍会回调
+        if (statusCode && statusCode >= 400 && statusCode < 500) {
+          logger.error(`Astria 4xx for model ${modelId}:`, e?.response?.data);
+          await supabase.from("models").update({ status: "failed" }).eq("id", modelId);
+        } else {
+          logger.warn(`Astria request pending for model ${modelId}: ${e?.message || 'unknown'}`);
+          // 保持 training 状态，train-webhook 回调时会更新
+        }
+      });
+
+    // ⭐ 5. 立即返回 — 不等待 Astria 响应
+    return NextResponse.json(
       {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${API_KEY}`,
-        },
-        timeout: 9000, // 9s，留 1s 给 Vercel 返回响应
-      }
+        message: "success",
+        model_id: modelId,
+        status: "training",
+      },
+      { status: 200 }
     );
-
-    const { status, data: astriaData } = response;
-
-    if (status !== 201) {
-      logger.error("Astria API error - status:", status, "response:", astriaData);
-      // Rollback: Delete the created model if something goes wrong
-      if (modelId) {
-        await supabase.from("models").delete().eq("id", modelId);
-      }
-
-      const errorMessage = (astriaData as any)?.message || (astriaData as any)?.error || `Astria API returned status ${status}`;
-      return NextResponse.json(
-        {
-          message: errorMessage,
-        },
-        { status }
-      );
-    }
-
-    const { error: samplesError } = await supabase.from("samples").insert(
-      images.map((sample: string) => ({
-        modelId: modelId,
-        uri: sample,
-      }))
-    );
-
-    if (samplesError) {
-      logger.error("samplesError: ", samplesError);
-      return NextResponse.json(
-        {
-          message: samplesError.message || "Failed to save image samples.",
-        },
-        { status: 500 }
-      );
-    }
-
-    // ⭐ credits 扣减移到 train-webhook（确保只有训练成功才扣）
-    // 之前在此处扣减，但超时场景下 Astria 可能实际排队了但响应未到
   } catch (e: any) {
-    logger.error("Train model error:", e);
-    // ⭐ Axios 超时（ECONNABORTED）：请求已发出但 Astria 响应慢，Vercel Hobby 10s 限制
-    // 保留 model 行，标记为 pending — train-webhook 回调时会更新为 finished + 扣 credits
-    if (e?.code === 'ECONNABORTED' || e?.message?.includes('timeout')) {
-      logger.warn("Astria request timed out (likely queued successfully) — setting status=pending");
-      if (modelId) {
-        await supabase
-          .from("models")
-          .update({ status: "pending" })
-          .eq("id", modelId);
-      }
-      return NextResponse.json(
-        { message: "success", queued: true },
-        { status: 202 }
-      );
-    }
-    // 🔍 Astria 422/400 等错误 — 打印完整响应体用于排查
-    if (e?.response) {
-      logger.error("Astria response status:", e.response.status);
-      logger.error("Astria response data:", JSON.stringify(e.response.data, null, 2));
-    }
-    // Rollback: Delete the created model if something goes wrong
+    // 仅捕获 samples insert 等同步操作的错误
+    logger.error("Train model pre-flight error:", e);
     if (modelId) {
       await supabase.from("models").delete().eq("id", modelId);
     }
-    const message = e?.response?.data?.message || e?.response?.data?.error || e?.message || "Something went wrong!";
-    // 提取 Astria errors 数组（通常是具体的校验错误）
-    const details = e?.response?.data?.errors
-      ? (Array.isArray(e.response.data.errors)
-          ? e.response.data.errors.map((err: any) => typeof err === 'string' ? err : (err.message || JSON.stringify(err))).join("; ")
-          : JSON.stringify(e.response.data.errors))
-      : (e?.response?.data?.details || '');
     return NextResponse.json(
-      { message, details },
-      { status: e?.response?.status || 500 }
+      { message: e?.message || "Something went wrong!" },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json(
-    {
-      message: "success",
-    },
-    { status: 200 }
-  );
 }

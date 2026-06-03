@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   const tokenHash = requestUrl.searchParams.get("token_hash");
   const token = requestUrl.searchParams.get("token");
   const type = requestUrl.searchParams.get("type");
-  const next = requestUrl.searchParams.get("next") || "/overview";
+  const next = requestUrl.searchParams.get("next") || requestUrl.searchParams.get("redirect_to") || "/overview";
   const error = requestUrl.searchParams.get("error");
   const errorDescription = requestUrl.searchParams.get("error_description");
   const email = requestUrl.searchParams.get("email");

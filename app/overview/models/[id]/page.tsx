@@ -74,8 +74,8 @@ export default async function Index({ params }: { params: { id: string } }) {
               variant={model.status === "failed" ? "destructive" : (model.status === "finished" || model.status === "completed") ? "default" : "secondary"}
               className="text-xs font-medium"
             >
-              {model.status === "processing" ? "training" : model.status === "pending" ? "queued" : model.status === "failed" ? "failed" : model.status }
-              {(model.status === "processing" || model.status === "pending") && (
+              {model.status === "training" ? "training" : model.status === "processing" ? "training" : model.status === "pending" ? "queued" : model.status === "failed" ? "failed" : model.status }
+              {(model.status === "training" || model.status === "processing" || model.status === "pending") && (
                 <Icons.spinner className="h-4 w-4 animate-spin ml-2 inline-block" />
               )}
               {model.status === "failed" && (

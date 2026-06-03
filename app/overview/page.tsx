@@ -51,12 +51,12 @@ export default async function Index() {
       )
       .eq("user_id", user.id);
 
-    // ⭐ 自动检测卡住的训练：processing 超过 60 分钟 + modelId 为空 → 标记为 failed
+    // ⭐ 自动检测卡住的训练：training/processing 超过 60 分钟 + modelId 为空 → 标记为 failed
     const STALE_TIMEOUT_MIN = 60;
     const now = new Date();
     for (const m of models ?? []) {
       if (
-        m.status === "processing" &&
+        (m.status === "training" || m.status === "processing") &&
         !m.modelId &&
         m.created_at &&
         (now.getTime() - new Date(m.created_at).getTime()) / 60000 > STALE_TIMEOUT_MIN

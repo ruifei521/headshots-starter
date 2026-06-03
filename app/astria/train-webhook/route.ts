@@ -4,6 +4,9 @@ import * as crypto from "crypto";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { logger } from "@/lib/logger";
+import { render } from "@react-email/components";
+import { createElement } from "react";
+import TrainingStartedEmail from "@/emails/training-started";
 
 export const dynamic = "force-dynamic";
 
@@ -133,7 +136,7 @@ export async function POST(request: Request) {
     // ⭐ 1. 读取 model 信息（仅用于日志）
     const { data: modelData, error: modelFetchError } = await supabase
       .from("models")
-      .select("id, tier, type, status")
+      .select("id, name, tier, type, status")
       .eq("id", Number(model_id))
       .single();
 
@@ -164,11 +167,14 @@ export async function POST(request: Request) {
 
     if (resendApiKey) {
       const resend = new Resend(resendApiKey);
+      const emailHtml = await render(
+        createElement(TrainingStartedEmail, { modelName: modelData?.name || 'Your Model' })
+      );
       await resend.emails.send({
-        from: "contact@snapprohead.com",
+        from: "SnapProHead <contact@snapprohead.com>",
         to: user?.email ?? "",
-        subject: "Your model was successfully trained!",
-        html: `<h2>We're writing to notify you that your model training was successful! Your headshots are being generated now.</h2>`,
+        subject: "Your AI headshot training has started!",
+        html: emailHtml,
       });
     }
 

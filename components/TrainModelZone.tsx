@@ -27,6 +27,7 @@ import { ImageInspectionResult, aggregateCharacteristics } from "@/lib/imageInsp
 import { TIERS, isTier, type Tier } from "@/lib/tiers";
 import { createBrowserClient } from "@supabase/ssr";
 import Image from "next/image";
+import TrainingProgress from "./TrainingProgress";
 
 type FormInput = z.infer<typeof fileUploadFormSchema>;
 
@@ -34,7 +35,7 @@ const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
 const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
 
 // Minimum and maximum number of images
-const MIN_IMAGES = 4;
+const MIN_IMAGES = 3;
 const MAX_IMAGES = 10;
 // Maximum total size in bytes (4.5MB)
 const MAX_TOTAL_SIZE = 4.5 * 1024 * 1024;
@@ -50,6 +51,8 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
   const [fileObjects, setFileObjects] = useState<FileObject[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [userTier, setUserTier] = useState<Tier>('starter'); // ⭐ 用户当前套餐
+  const [showTrainingProgress, setShowTrainingProgress] = useState(false);
+  const [trainingModelId, setTrainingModelId] = useState<number | null>(null);
   const { toast } = useToast();
   // Track characteristics by file ID to avoid race conditions
   const characteristicsMapRef = useRef<Map<string, ImageInspectionResult>>(new Map());
@@ -354,22 +357,18 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
         return;
       }
 
-      // Update toast to step 3
-      loadingToast.update({
-        id: loadingToast.id,
-        title: "✓ Model queued for training!",
-        description: "You can close this page now. We'll email you when your headshots are ready (~30 mins). Redirecting...",
-      });
+      // ⭐ Parse model_id from response and show TrainingProgress
+      const responseData = await response.json();
+      const modelId: number = responseData.model_id;
 
-      // Clean up preview URLs before navigating away
+      // Clean up preview URLs before switching views
       currentFileObjects.forEach(fo => {
         try { URL.revokeObjectURL(fo.previewUrl); } catch {}
       });
 
-      setTimeout(() => {
-        loadingToast.dismiss();
-        window.location.href = "/overview";
-      }, 1000);
+      loadingToast.dismiss();
+      setShowTrainingProgress(true);
+      setTrainingModelId(modelId);
     } catch (error: any) {
       setIsLoading(false);
       loadingToast.dismiss();
@@ -407,6 +406,9 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
 
   return (
     <div>
+      {showTrainingProgress && trainingModelId ? (
+        <TrainingProgress modelId={trainingModelId} />
+      ) : (
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -509,7 +511,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
             className=" rounded-md justify-center align-middle cursor-pointer flex flex-col gap-4"
           >
             <FormDescription>
-              Upload 4-10 images of the person you want to generate headshots
+              Upload 3-10 images of the person you want to generate headshots
               for.
             </FormDescription>
             <div className="outline-dashed outline-2 outline-gray-100 hover:outline-blue-500 w-full h-full rounded-md p-4 flex justify-center align-middle">
@@ -614,6 +616,7 @@ export default function TrainModelZone({ packSlug }: { packSlug: string }) {
           </Button>
         </form>
       </Form>
+      )}
     </div>
   );
 }

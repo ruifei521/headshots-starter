@@ -159,7 +159,7 @@ export default function ClientSideModel({
   return (
     <div id="train-model-container" className="w-full h-full">
       <div className="flex flex-col w-full mt-4 gap-8">
-        {(model.status === "processing" || model.status === "pending" || model.status === "finished") && (
+        {(model.status === "training" || model.status === "processing" || model.status === "pending" || model.status === "finished") && (
           <TrainingProgressBanner model={model} />
         )}
         {model.status === "failed" && (

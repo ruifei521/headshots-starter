@@ -4,6 +4,9 @@ import * as crypto from "crypto";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { logger } from "@/lib/logger";
+import { render } from "@react-email/components";
+import { createElement } from "react";
+import HeadshotsReadyEmail from "@/emails/headshots-ready";
 
 export const dynamic = "force-dynamic";
 
@@ -305,11 +308,14 @@ export async function POST(request: Request) {
             if (resendApiKey) {
               try {
                 const resend = new Resend(resendApiKey);
+                const emailHtml = await render(
+                  createElement(HeadshotsReadyEmail, { headshotCount: newCount })
+                );
                 await resend.emails.send({
-                  from: "contact@snapprohead.com",
+                  from: "SnapProHead <contact@snapprohead.com>",
                   to: user?.email ?? "",
                   subject: "Your AI headshots are ready!",
-                  html: `<h2>Great news! Your ${newCount} AI headshots have been generated successfully.</h2><p>Visit your <a href="https://snapprohead.com/overview">dashboard</a> to view and download your headshots.</p>`,
+                  html: emailHtml,
                 });
               } catch (emailErr) {
                 logger.error(

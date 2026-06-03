@@ -7,6 +7,8 @@
  * 核心定义统一从 lib/tiers.ts 导出，本文件保持简化兼容层。
  */
 
+import { TIERS, CREEM_PRODUCT_IDS } from './tiers';
+
 export {
   TIERS,
   CREEM_PRODUCT_IDS,
@@ -21,14 +23,14 @@ export {
 
 export type { Tier, TierInfo } from './tiers';
 
-// 向后兼容：保留单包价格（最低档 Basic）
+// 向后兼容：保留单包价格（从 TIERS 读取真实价格）
 export const PRICING = {
-  single: { price: 29 },       // Basic
-  professional: { price: 39 },
-  executive: { price: 59 },
+  single: { price: TIERS.starter.price },
+  professional: { price: TIERS.professional.price },
+  executive: { price: TIERS.executive.price },
 } as const;
 
 // 向后兼容：默认产品 ID（旧代码引用 single）
 export const PRODUCT_IDS = {
-  single: 'prod_fWHFyTDAhVb1xqwS71esu',  // 新 Basic Product ID
+  single: CREEM_PRODUCT_IDS.starter,
 } as const;

@@ -2,7 +2,10 @@
 
 import { Check, Clock, Shield, ArrowRight, Zap, Star, X, DollarSign, Camera, Users, Palette } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { TIERS, type TierInfo } from "@/lib/tiers"
+import { TIERS, type Tier, type TierInfo } from "@/lib/tiers"
+import { createBrowserClient } from "@supabase/ssr"
+import { useRouter } from "next/navigation"
+import { SocialProofBar, Testimonials } from "./trust-signals"
 
 // Default pack used when user clicks directly from pricing card
 const DEFAULT_PACK = 'corporate-headshots'
@@ -130,6 +133,9 @@ export default function ModernPricing() {
             $232. Our packages start from $29.
           </p>
         </div>
+
+        {/* ⭐ Social Proof Bar */}
+        <SocialProofBar />
 
         {/* Three Pricing Cards */}
         <div className="mt-8 grid w-full grid-cols-1 gap-6 md:grid-cols-3">
@@ -273,6 +279,9 @@ export default function ModernPricing() {
             </table>
           </div>
         </div>
+
+        {/* ⭐ Testimonials */}
+        <Testimonials />
       </div>
     </div>
   )

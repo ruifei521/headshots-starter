@@ -10,6 +10,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "@/components/homepage/theme-provider"
 import { validateConfig } from "@/lib/config";
 import { HashAuthHandler } from "@/components/HashAuthHandler";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { getSiteWideJsonLd } from "@/lib/json-ld";
 
 // Dynamic import with ssr: false to prevent motion/react from being bundled on every page
@@ -108,7 +109,9 @@ export default function RootLayout({
             <Navbar />
           </Suspense>
           <main id="main" className="flex-1">
-            {children}
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
           </main>
           <Footer />
           <Toaster />
