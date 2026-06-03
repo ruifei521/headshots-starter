@@ -1,7 +1,43 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+function dumpError(err: unknown): string {
+  if (err === null) return "null";
+  if (err === undefined) return "undefined";
+  if (err instanceof Error) {
+    const d = err as Error & { digest?: string; cause?: unknown };
+    return [
+      `Type: Error`,
+      `Name: ${d.name}`,
+      `Message: ${d.message}`,
+      d.digest ? `Digest: ${d.digest}` : null,
+      d.cause ? `Cause: ${dumpError(d.cause)}` : null,
+      `Stack: ${d.stack || "(none)"}`,
+    ].filter(Boolean).join("\n");
+  }
+  if (typeof err === "object") {
+    const lines = [`Type: ${(err as any).constructor?.name || "Object"}`];
+    // Show all own properties (including non-enumerable)
+    const props = new Set<string>();
+    for (const k in (err as object)) props.add(k);
+    Object.getOwnPropertyNames(err).forEach(k => props.add(k));
+    Object.getOwnPropertySymbols(err).forEach(k => props.add(k.toString()));
+    if (props.size > 0) {
+      lines.push("Properties:");
+      props.forEach(k => {
+        try { lines.push(`  ${k}: ${JSON.stringify((err as any)[k])}`); } catch {}
+      });
+    } else {
+      lines.push("(empty object — no own properties)");
+    }
+    // Try raw toString
+    try { lines.push(`toString: ${String(err)}`); } catch {}
+    return lines.join("\n");
+  }
+  return String(err);
+}
 
 export default function Error({
   error,
@@ -10,13 +46,21 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [browserInfo] = useState(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      return `URL: ${window.location.href}\nSearch: ${window.location.search}\nHash: ${window.location.hash}`;
+    } catch { return ""; }
+  });
+
   useEffect(() => {
-    console.error("Global error boundary caught:", {
-      name: error instanceof Error ? error.name : 'Unknown',
-      message: error instanceof Error ? error.message : JSON.stringify(error),
-      digest: (error as any).digest,
-      url: window.location.href,
-    });
+    console.error("=== ERROR BOUNDARY CAUGHT ===");
+    console.error("Type:", typeof error);
+    console.error("InstanceOf Error:", error instanceof Error);
+    console.error("Raw:", error);
+    console.error("Dump:", dumpError(error));
+    console.error("URL:", window.location.href);
+    console.error("=========================");
   }, [error]);
 
   return (
@@ -46,12 +90,21 @@ export default function Error({
           <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
             Error details
           </summary>
-          <pre className="mt-2 p-3 bg-muted rounded-md text-xs overflow-auto max-h-48 whitespace-pre-wrap break-all">
-            {error instanceof Error
-              ? `${error.name}: ${error.message}${error.stack ? '\n\n' + error.stack : ''}${error.digest ? '\n\nDigest: ' + error.digest : ''}`
-              : JSON.stringify(error, null, 2)}
+          <pre className="mt-2 p-3 bg-muted rounded-md text-xs overflow-auto max-h-80 whitespace-pre-wrap break-all">
+            {dumpError(error)}
           </pre>
         </details>
+
+        {browserInfo && (
+          <details className="text-left w-full">
+            <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+              Browser Info
+            </summary>
+            <pre className="mt-2 p-3 bg-muted rounded-md text-xs overflow-auto max-h-32 whitespace-pre-wrap break-all">
+              {browserInfo}
+            </pre>
+          </details>
+        )}
 
         <div className="flex gap-3 mt-2">
           <Button variant="outline" onClick={() => reset()}>
