@@ -92,7 +92,8 @@ module.exports = withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   silent: !process.env.CI,
-  widenClientFileUpload: true,
+  // Don't widen client-side file upload scope — saves bundle size
+  widenClientFileUpload: false,
   tunnelRoute: "/monitoring",
   disableLogger: true,
   automaticVercelMonitors: true,

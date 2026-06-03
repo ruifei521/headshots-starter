@@ -76,6 +76,24 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  // 🚀 性能优化：公开页面跳过 Supabase getSession() 减少 1 次网络往返
+  const publicPaths = ['/', '/login', '/signup', '/pricing'];
+  const isPublicPage = publicPaths.some(p =>
+    request.nextUrl.pathname === p ||
+    (p !== '/' && request.nextUrl.pathname.startsWith(p + '/'))
+  ) || request.nextUrl.pathname.startsWith('/headshots/');
+
+  if (isPublicPage) {
+    const response = NextResponse.next({
+      request: {
+        headers: request.headers,
+      },
+    });
+    // ISR 缓存：公开页面可以被 CDN 缓存
+    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400');
+    return response;
+  }
+
   const response = NextResponse.next({
     request: {
       headers: request.headers,

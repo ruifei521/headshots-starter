@@ -1,5 +1,3 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr"
-import { cookies } from "next/headers"
 import dynamic from "next/dynamic"
 import type { Metadata } from "next"
 import HeroSection from "@/components/homepage/HeroSection"
@@ -42,40 +40,10 @@ const TestimonialsSection = dynamic(
   { ssr: false }
 )
 
+// ISR: regenerate page every hour — no auth needed on landing page
 export const revalidate = 3600
 
-export default async function Index() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  const isSupabaseConfigured = supabaseUrl && supabaseUrl !== 'your-project-url' && supabaseAnonKey && supabaseAnonKey !== 'your-anon-key'
-
-  let user = null
-  if (isSupabaseConfigured) {
-    const supabase = createServerClient(
-      supabaseUrl,
-      supabaseAnonKey,
-      {
-        cookies: {
-          getAll() {
-            return cookies().getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) => {
-                cookies().set(name, value, options)
-              })
-            } catch {
-              // The `set` method was called from a Server Component.
-            }
-          },
-        },
-      }
-    )
-
-    const { data } = await supabase.auth.getUser()
-    user = data.user
-  }
-
+export default function Index() {
   return (
     <>
       <script
