@@ -3,8 +3,6 @@ import { cookies } from "next/headers"
 import dynamic from "next/dynamic"
 import type { Metadata } from "next"
 import HeroSection from "@/components/homepage/HeroSection"
-import ExamplesSection from "@/components/homepage/ExamplesSection"
-import TestimonialsSection from "@/components/homepage/TestimonialsSection"
 import { getHomepageJsonLd } from "@/lib/json-ld"
 
 export const metadata: Metadata = {
@@ -33,6 +31,14 @@ const FAQSection = dynamic(
 )
 const PrivacySection = dynamic(
   () => import("@/components/homepage/PrivacySection"),
+  { ssr: false }
+)
+const ExamplesSection = dynamic(
+  () => import("@/components/homepage/ExamplesSection"),
+  { ssr: false }
+)
+const TestimonialsSection = dynamic(
+  () => import("@/components/homepage/TestimonialsSection"),
   { ssr: false }
 )
 
