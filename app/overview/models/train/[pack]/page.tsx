@@ -11,7 +11,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
-import { CreditCard } from "lucide-react";
+import { redirect } from 'next/navigation';
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logger";
@@ -75,6 +75,11 @@ export default async function Index({
       // 检查失败时放行，由 API 层兜底
       hasCredits = true;
     }
+  }
+
+  // ⭐ 无 credits 直接重定向到定价页
+  if (!hasCredits) {
+    redirect('/#pricing');
   }
 
   return (
@@ -152,53 +157,7 @@ export default async function Index({
               </Button>
             </Link>
 
-            {!hasCredits ? (
-              /* ⭐ 未付费用户：显示购买引导卡片 */
-              <Card className="p-2 border-amber-400/60">
-                <CardHeader className="px-3 pt-2 pb-0">
-                  <CardTitle className="text-amber-600">Credits Required</CardTitle>
-                  <CardDescription className="text-xs mt-0">
-                    You need credits to train a model and generate headshots. Purchase a plan to get started.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-4 px-3 pb-4">
-                  <div className="flex flex-col gap-3">
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="rounded-lg border p-3 text-center">
-                        <div className="font-bold text-lg">$1</div>
-                        <div className="text-xs text-muted-foreground">Starter</div>
-                        <div className="text-xs">40 headshots</div>
-                      </div>
-                      <div className="rounded-lg border-2 border-primary p-3 text-center relative">
-                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full">Popular</div>
-                        <div className="font-bold text-lg">$1</div>
-                        <div className="text-xs text-muted-foreground">Professional</div>
-                        <div className="text-xs">60 headshots</div>
-                      </div>
-                      <div className="rounded-lg border p-3 text-center">
-                        <div className="font-bold text-lg">$1</div>
-                        <div className="text-xs text-muted-foreground">Executive</div>
-                        <div className="text-xs">100 headshots</div>
-                      </div>
-                    </div>
-                    <Link href="/#pricing">
-                      <Button size="lg" className="w-full text-base font-bold">
-                        <CreditCard className="mr-2 h-5 w-5" />
-                        Purchase Credits to Start
-                      </Button>
-                    </Link>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Already purchased?{" "}
-                      <Link href="/overview" className="text-primary hover:underline">
-                        Go back to My Models
-                      </Link>
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              /* 已付费或支付未配置：正常显示训练表单 */
-              <Card className="p-2">
+            <Card className="p-2">
                 <CardHeader className="px-3 pt-2 pb-0">
                   <CardTitle>Train Model</CardTitle>
                   <CardDescription className="text-xs mt-0">
@@ -211,7 +170,6 @@ export default async function Index({
                   </TrainModelZoneErrorBoundary>
                 </CardContent>
               </Card>
-            )}
           </div>
         </div>
 

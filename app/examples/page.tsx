@@ -155,11 +155,11 @@ export default function ExamplesPage() {
             <p className="max-w-[600px] text-muted-foreground text-lg">
               Join thousands of professionals who trust SnapProHead for studio-quality AI headshots.
             </p>
-            <Link href="/#pricing">
+            <a href="/#pricing">
               <Button size="lg" className="mt-2">
                 Create Your Headshots Now
               </Button>
-            </Link>
+            </a>
           </div>
         </div>
       </section>
