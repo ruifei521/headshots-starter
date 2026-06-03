@@ -50,7 +50,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isLoading || props.disabled}
         {...props}
       >
-        {isLoading ? (
+        {/* asChild 时不能有多个 children（Slot 内部 React.Children.only 只接受单个子元素） */}
+        {!asChild && isLoading ? (
           <span className="mr-2 h-4 w-4 animate-spin">⏳</span>
         ) : null}
         {props.children}
