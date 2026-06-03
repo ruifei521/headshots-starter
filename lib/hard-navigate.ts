@@ -1,8 +1,7 @@
 /**
  * Full-page navigation that must not be preceded by React setState in the same flow.
- * Client-side routing (router.push) or setState + location.assign races React DOM
- * teardown and triggers "removeChild: node is not a child" on production.
+ * Uses replace() so the error page is not kept in history after auth/checkout redirects.
  */
 export function hardNavigate(url: string): void {
-  window.location.assign(url);
+  window.location.replace(url);
 }

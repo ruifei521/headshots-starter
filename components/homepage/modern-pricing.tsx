@@ -1,81 +1,36 @@
 "use client"
 
-import { useRef, useState } from "react"
-import { Check, Clock, Shield, ArrowRight, Zap, Star, Loader2, X, DollarSign, Camera, Users, Palette } from "lucide-react"
+import { Check, Clock, Shield, ArrowRight, Zap, Star, X, DollarSign, Camera, Users, Palette } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { TIERS, type Tier, type TierInfo } from "@/lib/tiers"
-import { createBrowserClient } from "@supabase/ssr"
-import { hardNavigate } from "@/lib/hard-navigate"
+import { TIERS, type TierInfo } from "@/lib/tiers"
 
 // Default pack used when user clicks directly from pricing card
 const DEFAULT_PACK = 'corporate-headshots'
 
-function getSupabase() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+function checkoutHref(tier: string) {
+  const params = new URLSearchParams({ tier, pack: DEFAULT_PACK })
+  return `/api/creem/go?${params.toString()}`
 }
 
-/** Single pricing card with direct checkout */
+function trackBeginCheckout(info: TierInfo) {
+  try {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      const priceNum = parseFloat(info.priceLabel.replace(/[^0-9.]/g, '')) || 0;
+      (window as any).gtag('event', 'begin_checkout', {
+        currency: 'USD',
+        value: priceNum,
+        items: [{ item_id: info.tier, item_name: info.name, price: priceNum }],
+      });
+    }
+  } catch {
+    // GA4 failure should never block checkout
+  }
+}
+
+/** Single pricing card — checkout via server redirect (no client fetch/setState) */
 function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean }) {
   const isPopular = info.badge === "Most Popular";
   const isBest = info.badge === "Best Value";
-  const [loading, setLoading] = useState(false);
-  const checkoutInFlight = useRef(false);
-
-  const handleCheckout = async () => {
-    if (checkoutInFlight.current) return;
-    checkoutInFlight.current = true;
-
-    try {
-      const supabase = getSupabase();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        hardNavigate(`/login?redirect=${encodeURIComponent('/#pricing')}`);
-        return;
-      }
-
-      setLoading(true);
-
-      const res = await fetch('/api/creem/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pack: DEFAULT_PACK,
-          gender: 'woman',
-          tier: info.tier,
-        }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        try {
-          if (typeof window !== 'undefined' && (window as any).gtag) {
-            const priceNum = parseFloat(info.priceLabel.replace(/[^0-9.]/g, '')) || 0;
-            (window as any).gtag('event', 'begin_checkout', {
-              currency: 'USD',
-              value: priceNum,
-              items: [{ item_id: info.tier, item_name: info.name, price: priceNum }],
-            });
-          }
-        } catch {
-          // GA4 failure should never block checkout
-        }
-        // No setState after this — hardNavigate tears down the page; setLoading(false)
-        // or setTimeout would race React reconcile and cause removeChild errors.
-        hardNavigate(data.url);
-        return;
-      }
-
-      checkoutInFlight.current = false;
-      setLoading(false);
-      alert('Failed to create checkout: ' + (data.error || 'Unknown error'));
-    } catch {
-      checkoutInFlight.current = false;
-      setLoading(false);
-      alert('Something went wrong. Please try again.');
-    }
-  };
 
   return (
     <div
@@ -126,10 +81,9 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
         ))}
       </ul>
 
-      {/* CTA Button — direct checkout */}
+      {/* CTA — native navigation to /api/creem/go (server 302 → Creem) */}
       <Button
-        onClick={handleCheckout}
-        disabled={loading}
+        asChild
         className={`w-full min-h-[48px] font-semibold text-base ${
           highlight
             ? "bg-primary hover:bg-primary/90"
@@ -137,14 +91,13 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
         }`}
         variant={highlight ? "default" : "secondary"}
       >
-        {loading ? (
-          <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Processing...</>
-        ) : (
-          <>
-            {highlight ? `Get ${info.name}` : `Choose ${info.name}`}
-            <ArrowRight className="h-4 w-4 ml-2" />
-          </>
-        )}
+        <a
+          href={checkoutHref(info.tier)}
+          onClick={() => trackBeginCheckout(info)}
+        >
+          {highlight ? `Get ${info.name}` : `Choose ${info.name}`}
+          <ArrowRight className="h-4 w-4 ml-2" />
+        </a>
       </Button>
     </div>
   )

@@ -2,7 +2,7 @@
 
 import { Database } from "@/types/supabase";
 import { createBrowserClient } from "@supabase/ssr";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { logger } from "@/lib/logger";
 import { hardNavigate } from "@/lib/hard-navigate";
 
@@ -11,20 +11,13 @@ import { hardNavigate } from "@/lib/hard-navigate";
  *
  * Supports two auth flows:
  * 1. Implicit flow: tokens in URL hash (#access_token=...&refresh_token=...)
- *    - Used by Supabase Magic Link (signInWithOtp)
  * 2. PKCE flow: code in query params (?code=xxx)
- *    - Used by Supabase OAuth and newer PKCE-based magic links
  *
- * IMPORTANT: emailRedirectTo for Magic Link must point to the ROOT URL (e.g. https://snapprohead.com),
- * NOT /auth/callback. This is because hash fragments (#) are not sent to the server,
- * so server-side route handlers cannot read them. The HashAuthHandler is a client component
- * that can access both hash fragments and query parameters.
+ * No loading overlay — setState before hardNavigate caused removeChild DOM errors.
  */
 export function HashAuthHandler() {
-  const [processing, setProcessing] = useState(false);
-  const [hasRun, setHasRun] = useState(false);
+  const hasRun = useRef(false);
 
-  // Check if there's a post-login redirect
   const getPostLoginUrl = () => {
     if (typeof window === 'undefined') return '/overview';
     const redirect = sessionStorage.getItem('postLoginRedirect');
@@ -43,28 +36,22 @@ export function HashAuthHandler() {
   }, []);
 
   useEffect(() => {
-    // Prevent running multiple times
-    if (hasRun) {
-      return;
-    }
+    if (hasRun.current) return;
 
     const handleAuth = async () => {
-      setHasRun(true);
+      hasRun.current = true;
 
-      // ===== Flow 1: Check for PKCE code in query params =====
       const searchParams = new URLSearchParams(window.location.search);
       const code = searchParams.get("code");
 
       if (code) {
-        setProcessing(true);
         try {
-          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) {
             logger.error("[HashAuthHandler] ✗ PKCE exchange error:", exchangeError);
             hardNavigate(`/login?error=${encodeURIComponent("Login link expired or invalid. Please try again.")}`);
             return;
           }
-
           hardNavigate(getPostLoginUrl());
           return;
         } catch (err) {
@@ -74,15 +61,10 @@ export function HashAuthHandler() {
         }
       }
 
-      // ===== Flow 2: Check for implicit flow tokens in hash =====
       const hash = window.location.hash.substring(1);
-      if (!hash) {
-        return;
-      }
+      if (!hash) return;
 
       const hashParams = new URLSearchParams(hash);
-
-      // Check for error in hash
       const error = hashParams.get("error");
       const errorDescription = hashParams.get("error_description");
       if (error) {
@@ -93,12 +75,7 @@ export function HashAuthHandler() {
 
       const accessToken = hashParams.get("access_token");
       const refreshToken = hashParams.get("refresh_token");
-
-      if (!accessToken || !refreshToken) {
-        return;
-      }
-
-      setProcessing(true);
+      if (!accessToken || !refreshToken) return;
 
       try {
         const { error: sessionError } = await supabase.auth.setSession({
@@ -116,21 +93,11 @@ export function HashAuthHandler() {
       } catch (err) {
         logger.error("[HashAuthHandler] ✗ Unexpected error:", err);
         hardNavigate(`/login?error=${encodeURIComponent("Login failed. Please try again.")}`);
-        return;
       }
     };
 
     handleAuth();
   }, [supabase]);
 
-  if (!processing) return null;
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 dark:bg-black/80">
-      <div className="text-center">
-        <div className="mb-3 h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600 mx-auto" />
-        <p className="text-sm text-gray-600 dark:text-gray-400">Signing you in...</p>
-      </div>
-    </div>
-  );
+  return null;
 }
