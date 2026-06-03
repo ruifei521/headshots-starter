@@ -4,6 +4,7 @@ import { Database } from "@/types/supabase";
 import { createBrowserClient } from "@supabase/ssr";
 import { useEffect, useMemo, useState } from "react";
 import { logger } from "@/lib/logger";
+import { hardNavigate } from "@/lib/hard-navigate";
 
 /**
  * Handles Supabase auth redirects that land on the root URL.
@@ -60,18 +61,15 @@ export function HashAuthHandler() {
           const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) {
             logger.error("[HashAuthHandler] ✗ PKCE exchange error:", exchangeError);
-            window.location.href = `/login?error=${encodeURIComponent("Login link expired or invalid. Please try again.")}`;
+            hardNavigate(`/login?error=${encodeURIComponent("Login link expired or invalid. Please try again.")}`);
             return;
           }
 
-          // 使用 window.location.href 而非 router.push()
-          // router.push() 在 React 渲染周期中触发客户端导航会导致 removeChild DOM 错误
-          // 因为 React reconcile 当前组件树时 DOM 已被导航改变
-          window.location.href = getPostLoginUrl();
+          hardNavigate(getPostLoginUrl());
           return;
         } catch (err) {
           logger.error("[HashAuthHandler] ✗ PKCE exchange unexpected error:", err);
-          window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
+          hardNavigate(`/login?error=${encodeURIComponent("Login failed. Please try again.")}`);
           return;
         }
       }
@@ -89,7 +87,7 @@ export function HashAuthHandler() {
       const errorDescription = hashParams.get("error_description");
       if (error) {
         logger.error("[HashAuthHandler] ✗ Auth error in hash:", error, errorDescription);
-        window.location.href = `/login?error=${encodeURIComponent(errorDescription || error)}`;
+        hardNavigate(`/login?error=${encodeURIComponent(errorDescription || error)}`);
         return;
       }
 
@@ -100,27 +98,24 @@ export function HashAuthHandler() {
         return;
       }
 
-      // Found auth tokens in hash - process them
       setProcessing(true);
 
       try {
-        const { data, error: sessionError } = await supabase.auth.setSession({
+        const { error: sessionError } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
         });
 
         if (sessionError) {
           logger.error("[HashAuthHandler] ✗ Set session error:", sessionError);
-          window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
+          hardNavigate(`/login?error=${encodeURIComponent("Login failed. Please try again.")}`);
           return;
         }
 
-        setProcessing(false);
-        // 使用 window.location.href 避免 React reconcile 冲突
-        window.location.href = getPostLoginUrl();
+        hardNavigate(getPostLoginUrl());
       } catch (err) {
         logger.error("[HashAuthHandler] ✗ Unexpected error:", err);
-        window.location.href = `/login?error=${encodeURIComponent("Login failed. Please try again.")}`;
+        hardNavigate(`/login?error=${encodeURIComponent("Login failed. Please try again.")}`);
         return;
       }
     };

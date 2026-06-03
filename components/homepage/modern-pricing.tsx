@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { Check, Clock, Shield, ArrowRight, Zap, Star, Loader2, X, DollarSign, Camera, Users, Palette } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TIERS, type Tier, type TierInfo } from "@/lib/tiers"
 import { createBrowserClient } from "@supabase/ssr"
+import { hardNavigate } from "@/lib/hard-navigate"
 
 // Default pack used when user clicks directly from pricing card
 const DEFAULT_PACK = 'corporate-headshots'
@@ -21,16 +22,21 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
   const isPopular = info.badge === "Most Popular";
   const isBest = info.badge === "Best Value";
   const [loading, setLoading] = useState(false);
+  const checkoutInFlight = useRef(false);
+
   const handleCheckout = async () => {
-    setLoading(true);
+    if (checkoutInFlight.current) return;
+    checkoutInFlight.current = true;
+
     try {
       const supabase = getSupabase();
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        setLoading(false);
-        window.location.href = `/login?redirect=${encodeURIComponent('/#pricing')}`;
+        hardNavigate(`/login?redirect=${encodeURIComponent('/#pricing')}`);
         return;
       }
+
+      setLoading(true);
 
       const res = await fetch('/api/creem/checkout', {
         method: 'POST',
@@ -43,7 +49,6 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
       });
       const data = await res.json();
       if (data.url) {
-        // GA4: track begin_checkout event (wrapped in try-catch to prevent errors)
         try {
           if (typeof window !== 'undefined' && (window as any).gtag) {
             const priceNum = parseFloat(info.priceLabel.replace(/[^0-9.]/g, '')) || 0;
@@ -56,20 +61,20 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
         } catch {
           // GA4 failure should never block checkout
         }
-        // Defer navigation to next macrotask — lets React fully flush all pending renders
-        // before browser navigation tears down the component tree
-        const checkoutUrl = data.url;
-        setTimeout(() => {
-          window.location.href = checkoutUrl;
-        }, 0);
+        // No setState after this — hardNavigate tears down the page; setLoading(false)
+        // or setTimeout would race React reconcile and cause removeChild errors.
+        hardNavigate(data.url);
         return;
-      } else {
-        alert('Failed to create checkout: ' + (data.error || 'Unknown error'));
       }
+
+      checkoutInFlight.current = false;
+      setLoading(false);
+      alert('Failed to create checkout: ' + (data.error || 'Unknown error'));
     } catch {
+      checkoutInFlight.current = false;
+      setLoading(false);
       alert('Something went wrong. Please try again.');
     }
-    setLoading(false);
   };
 
   return (

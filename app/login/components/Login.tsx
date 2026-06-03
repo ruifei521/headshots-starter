@@ -9,6 +9,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { AiOutlineGoogle } from 'react-icons/ai';
 import { WaitingForMagicLink } from './WaitingForMagicLink';
+import { hardNavigate } from '@/lib/hard-navigate';
 
 type Inputs = {
   email: string;
@@ -160,7 +161,7 @@ export const Login = ({
 
     // implicit flow 返回 URL，Supabase 不会自动跳转，需要手动跳转
     if (data?.url) {
-      window.location.href = data.url;
+      hardNavigate(data.url);
     }
   };
 
