@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaCreditCard } from "react-icons/fa";
 import { redirect } from 'next/navigation';
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -189,7 +189,7 @@ export default async function Index({
                     </div>
                     <Link href="/#pricing">
                       <Button size="lg" className="w-full text-base font-bold">
-                        <CreditCard className="mr-2 h-5 w-5" />
+                        <FaCreditCard className="mr-2 h-5 w-5" />
                         Purchase Credits to Start
                       </Button>
                     </Link>
@@ -217,6 +217,7 @@ export default async function Index({
                   </TrainModelZoneErrorBoundary>
                 </CardContent>
               </Card>
+            )}
           </div>
         </div>
 
