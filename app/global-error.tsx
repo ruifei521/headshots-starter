@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { reportError } from '@/lib/report-error';
 
 export default function GlobalError({
   error,
@@ -10,10 +11,10 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Global error boundary caught:', {
-      name: error instanceof Error ? error.name : 'Unknown',
-      message: error instanceof Error ? error.message : JSON.stringify(error),
-      digest: (error as any).digest,
+    reportError(error, {
+      area: 'global-error-boundary',
+      level: 'fatal',
+      extra: { digest: error.digest },
     });
   }, [error]);
 

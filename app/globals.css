@@ -98,9 +98,18 @@
     width: 100%;
   }
 
-  /* Ensure images don't overflow */
-  img, video {
+  /* Ensure content images don't overflow (exclude absolute fill / marquee images) */
+  img:not(.object-cover), video {
     max-width: 100%;
     height: auto;
   }
+}
+
+/* Decorative homepage marquee — always animate (not gated on prefers-reduced-motion). */
+@keyframes snap-marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.snap-marquee-fallback {
+  animation: snap-marquee-left 35s linear infinite !important;
 }

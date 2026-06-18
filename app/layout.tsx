@@ -3,15 +3,20 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
-import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { Analytics } from "@vercel/analytics/react";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import { LazyGoogleAnalytics } from "@/components/LazyGoogleAnalytics";
 import { ThemeProvider } from "@/components/homepage/theme-provider"
 import { validateConfig } from "@/lib/config";
 import { HashAuthHandler } from "@/components/HashAuthHandler";
-import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { HashScrollHandler } from "@/components/HashScrollHandler";
 import { getSiteWideJsonLd } from "@/lib/json-ld";
+import { META_SITE_DESCRIPTION } from "@/lib/refund-policy";
+
+const ClientErrorReporter = dynamic(
+  () => import("@/components/ClientErrorReporter").then((m) => m.ClientErrorReporter),
+  { ssr: false }
+);
 
 // Dynamic import with ssr: false to prevent motion/react from being bundled on every page
 const AnnouncementBar = dynamic(
@@ -25,7 +30,6 @@ validateConfig();
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
     { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
@@ -40,13 +44,13 @@ export const metadata: Metadata = {
     default: `SnapProHead - AI Professional Headshots in ~25 Minutes | From $29`,
     template: "%s | SnapProHead",
   },
-  description: `Generate professional AI headshots for LinkedIn, resumes, and social media in ~25 minutes. 14-day money-back guarantee. Starting at $29 — a fraction of traditional photography.`,
+  description: META_SITE_DESCRIPTION,
     alternates: {
       canonical: "https://snapprohead.com",
     },
   openGraph: {
     title: "SnapProHead - AI Professional Headshots in ~25 Minutes",
-    description: `Turn selfies into professional headshots in ~25 minutes. Starting at $29 with a 14-day money-back guarantee. Used by professionals on LinkedIn and social media.`,
+    description: `Turn selfies into professional headshots in ~25 minutes. Starting at $29. Used by professionals on LinkedIn and social media.`,
     url: "https://snapprohead.com",
     siteName: "SnapProHead",
     locale: "en_US",
@@ -63,7 +67,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "SnapProHead - AI Professional Headshots in ~25 Minutes",
-    description: `Turn selfies into professional headshots in ~25 minutes. Starting at $29 with a 14-day money-back guarantee.`,
+    description: `Turn selfies into professional headshots in ~25 minutes. Starting at $29.`,
     images: ["https://snapprohead.com/hero.png"],
   },
   manifest: "/site.webmanifest",
@@ -81,7 +85,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" translate="no" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background">
         {/* JSON-LD: 全站 Organization + WebSite Schema */}
         <script
@@ -97,26 +101,19 @@ export default function RootLayout({
         </a>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <HashAuthHandler />
+          <HashScrollHandler />
+          <ClientErrorReporter />
           <AnnouncementBar />
-          {/* Remove the section wrapper as it's interfering with sticky positioning */}
-          <Suspense
-            fallback={
-              <div className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="container h-16" />
-              </div>
-            }
-          >
-            <Navbar />
-          </Suspense>
+          <Navbar />
           <main id="main" className="flex-1">
-            <ErrorBoundary>
-              {children}
-            </ErrorBoundary>
+            {children}
           </main>
           <Footer />
           <Toaster />
           <Analytics />
-          {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
+          {process.env.NEXT_PUBLIC_GA_ID && (
+            <LazyGoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+          )}
         </ThemeProvider>
       </body>
     </html>

@@ -1,16 +1,11 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Check, ArrowRight, Shield } from "lucide-react"
-import type { Metadata } from 'next'
+import { getProfessionMetadata } from "@/lib/profession-metadata";
+import { PROFESSION_PAGE_CTA, PROFESSION_HERO_SUFFIX, DELIVERY_FAQ_ANSWER } from "@/lib/refund-policy";
+import { ESTIMATED_DELIVERY_LONG } from "@/lib/tiers";
 
-export const metadata: Metadata = {
-  title: 'Professional Headshots - Professional AI Photos for job seekers and career professionals',
-  description: 'Get professional AI professional in ~30 minutes. Professional Headshots for job seekers and career professionals. 40+ HD photos, starting at $29. 14-day money-back guarantee.',
-  openGraph: {
-    title: 'AI Professional Headshots - job seekers and career professionals',
-    description: 'Professional professional for job seekers and career professionals. Starting at $29 for 40+ HD headshots.',
-  },
-}
+export const metadata = getProfessionMetadata("professional");
 
 export default function ProfessionalHeadshotsPage() {
   return (
@@ -24,16 +19,16 @@ export default function ProfessionalHeadshotsPage() {
         </h1>
         <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto mb-8">
           Professional professional that help you make the right impression. 
-          Upload selfies and get studio-quality photos in ~30 minutes.
+          Upload selfies and get studio-quality photos in {ESTIMATED_DELIVERY_LONG}.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/login">
+          <Link href="/pricing">
             <Button size="lg" className="group w-full sm:w-auto">
               Create Your Professional Headshots
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
-          <Link href="/templates">
+          <Link href="/headshots">
             <Button size="lg" variant="outline">Browse Styles</Button>
           </Link>
         </div>
@@ -47,28 +42,28 @@ export default function ProfessionalHeadshotsPage() {
       <div className="mx-auto max-w-2xl mb-16 p-8 rounded-xl border bg-card">
         <h2 className="text-2xl font-bold mb-4">Professional Professional Headshots</h2>
         <p className="text-muted-foreground mb-4">
-          Choose from 12 professional styles including professional looks, 
+          Choose from 21 professional styles including professional looks, 
           formal business, and modern casual — all in one session.
         </p>
         <div className="grid grid-cols-2 gap-4 text-sm mb-6">
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 40+ HD headshots</div>
-          <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 12 professional styles</div>
+          <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 21 professional styles</div>
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Multiple backgrounds</div>
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Commercial license</div>
         </div>
-        <Link href="/login"><Button className="w-full">Get Started — $29</Button></Link>
+        <Link href="/pricing"><Button className="w-full">Get Started — $29</Button></Link>
         <p className="text-center mt-4">
-          <Link href="/templates" className="text-sm text-primary hover:underline">Browse all 12 styles →</Link>
+          <Link href="/headshots" className="text-sm text-primary hover:underline">Browse all 21 styles →</Link>
         </p>
       </div>
 
       <div className="mx-auto max-w-2xl text-center">
         <Shield className="h-12 w-12 mx-auto text-green-500 mb-4" />
         <h2 className="text-2xl font-bold mb-4">Ready to Upgrade Your Image?</h2>
-        <p className="text-muted-foreground mb-6">$29. 14-day guarantee. Delivered in ~30 minutes.</p>
+        <p className="text-muted-foreground mb-6">{PROFESSION_PAGE_CTA}</p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/login"><Button size="lg">Create Your Professional Headshots Now</Button></Link>
-          <Link href="/templates"><Button size="lg" variant="outline">Browse All Styles</Button></Link>
+          <Link href="/pricing"><Button size="lg">Create Your Professional Headshots Now</Button></Link>
+          <Link href="/headshots"><Button size="lg" variant="outline">Browse All Styles</Button></Link>
         </div>
       </div>
 
@@ -77,9 +72,9 @@ export default function ProfessionalHeadshotsPage() {
           '@context': 'https://schema.org','@type': 'FAQPage',
           mainEntity: [
             {'@type':'Question', name: 'How much do professional cost?',
-             acceptedAnswer:{'@type':'Answer', text: 'Starting at $29 for 40+ HD professional headshots.'}},
+             acceptedAnswer:{'@type':'Answer', text: PROFESSION_HERO_SUFFIX}},
             {'@type':'Question', name: 'How long does it take?',
-             acceptedAnswer:{'@type':'Answer', text: 'About 30 minutes. Upload 4-10 selfies and our AI generates your photos.'}},
+             acceptedAnswer:{'@type':'Answer', text: DELIVERY_FAQ_ANSWER}},
           ]}
         )}}
       />

@@ -48,7 +48,10 @@ export async function POST(req: NextRequest) {
     });
 
     if ('error' in result) {
-      const status = result.error.includes('Unknown tier') ? 400 : 502;
+      const status =
+        result.error === 'invalid_tier' || result.error.includes('Unknown tier')
+          ? 400
+          : 502;
       return NextResponse.json({ error: result.error }, { status });
     }
 

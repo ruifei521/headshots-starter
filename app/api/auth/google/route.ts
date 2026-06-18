@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { safeAuthRedirectPath } from '@/lib/auth-redirect';
+import { resolvePostLoginDestination } from '@/lib/auth-redirect';
 import { getSiteOrigin } from '@/lib/site-origin';
 
 export const dynamic = 'force-dynamic';
@@ -23,7 +23,9 @@ export async function GET(req: NextRequest) {
 
   const origin = getSiteOrigin(req);
   const redirectUri = `${origin}/api/auth/google/callback`;
-  const afterLogin = safeAuthRedirectPath(req.nextUrl.searchParams.get('redirect'));
+  const afterLogin = resolvePostLoginDestination(
+    req.nextUrl.searchParams.get('redirect')
+  );
 
   const params = new URLSearchParams({
     client_id: clientId,

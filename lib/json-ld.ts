@@ -4,6 +4,19 @@
 // ============================================
 
 import { TIERS, type Tier } from "@/lib/tiers";
+import {
+  COMPARE_PRIVACY_SNIPPET,
+  PHOTOS_FAQ_ANSWER,
+} from "@/lib/data-retention-policy";
+import {
+  REFUND_FAQ_ANSWER,
+  COMPARE_STARTER_LINE,
+  TIER_COUNTS_LINE,
+  META_SITE_DESCRIPTION,
+  DELIVERY_FAQ_STANDARD,
+} from "@/lib/refund-policy";
+import { ESTIMATED_DELIVERY_MINUTES } from "@/lib/tiers";
+import { compareVsStudioPhotographerSnippet } from "@/lib/marketing-copy";
 
 // ============================================
 // 类型定义
@@ -32,8 +45,7 @@ export interface ReviewItem {
 const SITE = {
   name: "SnapProHead",
   url: "https://snapprohead.com",
-  description:
-    "Generate professional AI headshots for LinkedIn, resumes, and social media in ~25 minutes. Starting at $29 with a 14-day money-back guarantee.",
+  description: META_SITE_DESCRIPTION,
   logo: "https://snapprohead.com/hero.png",
   email: "contact@snapprohead.com",
   foundingDate: "2024",
@@ -50,7 +62,7 @@ export const FAQ_DATA: FAQItem[] = [
   {
     question: "How does AI headshot generation work?",
     answer:
-      "Upload 4-10 selfies from any device (phone, computer, or tablet), choose a professional style, then our Flux AI trains on your face and generates studio-quality headshots in ~30 minutes. You get 40+ photos with different backgrounds and outfits.",
+      `Upload 4-10 selfies from any device (phone, computer, or tablet), choose a professional style, then our Flux AI trains on your face and generates studio-quality headshots in about ${ESTIMATED_DELIVERY_MINUTES} minutes. You get 40+ photos with different backgrounds and outfits.`,
   },
   {
     question: "What kind of photos should I upload?",
@@ -60,17 +72,16 @@ export const FAQ_DATA: FAQItem[] = [
   {
     question: "What styles are available?",
     answer:
-      "We offer 12 professional styles: Corporate Headshots, Partner's Headshots, Lawyer Headshots, Natural Looks, Speaker, Realtor, Styled for Success, Talya Maor, Business Profile Studio, Effortless Professionalism, Office Outfits, and Stylish Studio Portraits.",
+      "We offer professional outfit and background presets across Basic, Professional, and Executive packs — from corporate blazers to polished studio looks.",
   },
   {
     question: "How many headshots do I get per pack?",
     answer:
-      "Starter packs include 40 headshots, Professional packs include 60, and Executive packs include 100 headshots. Each style within a pack generates multiple variations with different backgrounds, outfits, and poses.",
+      "Basic packs include 40+ headshots, Professional packs include 60+, and Executive packs include 100+. Each outfit within a pack generates three variations with different backgrounds and poses.",
   },
   {
     question: "How long does it take to get my AI headshots?",
-    answer:
-      "Standard processing takes ~30 minutes. Professional and Executive plans get priority processing for faster turnaround. You'll receive an email notification as soon as your headshots are ready.",
+    answer: DELIVERY_FAQ_STANDARD,
   },
   {
     question: "Can I use AI headshots professionally?",
@@ -79,28 +90,25 @@ export const FAQ_DATA: FAQItem[] = [
   },
   {
     question: "What if I don't like my AI headshots?",
-    answer:
-      "We stand behind our results. If you don't get a single headshot you're happy with, we'll refund your entire purchase — no questions asked. Just contact us within 14 days of delivery.",
+    answer: REFUND_FAQ_ANSWER,
   },
   {
     question: "How does SnapProHead compare to other AI headshot services?",
-    answer:
-      "SnapProHead starts at just $29 with up to 100 headshots per pack — that's 97% cheaper than a $500 professional photographer and 95% faster (30 minutes vs 2-3 weeks). We use advanced Flux AI for 1024×1024 resolution, offer 12 curated styles, a 14-day money-back guarantee, and 30-day auto-delete privacy that many alternatives don't provide.",
+    answer: `${COMPARE_STARTER_LINE} That's ${compareVsStudioPhotographerSnippet()} and 95% faster (~${ESTIMATED_DELIVERY_MINUTES} minutes vs 2-3 weeks). We use advanced Flux AI for 1024×1024 resolution, curated outfit presets, ${COMPARE_PRIVACY_SNIPPET}, and a fair refund policy that many alternatives don't provide.`,
   },
   {
     question: "How much does it cost?",
-    answer:
-      "Starter: $29 (40 headshots), Professional: $39 (60 headshots), Executive: $59 (100 headshots). You can purchase additional packs anytime without re-uploading photos — your trained model is reused.",
+    answer: `${TIER_COUNTS_LINE} You can purchase additional packs anytime without re-uploading photos — your trained model is reused.`,
   },
   {
     question: "Are the headshots realistic? Will people know they're AI-generated?",
     answer:
-      "Yes — our AI uses the latest Flux technology to produce 1024×1024 high-resolution headshots with natural skin textures, realistic lighting, and authentic-looking backgrounds. 95% of our customers say the results are indistinguishable from real photos.",
+      "Yes — our AI uses Flux technology to produce 1024×1024 high-resolution headshots with natural skin textures, realistic lighting, and professional backgrounds. Results are designed to look like studio portraits, not obvious AI art.",
   },
   {
     question: "How many good photos can I expect?",
     answer:
-      "Based on customer feedback, the average user gets 25-35 usable headshots and 10-15 photos they absolutely love per Starter pack. With 40-100 headshots depending on your plan, you'll have plenty to choose from.",
+      "Based on customer feedback, the average user gets 28-35 usable headshots and 10-15 photos they absolutely love per Basic pack. With 40-100+ headshots depending on your plan, you'll have plenty to choose from.",
   },
   {
     question: "Who owns the copyright? Can I use them commercially?",
@@ -110,12 +118,11 @@ export const FAQ_DATA: FAQItem[] = [
   {
     question: "Is there a free trial?",
     answer:
-      "We don't offer a free trial because AI model training has real computing costs. However, we offer a 14-day no-questions-asked money-back guarantee — so there's zero risk to see the results for yourself.",
+      "We don't offer a free trial because AI model training has real computing costs. See our refund policy at snapprohead.com/refund if you'd like to understand your options before purchasing.",
   },
   {
     question: "What do you do with my uploaded photos?",
-    answer:
-      "We never sell, share, or display your photos. They're used solely to train your personal AI model and are automatically deleted 30 days after training completes. All data is transmitted with SSL encryption and stored with AES-256 encryption. You can request earlier deletion anytime from your account settings.",
+    answer: PHOTOS_FAQ_ANSWER,
   },
 ];
 
@@ -144,14 +151,6 @@ export function generateWebSiteSchema() {
     name: SITE.name,
     url: SITE.url,
     description: SITE.description,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${SITE.url}/search?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
   };
 }
 
@@ -163,14 +162,14 @@ export function generateProductSchema() {
     const info = TIERS[tier];
     return {
       "@type": "Offer",
-      name: `${info.name} Plan — ${info.imageCount} AI Headshots`,
+      name: `${info.name} Plan — ${info.marketingImageCount}+ AI Headshots`,
       price: info.price.toString(),
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
-      description: `${info.imageCount} HD AI headshots, ${info.features.slice(0, 3).join(", ")}`,
+      description: `${info.marketingImageCount}+ HD AI headshots, ${info.features.slice(0, 3).join(", ")}`,
       eligibleQuantity: {
         "@type": "QuantitativeValue",
-        value: info.imageCount,
+        value: info.marketingImageCount,
         unitText: "headshots",
       },
     };
@@ -198,13 +197,6 @@ export function generateProductSchema() {
         availability: "https://schema.org/InStock",
       },
     ],
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.9",
-      bestRating: "5",
-      ratingCount: "50",
-      reviewCount: "50000",
-    },
   };
 }
 
@@ -279,12 +271,94 @@ export function getHomepageJsonLd() {
   };
 }
 
-/** 评价页：Review（精选） + Breadcrumb */
-export function getExamplesJsonLd(reviews: ReviewItem[]) {
+/** Blog article: Article + Breadcrumb */
+export function getBlogArticleJsonLd(input: {
+  title: string;
+  description: string;
+  slug: string;
+  datePublished: string;
+  dateModified?: string;
+  imageUrl?: string;
+  wordCount?: number;
+}) {
+  const url = `${SITE.url}/blog/${input.slug}`;
+  const modified = input.dateModified ?? input.datePublished;
+
   return {
     "@context": "https://schema.org",
     "@graph": [
-      ...generateReviewSchema(reviews),
+      {
+        "@type": "Article",
+        headline: input.title,
+        description: input.description,
+        datePublished: input.datePublished,
+        dateModified: modified,
+        author: {
+          "@type": "Organization",
+          name: SITE.name,
+          url: SITE.url,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: SITE.name,
+          url: SITE.url,
+          logo: {
+            "@type": "ImageObject",
+            url: SITE.logo,
+          },
+        },
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": url,
+        },
+        image: [input.imageUrl ?? SITE.logo],
+        ...(input.wordCount != null && input.wordCount > 0
+          ? { wordCount: input.wordCount }
+          : {}),
+      },
+      generateBreadcrumbSchema([
+        { name: "Home", url: SITE.url },
+        { name: "Blog", url: `${SITE.url}/blog` },
+        { name: input.title, url },
+      ]),
+    ],
+  };
+}
+
+/** Blog index: CollectionPage + Breadcrumb */
+export function getBlogIndexJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: "SnapProHead Blog",
+        description:
+          "Guides and comparisons on AI professional headshots, LinkedIn photos, and studio-quality portraits.",
+        url: `${SITE.url}/blog`,
+        isPartOf: { "@type": "WebSite", name: SITE.name, url: SITE.url },
+      },
+      generateBreadcrumbSchema([
+        { name: "Home", url: SITE.url },
+        { name: "Blog", url: `${SITE.url}/blog` },
+      ]),
+    ],
+  };
+}
+
+/** Examples page: breadcrumb only (testimonials are illustrative, not Review schema). */
+export function getExamplesJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        name: "Sample Reviews & Examples",
+        description:
+          "Illustrative customer-style feedback and AI headshot examples from SnapProHead.",
+        url: `${SITE.url}/examples`,
+        isPartOf: { "@type": "WebSite", name: SITE.name, url: SITE.url },
+      },
       generateBreadcrumbSchema([
         { name: "Home", url: SITE.url },
         { name: "Reviews & Examples", url: `${SITE.url}/examples` },

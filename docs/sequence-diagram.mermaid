@@ -49,7 +49,7 @@ sequenceDiagram
         Astria-->>TM: 201 Created {tune_id: 999}
         TM->>DB: INSERT INTO samples (modelId=42, uri) × N
         TM->>DB: UPDATE credits SET credits=credits-1
-        TM-->>User: ✓ 训练已提交！预计 ~40 分钟
+        TM-->>User: ✓ 训练已提交！预计 ~25 分钟
     end
 
     %% ============================================
@@ -57,7 +57,7 @@ sequenceDiagram
     %% ============================================
     rect rgb(240, 255, 240)
         Note over Astria,TWH: === Phase 3: Astria 训练完成 → Webhook 回调 ===
-        Note over Astria: ~30-40 分钟训练 + corporate prompts 生成
+        Note over Astria: ~25 分钟训练 + corporate prompts 生成
         Astria->>TWH: POST train-webhook<br/>{tune: {id: 999, name: 'man', ...}}
         TWH->>TWH: 校验 webhook_secret
 

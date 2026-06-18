@@ -1,6 +1,7 @@
 import { createServerClient, parseCookieHeader } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { isPublicMarketingPath } from '@/lib/public-paths'
 
 // Rate limiting store (in-memory, per-region, resets on cold start)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -17,7 +18,7 @@ function getRateLimitKey(request: NextRequest): string {
 
 function getRateLimitConfig(pathname: string): { maxRequests: number; windowMs: number } {
   if (pathname.startsWith('/api/')) return { maxRequests: 60, windowMs: 60_000 };
-  if (pathname.startsWith('/auth/')) return { maxRequests: 10, windowMs: 60_000 };
+  if (pathname.startsWith('/auth/')) return { maxRequests: 40, windowMs: 60_000 };
   return { maxRequests: 120, windowMs: 60_000 };
 }
 
@@ -43,6 +44,20 @@ function checkRateLimit(request: NextRequest): { allowed: boolean; retryAfter?: 
   return { allowed: true };
 }
 
+function withPathHeaders(request: NextRequest): Headers {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', request.nextUrl.pathname);
+  requestHeaders.set('x-search', request.nextUrl.search);
+  return requestHeaders;
+}
+
+function continueWithPath(request: NextRequest, init?: ResponseInit) {
+  return NextResponse.next({
+    request: { headers: withPathHeaders(request) },
+    ...init,
+  });
+}
+
 export async function middleware(request: NextRequest) {
   // Rate limiting — check before any processing
   const rateLimitResult = checkRateLimit(request);
@@ -63,42 +78,27 @@ export async function middleware(request: NextRequest) {
   const isLocalhost = request.nextUrl.hostname === 'localhost' || request.nextUrl.hostname === '127.0.0.1';
 
   // ⚠️ 关键修复：跳过 /auth/ 路由，避免 middleware 干扰 PKCE 认证流程
-  // middleware 中的 getSession() 会读取并可能清除 code_verifier cookie，
-  // 导致 /auth/callback 中的 exchangeCodeForSession() 找不到 verifier 而失败
-  // 这是 Supabase SSR + Next.js 的已知问题
   if (request.nextUrl.pathname.startsWith('/auth/')) {
-    const response = NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
+    const response = continueWithPath(request);
     response.headers.set('Cache-Control', 'private, no-store');
     return response;
   }
 
-  // 🚀 性能优化：公开页面跳过 Supabase getSession() 减少 1 次网络往返
-  const publicPaths = ['/', '/login', '/signup', '/pricing'];
-  const isPublicPage = publicPaths.some(p =>
-    request.nextUrl.pathname === p ||
-    (p !== '/' && request.nextUrl.pathname.startsWith(p + '/'))
-  ) || request.nextUrl.pathname.startsWith('/headshots/');
+  // Checkout API validates auth itself; skip getSession() to avoid duplicate Supabase RTT (~300–800ms)
+  if (request.nextUrl.pathname.startsWith('/api/creem/')) {
+    const response = continueWithPath(request);
+    response.headers.set('Cache-Control', 'private, no-store');
+    return response;
+  }
 
-  if (isPublicPage) {
-    const response = NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
+  // 🚀 公开页跳过 Supabase getSession() — 减少 TTFB，允许 CDN 缓存
+  if (isPublicMarketingPath(request.nextUrl.pathname)) {    const response = continueWithPath(request);
     // ISR 缓存：公开页面可以被 CDN 缓存
     response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400');
     return response;
   }
 
-  const response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
+  const response = continueWithPath(request)
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

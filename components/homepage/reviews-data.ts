@@ -15,7 +15,7 @@ export const reviews: Review[] = [
     role: "Marketing Director",
     rating: 5,
     date: "May 28, 2026",
-    text: "Absolutely blown away by the quality! Updated my LinkedIn photo and saw a 3x increase in profile views within the first week.",
+    text: "Absolutely blown away by the quality! Updated my LinkedIn photo and it looks much more polished than my old selfie.",
     avatar: "/gallery-images/01.jpg"
   },
   {
@@ -30,7 +30,7 @@ export const reviews: Review[] = [
     role: "HR Manager",
     rating: 5,
     date: "May 27, 2026",
-    text: "Best AI headshot tool I've come across. The results look completely natural — none of that weird plasticky AI look. Our entire HR department uses it now for onboarding photos.",
+    text: "Best AI headshot tool I've come across. The results look completely natural — none of that weird plasticky AI look. Great for team onboarding photos.",
     avatar: "/gallery-images/03.jpg"
   },
   {
@@ -45,7 +45,7 @@ export const reviews: Review[] = [
     role: "VP of People",
     rating: 5,
     date: "May 26, 2026",
-    text: "Total game changer for distributed teams. We rolled this out to 60+ employees across 4 time zones and everyone got consistent, high-quality headshots without the logistical nightmare of scheduling photographers.",
+    text: "Total game changer for distributed teams. We used it for a remote team refresh and everyone got consistent, high-quality headshots without scheduling photographers.",
     avatar: "/gallery-images/05.jpg"
   },
   // 6-8: 无头像
@@ -89,14 +89,14 @@ export const reviews: Review[] = [
     role: "Sales Director",
     rating: 5,
     date: "May 23, 2026",
-    text: "I've recommended this to at least 30 people in my network. It's the only AI headshot tool that consistently delivers results indistinguishable from professional photography.",
+    text: "I've recommended this to several colleagues in my network. It's the only AI headshot tool that consistently delivers results indistinguishable from professional photography.",
     avatar: "/gallery-images/08.jpg"
   },
   {
     name: "A. Kowalski",
     rating: 5,
     date: "May 23, 2026",
-    text: "Pretty good. Saved me $400 vs a real photographer. Would recommend.",
+    text: "Pretty good. Saved me a lot compared with booking a real photographer. Would recommend.",
     avatar: "/gallery-images/09.jpg"
   },
   {
@@ -145,7 +145,7 @@ export const reviews: Review[] = [
     name: "Laura B.",
     rating: 5,
     date: "May 19, 2026",
-    text: "Paid $500 for professional headshots two years ago. These are better. More variety, better lighting, and I can generate new ones whenever I want."
+    text: "Paid for a traditional studio session a couple of years ago. These are better — more variety, better lighting, and I can generate new ones whenever I want.",
   },
   // 20-22: 有头像
   {
@@ -160,7 +160,7 @@ export const reviews: Review[] = [
     name: "Daniel M.",
     rating: 5,
     date: "May 18, 2026",
-    text: "My old headshot was from 2019. Been dreading the cost and hassle of a new one. Found this, uploaded a few selfies, and had 40+ professional options in under 30 minutes. Unreal.",
+    text: "My old headshot was from 2019. Been dreading the cost and hassle of a new one. Found this, uploaded a few selfies, and had 40+ professional options in under 25 minutes. Unreal.",
     avatar: "/gallery-images/14.jpg"
   },
   {
@@ -228,7 +228,7 @@ export const reviews: Review[] = [
     name: "Michelle F.",
     rating: 5,
     date: "May 12, 2026",
-    text: "As a job seeker, first impressions matter. Updated my LinkedIn with a SnapProHead photo and immediately started getting more profile views. Landed an interview within two weeks.",
+    text: "As a job seeker, first impressions matter. Updated my LinkedIn with a SnapProHead photo and felt much more confident applying to roles.",
     avatar: "/gallery-images/20.jpg"
   },
   // 32-35: 无头像
@@ -315,7 +315,7 @@ export const reviews: Review[] = [
     name: "George K.",
     rating: 5,
     date: "May 5, 2026",
-    text: "Solid product. Would recommend to anyone who needs a headshot without the $300-500 price tag of a professional photographer.",
+    text: "Solid product. Would recommend to anyone who needs a headshot without the cost of a traditional photographer.",
     avatar: "/gallery-images/25.jpg"
   },
   // 45-48: 无头像

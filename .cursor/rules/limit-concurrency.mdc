@@ -1,0 +1,30 @@
+---
+description: Limit parallel agent work to reduce Cursor lag and CPU load
+alwaysApply: true
+---
+
+# Concurrency limits (performance)
+
+Keep the machine responsive. Do **not** fan out unlimited parallel work by default.
+
+## Hard limits
+
+- **Max 7** parallel tool calls in a single turn (shell, read, grep, etc.).
+- **Max 7** subagents (`Task` tool) at the same time. Queue the rest.
+- **Max 2** long-running background shells (build, deploy, dev server) unless the user explicitly asks for more.
+- **Never** launch more than **7** subagents or **7+** simultaneous shells in one step.
+
+## When to parallelize
+
+Only batch work when tasks are **independent and read-only** (e.g. grep multiple unrelated paths). Prefer sequential execution for:
+
+- writes, deploys, installs, migrations
+- anything that shares git state, node_modules, or the same dev server port
+
+## Multitask / parallel agents
+
+If the user uses `/multitask`, suggest `--max 7` (not 20). Default assumption: **7 concurrent**, not unlimited.
+
+## If work is queued
+
+Run the next item when a slot frees up; do not wait to start a huge new batch.

@@ -1,6 +1,9 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import Link from "next/link";
 import { Camera } from "lucide-react";
-
+import { PRICING_TRUST_LINE } from "@/lib/refund-policy";
+import { HEADSHOT_PROFESSION_STYLES_SHORT } from "@/lib/marketing-copy";
+import { TIERS } from "@/lib/tiers";
 export const metadata: Metadata = {
   title: "About Us",
   description:
@@ -25,7 +28,7 @@ export default function AboutPage() {
           <p className="text-lg text-muted-foreground mb-6">
             SnapProHead makes professional headshots accessible to everyone. 
             No studios, no expensive photographers, no scheduling headaches — 
-            just upload your selfies and get studio-quality portraits in ~30 minutes.
+            just upload your selfies and get studio-quality portraits in ~25 minutes.
           </p>
 
           <h2 className="text-xl font-semibold mt-10 mb-3">Our Mission</h2>
@@ -45,10 +48,37 @@ export default function AboutPage() {
 
           <h2 className="text-xl font-semibold mt-10 mb-3">Our Guarantee</h2>
           <ul className="list-disc pl-5 space-y-2 text-muted-foreground mb-6">
-            <li><strong>3 plans from $29</strong> — 40, 60, or 100 HD headshots. No subscription, no hidden fees.</li>
-            <li><strong>14-day money-back guarantee</strong> — Not happy? Full refund.</li>
-            <li><strong>~30 minute turnaround</strong> — Fast, no waiting.</li>
-            <li><strong>12 professional styles</strong> — Corporate, legal, real estate, and more.</li>
+            <li><strong>3 plans from $29</strong> — {TIERS.starter.marketingImageCount}+, {TIERS.professional.marketingImageCount}+, or {TIERS.executive.marketingImageCount}+ HD headshots. No subscription, no hidden fees.</li>
+            <li><strong>{PRICING_TRUST_LINE}</strong> — Not happy with your results? See our <Link href="/refund" className="text-blue-600 hover:underline">refund policy</Link>.</li>
+            <li><strong>~25 minute turnaround</strong> — Fast, no waiting.</li>
+            <li><strong>{HEADSHOT_PROFESSION_STYLES_SHORT}</strong> — Corporate, legal, real estate, and more.</li>
+          </ul>
+
+          <h2 className="text-xl font-semibold mt-10 mb-3">Explore SnapProHead</h2>
+          <p className="text-muted-foreground mb-3">
+            Browse styles, read guides, and see sample results before you buy.
+          </p>
+          <ul className="list-disc pl-5 space-y-2 text-muted-foreground text-sm mb-6">
+            <li>
+              <Link href="/headshots" className="text-blue-600 hover:underline">
+                All headshot styles
+              </Link>
+            </li>
+            <li>
+              <Link href="/pricing" className="text-blue-600 hover:underline">
+                Pricing &amp; plans
+              </Link>
+            </li>
+            <li>
+              <Link href="/examples" className="text-blue-600 hover:underline">
+                Examples &amp; sample testimonials
+              </Link>
+            </li>
+            <li>
+              <Link href="/blog" className="text-blue-600 hover:underline">
+                Blog &amp; industry guides
+              </Link>
+            </li>
           </ul>
 
           <h2 className="text-xl font-semibold mt-10 mb-3">Contact Us</h2>

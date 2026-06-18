@@ -11,10 +11,11 @@
 
 ## 铁律
 
-### 1. SSR 策略 — 绝对不要碰
-主页面 `app/page.tsx` 除 HeroSection 外，所有 section 必须用 `dynamic(() => import(...), { ssr: false })`。
-**禁止**把任何含 shadcn/lucide-react/next Image 组件的 section 改成静态导入。
-否则 streaming SSR 会触发 `removeChild` DOM 错误，生产环境直接炸。
+### 1. SSR 策略 — 首页 SEO
+主页面 `app/page.tsx` 各 section **静态 import**（服务端渲染正文，供搜索引擎索引）。
+**禁止**在 `page.tsx` 对整块 section 使用 `dynamic(..., { ssr: false })`。
+Hero 内纯动效组件（3DBeforeAfterGallery、ScrollingGallery）可继续 `ssr: false`。
+若改回全站 `ssr: false` 会导致首页 SEO 空壳。
 
 ### 2. 改代码前先读代码
 不要假设文件内容，先打开看。改完立刻验证构建（`npx next build`）。

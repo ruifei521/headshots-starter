@@ -1,6 +1,9 @@
+import { reportError } from "@/lib/report-error";
+
 /**
  * Logger — log/warn fire only in development, error always fires.
- * In production, error logs use sanitized output (no raw secrets/keys).
+ * In production, error logs use sanitized output (no raw secrets/keys)
+ * and are forwarded to Sentry when NEXT_PUBLIC_SENTRY_DSN is set.
  */
 const isDev = process.env.NODE_ENV === "development";
 
@@ -38,8 +41,25 @@ export const logger = {
     else console.warn("[WARN]", ...sanitize(args));
   },
   error: (...args: unknown[]) => {
-    // Always log errors — sanitized in production to avoid leaking secrets
+    const safe = sanitize(args);
     if (isDev) console.error(...args);
-    else console.error("[ERROR]", ...sanitize(args));
+    else console.error("[ERROR]", ...safe);
+
+    const err = args.find((a): a is Error => a instanceof Error);
+    const summary = safe
+      .map((a) => {
+        if (typeof a === "string") return a;
+        if (a instanceof Error) return a.message;
+        try {
+          return JSON.stringify(a);
+        } catch {
+          return String(a);
+        }
+      })
+      .join(" ");
+    reportError(err ?? summary, {
+      area: "logger",
+      extra: { details: safe },
+    });
   },
 };

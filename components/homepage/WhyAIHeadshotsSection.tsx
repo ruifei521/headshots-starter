@@ -1,6 +1,11 @@
 "use client"
 
 import { useRef } from "react"
+import { WHY_AI_PRIVACY_DIMENSION } from "@/lib/data-retention-policy";
+import {
+  STUDIO_PHOTOGRAPH_SESSION_LABEL,
+  HEADSHOT_PROFESSION_STYLES_SHORT,
+} from "@/lib/marketing-copy";
 import Link from "next/link"
 import { motion, useInView } from "motion/react"
 import { ArrowRight, Check, X } from "lucide-react"
@@ -14,12 +19,12 @@ interface ComparisonRow {
 }
 
 const comparisonData: ComparisonRow[] = [
-  { dimension: "Price", ai: "$29 per pack", traditional: "$500+" },
-  { dimension: "Turnaround Time", ai: "~30 minutes", traditional: "2-3 weeks" },
+  { dimension: "Price", ai: "$29 per pack", traditional: STUDIO_PHOTOGRAPH_SESSION_LABEL },
+  { dimension: "Turnaround Time", ai: "~25 minutes", traditional: "2-3 weeks" },
   { dimension: "Photos per Pack", ai: "40+ headshots", traditional: "5-10 photos" },
-  { dimension: "Style Variety", ai: "12 professional styles", traditional: "Single style" },
-  { dimension: "Refund Policy", ai: "14-day money-back guarantee", traditional: "Usually no refunds" },
-  { dimension: "Privacy", ai: "Auto-delete in 30 days", traditional: "Photographer keeps negatives" },
+  { dimension: "Style Variety", ai: HEADSHOT_PROFESSION_STYLES_SHORT, traditional: "Single style" },
+  { dimension: "Refund Policy", ai: "Fair refund policy", traditional: "Usually no refunds" },
+  { dimension: "Privacy", ai: WHY_AI_PRIVACY_DIMENSION, traditional: "Photographer keeps negatives" },
 ]
 
 function ComparisonRowItem({ row, index }: { row: ComparisonRow; index: number }) {
@@ -105,7 +110,7 @@ export default function WhyAIHeadshotsSection() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="mt-8 flex justify-center"
         >
-          <Link href="/#pricing">
+          <Link href="/pricing">
             <Button size="lg" className="group">
               Create Your Headshots Now
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />

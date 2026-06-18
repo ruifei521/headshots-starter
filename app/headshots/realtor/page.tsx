@@ -1,16 +1,10 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Check, ArrowRight, Shield } from "lucide-react"
-import type { Metadata } from 'next'
+import { getProfessionMetadata } from "@/lib/profession-metadata";
+import { STARTER_PRICE_LINE, PROFESSION_PAGE_CTA, DELIVERY_FAQ_ANSWER_40_PLUS, DELIVERY_FAQ_TRAINING } from "@/lib/refund-policy";
 
-export const metadata: Metadata = {
-  title: 'Realtor Headshots - Professional AI Photos for Real Estate Agents',
-  description: 'Get professional AI headshots for real estate agents. Stand out on Zillow, Realtor.com, and MLS with polished, approachable photos. Starting at $29 — 40+ HD headshots in ~30 minutes.',
-  openGraph: {
-    title: 'AI Headshots for Realtors & Real Estate Agents',
-    description: 'Professional real estate headshots that help you close more deals. Starting at $29.',
-  },
-}
+export const metadata = getProfessionMetadata("realtor");
 
 export default function RealtorHeadshotsPage() {
   const jsonLd = {
@@ -30,7 +24,7 @@ export default function RealtorHeadshotsPage() {
         name: "How much do professional realtor headshots cost?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Starting at $29 for 40+ HD headshots in your chosen professional style. All plans include a 14-day money-back guarantee — no questions asked.",
+          text: `${STARTER_PRICE_LINE}. ${PROFESSION_PAGE_CTA}`,
         },
       },
       {
@@ -38,7 +32,7 @@ export default function RealtorHeadshotsPage() {
         name: "How long does it take to get my realtor headshots?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "The AI training takes about 30 minutes. Once complete, you'll have 40+ professional headshots ready to download.",
+          text: DELIVERY_FAQ_TRAINING,
         },
       },
       {
@@ -87,7 +81,7 @@ export default function RealtorHeadshotsPage() {
             approachable headshots that help you close more deals.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/login">
+            <Link href="/pricing">
               <Button size="lg" className="group w-full sm:w-auto">
                 Create Your Realtor Headshots
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -118,11 +112,11 @@ export default function RealtorHeadshotsPage() {
             <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 19-20 HD images</div>
             <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Commercial license included</div>
           </div>
-          <Link href="/login">
+          <Link href="/pricing">
             <Button className="w-full">Get Started — $29</Button>
           </Link>
           <p className="text-center mt-4">
-            <Link href="/templates" className="text-sm text-primary hover:underline">Browse all professional styles →</Link>
+            <Link href="/headshots" className="text-sm text-primary hover:underline">Browse all professional styles →</Link>
           </p>
         </div>
 
@@ -130,9 +124,9 @@ export default function RealtorHeadshotsPage() {
           <Shield className="h-12 w-12 mx-auto text-green-500 mb-4" />
           <h2 className="text-2xl font-bold mb-4">Get More Listings with Professional Headshots</h2>
           <p className="text-muted-foreground mb-6">
-            Properties listing with agent headshots get more inquiries. 14-day money-back guarantee.
+            Properties listing with agent headshots get more inquiries. {STARTER_PRICE_LINE}.
           </p>
-          <Link href="/login">
+          <Link href="/pricing">
             <Button size="lg">Create Your Realtor Headshots Now</Button>
           </Link>
         </div>

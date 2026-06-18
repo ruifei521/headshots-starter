@@ -2,36 +2,35 @@ import { Database } from "@/types/supabase";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
-import * as crypto from "crypto";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { getTrainingConfig, isTier } from "@/lib/tiers";
+import { isTier } from "@/lib/tiers";
 import { getTierPrompts } from "@/lib/prompts";
 import { logger } from "@/lib/logger";
+import { isPaymentEnabled } from "@/lib/payment-config";
+import { deductTrainingCredit, refundTrainingCredit } from "@/lib/credits-admin";
+import { buildTrainWebhookUrl } from "@/lib/astria-webhook";
+import {
+  ASTRIA_FLUX_BASE_TUNE_ID,
+  buildAstriaTunePayload,
+  findUnreachableImageUrl,
+} from "@/lib/astria-tune";
+import {
+  buildAstriaTuneTitle,
+  createAstriaTune,
+  resolveAstriaTuneAfterTimeout,
+} from "@/lib/astria-create-tune";
 
 export const dynamic = "force-dynamic";
-// maxDuration no longer needed: training is non-blocking (fire-and-forget)
+export const maxDuration = 60;
 
 const astriaApiKey = process.env.ASTRIA_API_KEY;
 const astriaTestModeIsOn = process.env.ASTRIA_TEST_MODE === "true";
+const paymentIsConfigured = isPaymentEnabled();
 
-const appWebhookSecret = process.env.APP_WEBHOOK_SECRET;
-const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
-const creemIsConfigured = process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
-const paymentIsConfigured = stripeIsConfigured || creemIsConfigured;
-
-if (!appWebhookSecret) {
+if (!process.env.APP_WEBHOOK_SECRET) {
   logger.warn("MISSING APP_WEBHOOK_SECRET - train-model webhook will not function.");
 }
-
-/** 生成 HMAC-SHA256 webhook token，避免明文 secret 出现在 URL 中 */
-const generateWebhookToken = (uid: string, mid: number): string | null => {
-  if (!appWebhookSecret) return null;
-  return crypto
-    .createHmac("sha256", appWebhookSecret)
-    .update(`${uid}:${mid}`)
-    .digest("hex");
-};
 
 export async function POST(request: Request) {
   let payload;
@@ -41,14 +40,19 @@ export async function POST(request: Request) {
     logger.error("Failed to parse request JSON:", e);
     return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
   }
-  
+
   const images = payload.urls;
   const type = payload.type;
-  const pack = payload.pack;
   const name = payload.name;
   const characteristics = payload.characteristics;
 
-  // First verify user is authenticated using anon key + cookies
+  if (type !== "man" && type !== "woman") {
+    return NextResponse.json(
+      { message: "Invalid type. Please select Man or Woman." },
+      { status: 400 }
+    );
+  }
+
   const supabaseAuth = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -62,7 +66,7 @@ export async function POST(request: Request) {
             try {
               cookies().set(name, value, options);
             } catch {
-              // The `set` method was called from a Server Component.
+              // Called from a Server Component.
             }
           });
         },
@@ -75,15 +79,9 @@ export async function POST(request: Request) {
   } = await supabaseAuth.auth.getUser();
 
   if (!user) {
-    return NextResponse.json(
-      {
-        message: "Unauthorized",
-      },
-      { status: 401 }
-    );
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  // Use service_role_key for database writes to bypass RLS
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -101,23 +99,38 @@ export async function POST(request: Request) {
         message:
           "Missing API Key: Add your Astria API Key to generate headshots",
       },
-      {
-        status: 500,
-      }
-    );
-  }
-
-  if (images?.length < 3) {
-    return NextResponse.json(
-      {
-        message: "Upload at least 3 sample images",
-      },
       { status: 500 }
     );
   }
 
-  // ⭐ 读取用户 tier（用于决定训练参数）
-  let userTier: string = 'starter';
+  if (images?.length < 4) {
+    return NextResponse.json(
+      { message: "Upload at least 4 sample images" },
+      { status: 400 }
+    );
+  }
+
+  if (images.length > 10) {
+    return NextResponse.json(
+      { message: "Upload at most 10 sample images" },
+      { status: 400 }
+    );
+  }
+
+  const unreachableUrl = await findUnreachableImageUrl(images);
+  if (unreachableUrl) {
+    logger.error("Training image URL not reachable:", unreachableUrl);
+    return NextResponse.json(
+      {
+        message:
+          "Your photos uploaded, but Astria cannot access them. Make the Supabase 'headshots' storage bucket public.",
+        details: unreachableUrl,
+      },
+      { status: 400 }
+    );
+  }
+
+  let userTier: string = "starter";
 
   if (paymentIsConfigured) {
     const { error: creditError, data: credits } = await supabase
@@ -127,70 +140,61 @@ export async function POST(request: Request) {
 
     if (creditError) {
       logger.error({ creditError });
-      return NextResponse.json(
-        {
-          message: "Something went wrong!",
-        },
-        { status: 500 }
-      );
+      return NextResponse.json({ message: "Something went wrong!" }, { status: 500 });
     }
 
     if (credits.length === 0) {
-      // create credits for user.
-      const { error: errorCreatingCredits } = await supabase
-        .from("credits")
-        .insert({
-          user_id: user.id,
-          credits: 0,
-          tier: 'starter',
-        });
+      const { error: errorCreatingCredits } = await supabase.from("credits").insert({
+        user_id: user.id,
+        credits: 0,
+        tier: "starter",
+      });
 
       if (errorCreatingCredits) {
         logger.error({ errorCreatingCredits });
-        return NextResponse.json(
-          {
-            message: "Something went wrong!",
-          },
-          { status: 500 }
-        );
+        return NextResponse.json({ message: "Something went wrong!" }, { status: 500 });
       }
 
       return NextResponse.json(
         {
           error: "no_credits",
-          message:
-            "No credits available. Please purchase a plan to start training.",
+          message: "No credits available. Please purchase a plan to start training.",
         },
         { status: 402 }
       );
-    } else if (credits[0]?.credits < 1) {
+    }
+
+    if (credits[0]?.credits < 1) {
       return NextResponse.json(
         {
           error: "no_credits",
-          message:
-            "You've used all your credits. Please purchase more to continue.",
+          message: "You've used all your credits. Please purchase more to continue.",
         },
         { status: 402 }
       );
-    } else {
-      // ⭐ 读取用户 tier（向后兼容：无 tier 字段默认 starter）
-      userTier = credits[0]?.tier || 'starter';
-      logger.log(`User ${user.id} tier: ${userTier}`);
+    }
+
+    userTier = credits[0]?.tier || "starter";
+    logger.log(`User ${user.id} tier: ${userTier}`);
+
+    const deducted = await deductTrainingCredit(user.id);
+    if (!deducted) {
+      return NextResponse.json(
+        {
+          error: "no_credits",
+          message: "You've used all your credits. Please purchase more to continue.",
+        },
+        { status: 402 }
+      );
     }
   }
 
-  // ⭐ 根据 tier 决定训练配置
-  const trainingConfig = getTrainingConfig(isTier(userTier) ? userTier : 'starter');
+  let creditReserved = paymentIsConfigured;
 
-  logger.log(`Training config: branch=${trainingConfig.branch}, tier=${userTier}`);
-
-  // ⭐ 计算 total_images（从 prompts 数量得出）
-  const effectiveTierForCount = isTier(userTier) ? userTier : 'starter';
+  const effectiveTierForCount = isTier(userTier) ? userTier : "starter";
   const promptTemplatesForCount = getTierPrompts(effectiveTierForCount, type);
   const totalImages = promptTemplatesForCount.reduce((s, t) => s + t.num_images, 0);
 
-  // create a model row in supabase — ⭐ 非阻塞模式：初始状态为 'training'
-  // 后续由 train-webhook 回调更新为 'finished'，或由前端实时订阅感知状态变化
   const { error: modelError, data } = await supabase
     .from("models")
     .insert({
@@ -198,27 +202,26 @@ export async function POST(request: Request) {
       name,
       type,
       tier: userTier,
-      status: 'training',
-      total_images: totalImages,   // ⭐ 写入预计总图片数（prompt-webhook 用于判断完成）
+      status: "processing",
+      total_images: totalImages,
     })
     .select("id")
     .single();
 
   if (modelError) {
     logger.error("modelError: ", modelError);
+    if (creditReserved) {
+      await refundTrainingCredit(user.id, 1);
+    }
     return NextResponse.json(
-      {
-        message: modelError.message || "Failed to create model record.",
-      },
+      { message: modelError.message || "Failed to create model record." },
       { status: 500 }
     );
   }
-  
-  // Get the modelId from the created model
+
   const modelId = data?.id;
 
-  try {
-    // ⭐ 1. 先保存 samples（不依赖 Astria 响应，提前完成以减少阻塞）
+  const persistSamples = async (): Promise<boolean> => {
     const { error: samplesError } = await supabase.from("samples").insert(
       images.map((sample: string) => ({
         modelId: modelId,
@@ -228,117 +231,168 @@ export async function POST(request: Request) {
 
     if (samplesError) {
       logger.error("samplesError: ", samplesError);
-      return NextResponse.json(
-        { message: samplesError.message || "Failed to save image samples." },
-        { status: 500 }
-      );
+      return false;
     }
+    return true;
+  };
 
-    // ⭐ 2. 构建 webhook URLs
-    const deploymentUrl = process.env.DEPLOYMENT_URL || process.env.VERCEL_URL || '';
-    const baseUrl = deploymentUrl.startsWith('http://') || deploymentUrl.startsWith('https://') 
-      ? deploymentUrl 
-      : `https://${deploymentUrl}`;
+  const linkAstriaTune = async (astriaTuneId: number): Promise<boolean> => {
+    const { error: linkError } = await supabase
+      .from("models")
+      .update({ modelId: String(astriaTuneId), status: "processing" })
+      .eq("id", modelId);
 
-    const webhookToken = generateWebhookToken(user.id, modelId);
-    const trainWebhook = `${baseUrl}/astria/train-webhook`;
-    const trainWebhookWithParams = webhookToken
-      ? `${trainWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_token=${webhookToken}`
-      : `${trainWebhook}?user_id=${user.id}&model_id=${modelId}`;
-
-    const promptWebhook = `${baseUrl}/astria/prompt-webhook`;
-    const promptWebhookWithParams = webhookToken
-      ? `${promptWebhook}?user_id=${user.id}&model_id=${modelId}&webhook_token=${webhookToken}`
-      : `${promptWebhook}?user_id=${user.id}&model_id=${modelId}`;
-
-    // ⭐ 3. 构建 Astria 请求体
-    const branch = astriaTestModeIsOn ? "fast" : trainingConfig.branch;
-    const promptTemplates = promptTemplatesForCount;
-    const promptsAttributes = promptTemplates.map(t => ({
-      text: t.text,
-      callback: promptWebhookWithParams,
-      num_images: t.num_images,
-    }));
-
-    logger.log(`Firing tune with ${promptsAttributes.length} prompts (non-blocking), tier=${effectiveTierForCount} (${totalImages} images)`);
-
-    const tuneBody: Record<string, any> = {
-      tune: {
-        title: name,
-        name: type,
-        branch: branch,
-        model_type: "lora",
-        token: "ohwx",
-        image_urls: images,
-        callback: trainWebhookWithParams,
-        prompts_attributes: promptsAttributes,
-      },
-    };
-
-    if (characteristics && typeof characteristics === 'object' && Object.keys(characteristics).length > 0) {
-      tuneBody.tune.characteristics = characteristics;
+    if (linkError) {
+      logger.error("linkAstriaTune failed:", linkError);
+      return false;
     }
+    return true;
+  };
 
-    // ⭐ 4. 非阻塞模式：fire-and-forget Astria API 调用
-    // - 不 await Astria 响应 → Vercel Hobby 10s 限制不再阻塞训练
-    // - 成功路径：train-webhook 回调负责更新模型状态 + 扣减 credits
-    // - 失败路径：.catch() 将模型标记为 failed
-    const API_KEY = astriaApiKey;
-    const DOMAIN = "https://api.astria.ai";
-
-    axios.post(DOMAIN + "/tunes", tuneBody, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      timeout: 30000, // 30s 给后台请求本身（不影响 HTTP 响应）
-    })
-      .then(async (response) => {
-        if (response.status === 201) {
-          const astriaId = (response.data as any)?.id;
-          logger.log(`Astria tune accepted: model_id=${modelId}, astria_id=${astriaId}`);
-          if (astriaId) {
-            await supabase
-              .from("models")
-              .update({ modelId: `${astriaId}` })
-              .eq("id", modelId);
-          }
-        } else {
-          logger.error(`Astria rejected model ${modelId}: status ${response.status}`);
-          await supabase.from("models").update({ status: "failed" }).eq("id", modelId);
-        }
-      })
-      .catch(async (e: any) => {
-        const statusCode = e?.response?.status;
-        // 4xx = 请求格式错误（不可恢复）→ 标记 failed
-        // 5xx / timeout = 服务端暂时不可用 → 保留 training 状态，train-webhook 可能仍会回调
-        if (statusCode && statusCode >= 400 && statusCode < 500) {
-          logger.error(`Astria 4xx for model ${modelId}:`, e?.response?.data);
-          await supabase.from("models").update({ status: "failed" }).eq("id", modelId);
-        } else {
-          logger.warn(`Astria request pending for model ${modelId}: ${e?.message || 'unknown'}`);
-          // 保持 training 状态，train-webhook 回调时会更新
-        }
-      });
-
-    // ⭐ 5. 立即返回 — 不等待 Astria 响应
-    return NextResponse.json(
-      {
-        message: "success",
-        model_id: modelId,
-        status: "training",
-      },
-      { status: 200 }
-    );
-  } catch (e: any) {
-    // 仅捕获 samples insert 等同步操作的错误
-    logger.error("Train model pre-flight error:", e);
+  const abortTrainingStart = async (message: string, details?: string) => {
     if (modelId) {
       await supabase.from("models").delete().eq("id", modelId);
     }
+    if (creditReserved) {
+      await refundTrainingCredit(user.id, 1);
+    }
+    return NextResponse.json({ message, details }, { status: 503 });
+  };
+
+  try {
+    const trainWebhookWithParams = buildTrainWebhookUrl(user.id, modelId);
+    const tuneTitle = buildAstriaTuneTitle(name, modelId);
+
+    // Prompts are submitted after training completes (train-webhook) to avoid
+    // Astria 422 from oversized prompts_attributes payloads.
+    const tuneBody = buildAstriaTunePayload({
+      title: tuneTitle,
+      name: type,
+      imageUrls: images,
+      trainCallbackUrl: trainWebhookWithParams,
+      characteristics,
+      testMode: astriaTestModeIsOn,
+    });
+
+    logger.log(
+      `Creating Astria tune: ${images.length} images, tier=${effectiveTierForCount} (${totalImages} prompts queued post-training), testMode=${astriaTestModeIsOn}, base_tune_id=${astriaTestModeIsOn ? "fast" : ASTRIA_FLUX_BASE_TUNE_ID}`
+    );
+
+    let astriaTuneId: number | null = null;
+
+    try {
+      const created = await createAstriaTune({
+        apiKey: astriaApiKey,
+        tuneBody,
+        timeoutMs: 25_000,
+      });
+
+      if (created.status !== 201) {
+        logger.error("Astria API error - status:", created.status, "response:", created.data);
+        return abortTrainingStart(
+          (created.data as { message?: string; error?: string })?.message ||
+            (created.data as { message?: string; error?: string })?.error ||
+            `Astria API returned status ${created.status}`
+        );
+      }
+
+      astriaTuneId = created.tuneId;
+    } catch (firstError: unknown) {
+      const isTimeout =
+        axios.isAxiosError(firstError) &&
+        (firstError.code === "ECONNABORTED" ||
+          firstError.message.includes("timeout"));
+
+      if (!isTimeout) {
+        throw firstError;
+      }
+
+      logger.warn(
+        `Astria create timed out for model ${modelId} — resolving via title idempotency`
+      );
+      astriaTuneId = await resolveAstriaTuneAfterTimeout({
+        apiKey: astriaApiKey,
+        title: tuneTitle,
+        tuneBody,
+      });
+
+      if (!astriaTuneId) {
+        return abortTrainingStart(
+          "The connection timed out before training could be confirmed. Your credit was returned — please try again on Wi‑Fi or wait a moment and retry.",
+          "If you were charged a training credit, it has been refunded automatically."
+        );
+      }
+    }
+
+    if (!astriaTuneId) {
+      return abortTrainingStart(
+        "Astria did not return a training ID. Your credit was returned — please try again."
+      );
+    }
+
+    if (!(await linkAstriaTune(astriaTuneId))) {
+      return abortTrainingStart("Could not save training progress. Your credit was returned.");
+    }
+
+    if (!(await persistSamples())) {
+      if (creditReserved) {
+        await refundTrainingCredit(user.id, 1);
+      }
+      return NextResponse.json(
+        { message: "Failed to save image samples." },
+        { status: 500 }
+      );
+    }
+  } catch (e: any) {
+    logger.error("Train model error:", e);
+
+    if (e?.response) {
+      logger.error("Astria response status:", e.response.status);
+      logger.error("Astria response data:", JSON.stringify(e.response.data, null, 2));
+    }
+
+    const astriaBody = e?.response?.data;
+    const hasAstriaBody =
+      astriaBody &&
+      typeof astriaBody === "object" &&
+      Object.keys(astriaBody).length > 0;
+
+    let message =
+      astriaBody?.message ||
+      astriaBody?.error ||
+      (typeof e?.message === "string" && !e.message.includes("status code")
+        ? e.message
+        : "Training could not be started. Please try again.");
+    let details =
+      astriaBody?.errors != null
+        ? Array.isArray(astriaBody.errors)
+          ? astriaBody.errors
+              .map((err: any) =>
+                typeof err === "string" ? err : err.message || JSON.stringify(err)
+              )
+              .join("; ")
+          : JSON.stringify(astriaBody.errors)
+        : astriaBody?.details || "";
+
+    if (e?.response?.status === 422 && !hasAstriaBody) {
+      message =
+        "Astria could not start training. Check that your Supabase 'headshots' bucket is public and your Astria account has credits.";
+      details =
+        "Supabase → Storage → headshots → Public bucket. Astria → Settings → add credits.";
+    }
+
+    if (modelId) {
+      await supabase.from("models").delete().eq("id", modelId);
+    }
+    if (creditReserved) {
+      await refundTrainingCredit(user.id, 1);
+    }
+
     return NextResponse.json(
-      { message: e?.message || "Something went wrong!" },
-      { status: 500 }
+      { message, details },
+      { status: e?.response?.status || 500 }
     );
   }
+
+  return NextResponse.json({ message: "success", modelId }, { status: 200 });
 }

@@ -22,8 +22,8 @@ export default function ExamplesSection() {
           <Badge variant="outline" className="mb-2">
             See the Results
           </Badge>
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Examples</h2>
-          <p className="max-w-[700px] text-muted-foreground text-lg">
+          <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl md:text-5xl">Examples</h2>
+          <p className="max-w-[700px] text-muted-foreground text-base sm:text-lg px-2">
             These photos are not real. They were all created using AI.
           </p>
         </div>
@@ -44,7 +44,7 @@ export default function ExamplesSection() {
                     loading={i < 2 ? "eager" : "lazy"}
                     unoptimized
                   />
-                  <div className="absolute bottom-2 right-2 rounded-full bg-primary/80 px-2 py-1 text-xs text-white">
+                  <div className="absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 rounded-full bg-primary/80 px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs text-white">
                     <span className="flex items-center gap-1">
                       <span className="h-1.5 w-1.5 rounded-full bg-white"></span>
                       AI Generated
@@ -56,8 +56,11 @@ export default function ExamplesSection() {
           ))}
         </div>
 
-        {/* 8 条评论，每行 4 条，不展示头像 */}
-        <div className="mt-10 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          Sample testimonials for illustration — not verified third-party reviews.
+        </p>
+
+        <div className="mt-4 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {featuredReviews.map((review, i) => (
             <div
               key={i}
@@ -72,17 +75,18 @@ export default function ExamplesSection() {
                 ))}
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                "{review.text}"
+                &ldquo;{review.text}&rdquo;
               </p>
               <p className="mt-2 text-xs font-medium">
                 {review.name}
-                {review.role && <span className="text-muted-foreground font-normal"> · {review.role}</span>}
+                {review.role && (
+                  <span className="text-muted-foreground font-normal"> · {review.role}</span>
+                )}
               </p>
             </div>
           ))}
         </div>
 
-        {/* 查看更多示例和评论 */}
         <div className="mt-8 flex justify-center">
           <Link
             href="/examples"

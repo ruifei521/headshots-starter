@@ -1,16 +1,14 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Check, ArrowRight, Shield } from "lucide-react"
-import type { Metadata } from 'next'
+import { getProfessionMetadata } from "@/lib/profession-metadata";
+import {
+  STUDIO_PHOTOGRAPH_SESSION_LABEL,
+} from "@/lib/marketing-copy";
+import { RETAKES_COMPARISON_LINE, STARTER_PRICE_LINE, PROFESSION_PAGE_CTA, DELIVERY_FAQ_ANSWER_40_PLUS } from "@/lib/refund-policy";
+import { TIERS, ESTIMATED_DELIVERY_LONG } from "@/lib/tiers";
 
-export const metadata: Metadata = {
-  title: 'Lawyer Headshots - Professional AI Photos for Attorneys',
-  description: 'Get partner-quality AI headshots for lawyers and attorneys. Professional, trustworthy photos for law firm websites, LinkedIn, and court directories. Starting at $29 with 14-day guarantee.',
-  openGraph: {
-    title: 'Professional AI Headshots for Lawyers & Attorneys',
-    description: 'Partner-quality headshots for legal professionals. Starting at $29 — delivered in ~30 minutes.',
-  },
-}
+export const metadata = getProfessionMetadata("lawyer");
 
 export default function LawyerHeadshotsPage() {
   return (
@@ -28,7 +26,7 @@ export default function LawyerHeadshotsPage() {
           authority, and professionalism — tailored for law firms and legal professionals.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/login">
+          <Link href="/pricing">
             <Button size="lg" className="group w-full sm:w-auto">
               Create Your Lawyer Headshots
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -58,13 +56,13 @@ export default function LawyerHeadshotsPage() {
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Classic dark suits</div>
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Formal backgrounds</div>
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Professional framing</div>
-          <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 40-44 HD images</div>
+          <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> {TIERS.starter.marketingImageCount}+ HD images</div>
         </div>
-        <Link href="/login">
+        <Link href="/pricing">
           <Button className="w-full">Get Started — $29</Button>
         </Link>
         <p className="text-center mt-4">
-          <Link href="/templates" className="text-sm text-primary hover:underline">Browse all professional styles →</Link>
+          <Link href="/headshots" className="text-sm text-primary hover:underline">Browse all professional styles →</Link>
         </p>
       </div>
 
@@ -78,11 +76,11 @@ export default function LawyerHeadshotsPage() {
             <div className="p-4 text-center text-primary">SnapProHead</div>
           </div>
           {[
-            { f: "Cost", t: "$200 – $500/session", o: `$29` },
+            { f: "Cost", t: STUDIO_PHOTOGRAPH_SESSION_LABEL, o: `$29` },
             { f: "Scheduling", t: "Must coordinate with photographer", o: "Upload selfies anytime" },
-            { f: "Turnaround", t: "3 – 14 days", o: "~30 minutes" },
-            { f: "Outfits & Backgrounds", t: "Limited by studio setup", o: "6 professional styles" },
-            { f: "Retakes", t: "$50 – $150 extra", o: "Free regenerations" },
+            { f: "Turnaround", t: "3 – 14 days", o: ESTIMATED_DELIVERY_LONG },
+            { f: "Outfits & Backgrounds", t: "Limited by studio setup", o: `${TIERS.starter.outfitStyleCount}+ styles on Basic` },
+            { f: "Extra sessions", t: "$50 – $150 extra", o: RETAKES_COMPARISON_LINE },
           ].map((row, i) => (
             <div key={i} className="grid grid-cols-3 border-b last:border-0 text-sm">
               <div className="p-4 font-medium">{row.f}</div>
@@ -98,13 +96,14 @@ export default function LawyerHeadshotsPage() {
         <Shield className="h-12 w-12 mx-auto text-green-500 mb-4" />
         <h2 className="text-2xl font-bold mb-4">Professional Headshots for Legal Professionals</h2>
         <p className="text-muted-foreground mb-6">
-          14-day money-back guarantee.
+          {STARTER_PRICE_LINE}. {PROFESSION_PAGE_CTA}{" "}
+          <Link href="/refund" className="text-primary hover:underline">Refund policy</Link>
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/login">
+          <Link href="/pricing">
             <Button size="lg">Create Your Headshots Now</Button>
           </Link>
-          <Link href="/templates">
+          <Link href="/headshots">
             <Button size="lg" variant="outline">Browse All Styles</Button>
           </Link>
         </div>
@@ -116,11 +115,11 @@ export default function LawyerHeadshotsPage() {
           '@context': 'https://schema.org','@type': 'FAQPage',
           mainEntity: [
             {'@type':'Question', name:'How much do lawyer headshots cost?',
-             acceptedAnswer:{'@type':'Answer', text:'Starting at $29 for 40+ HD professional headshots. No hidden fees.'}},
+             acceptedAnswer:{'@type':'Answer', text:`${STARTER_PRICE_LINE}. No hidden fees.`}},
             {'@type':'Question', name:'What style is best for attorney headshots?',
              acceptedAnswer:{'@type':'Answer', text:'Our Partner\'s Headshots and Corporate styles are most popular for legal professionals. Both feature formal backgrounds and professional attire.'}},
             {'@type':'Question', name:'How long does AI headshot generation take?',
-             acceptedAnswer:{'@type':'Answer', text:'About 30 minutes. Upload 4-10 selfies and our AI generates your professional headshots.'}},
+             acceptedAnswer:{'@type':'Answer', text: DELIVERY_FAQ_ANSWER_40_PLUS}},
           ]}
         )}}
       />

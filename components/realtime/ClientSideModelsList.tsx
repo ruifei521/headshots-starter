@@ -4,10 +4,14 @@ import { Database } from "@/types/supabase";
 import { modelRowWithSamples } from "@/types/utils";
 import { createBrowserClient } from "@supabase/ssr";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FaImages } from "react-icons/fa";
+import { Suspense } from "react";
 import ModelsTable from "../ModelsTable";
+import { CheckoutResumeBanner } from "../CheckoutResumeBanner";
 import { logger } from "@/lib/logger";
+import { isModelGenerating } from "@/lib/model-status-label";
 
 const packsIsEnabled = false; // ⭐ 不再使用 Pack 选择，直接进入训练
 
@@ -15,13 +19,55 @@ export const revalidate = 0;
 
 type ClientSideModelsListProps = {
   serverModels: modelRowWithSamples[] | [];
+  creditsAvailable?: number | null;
 };
 
 export default function ClientSideModelsList({
   serverModels,
+  creditsAvailable = null,
 }: ClientSideModelsListProps) {
   const [models, setModels] = useState<modelRowWithSamples[]>(serverModels);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    setModels(serverModels);
+  }, [serverModels]);
+
+  useEffect(() => {
+    const hasInProgress = models.some((m) => isModelGenerating(m));
+    if (!hasInProgress) return;
+
+    const refreshOverview = () => {
+      router.refresh();
+    };
+
+    const runBackgroundReconcile = async () => {
+      try {
+        const res = await fetch("/api/models/reconcile-active", {
+          method: "POST",
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as { changed?: boolean };
+        if (data.changed) {
+          router.refresh();
+        }
+      } catch {
+        // non-blocking
+      }
+    };
+
+    refreshOverview();
+    void runBackgroundReconcile();
+
+    const refreshInterval = setInterval(refreshOverview, 30_000);
+    const reconcileInterval = setInterval(runBackgroundReconcile, 45_000);
+
+    return () => {
+      clearInterval(refreshInterval);
+      clearInterval(reconcileInterval);
+    };
+  }, [models, router]);
 
   // ✅ 使用 createBrowserClient（SSR 兼容），useMemo 只创建一次
   const supabase = useMemo(() => {
@@ -49,8 +95,10 @@ export default function ClientSideModelsList({
           try {
             const samples = await supabase
               .from("samples")
-              .select("*")
-              .eq("modelId", payload.new.id);
+              .select("id, uri, modelId, created_at")
+              .eq("modelId", payload.new.id)
+              .order("id", { ascending: true })
+              .limit(3);
 
             const newModel: modelRowWithSamples = {
               ...payload.new,
@@ -59,9 +107,9 @@ export default function ClientSideModelsList({
 
             setModels((prev) => {
               const dedupedModels = prev.filter(
-                (model) => model.id !== payload.old?.id
+                (m) => m.id !== payload.new.id
               );
-              return [...dedupedModels, newModel];
+              return [newModel, ...dedupedModels];
             });
           } catch (e) {
             logger.error("Realtime update error:", e);
@@ -96,13 +144,29 @@ export default function ClientSideModelsList({
 
   return (
     <div id="train-model-container" className="w-full">
+      <Suspense fallback={null}>
+        <CheckoutResumeBanner />
+      </Suspense>
+      {creditsAvailable !== null && (
+        <div className="mb-6 rounded-lg border bg-muted/40 px-4 py-3 text-sm">
+          <span className="text-muted-foreground">Headshot credits: </span>
+          <span className="font-semibold">{Math.max(0, creditsAvailable)}</span>
+          {creditsAvailable < 1 && (
+            <span className="ml-2">
+              <Link href="/pricing" className="text-primary underline underline-offset-2">
+                Get a plan
+              </Link>
+            </span>
+          )}
+        </div>
+      )}
       {models && models.length > 0 && (
         <div className="flex flex-col gap-4">
-          <div className="flex flex-row gap-4 w-full justify-between items-center text-center">
-            <h1>Your models</h1>
-            <Link href="/overview/models/train/headshots" className="w-fit">
-              <Button size={"sm"}>
-                Train model
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h1 className="text-xl font-semibold sm:text-2xl">Your headshots</h1>
+            <Link href="/overview/models/train/corporate-headshots" className="w-full sm:w-fit">
+              <Button size="default" className="h-11 w-full sm:h-9 sm:w-auto">
+                Create headshots
               </Button>
             </Link>
           </div>
@@ -110,16 +174,16 @@ export default function ClientSideModelsList({
         </div>
       )}
       {models && models.length === 0 && (
-        <div className="flex flex-col gap-4 items-center">
-          <FaImages size={64} className="text-gray-500" />
-          <h1 className="text-2xl">
-            Get started by training your first model.
+        <div className="flex flex-col gap-4 items-center px-2 py-8 text-center sm:px-0">
+          <FaImages size={56} className="text-muted-foreground" />
+          <h1 className="text-xl font-semibold sm:text-2xl">
+            Get started — upload photos to create your headshots.
           </h1>
-          <div>
-            <Link href="/overview/models/train/headshots">
-              <Button size={"lg"}>Train model</Button>
-            </Link>
-          </div>
+          <Link href="/overview/models/train/corporate-headshots" className="w-full max-w-xs sm:w-auto">
+            <Button size="lg" className="h-12 w-full sm:w-auto">
+              Create headshots
+            </Button>
+          </Link>
         </div>
       )}
     </div>

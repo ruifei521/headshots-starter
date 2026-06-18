@@ -1,21 +1,10 @@
-import { Metadata } from "next";
 import Link from "next/link";
+import { getProfessionMetadata } from "@/lib/profession-metadata";
+import { PROFESSION_CARD_HEADLINE } from "@/lib/refund-policy";
+import { ESTIMATED_DELIVERY_LONG } from "@/lib/tiers";
+import { TIERS } from "@/lib/tiers";
 
-export const metadata: Metadata = {
-  title: "Startup Headshots",
-  description:
-    "Professional headshots for startup founders and teams. Look polished and investable with AI-generated portraits. Starting at $29 — 14-day guarantee.",
-  alternates: {
-    canonical: "https://snapprohead.com/headshots/startup",
-  },
-  openGraph: {
-    title: "Startup Headshots – Professional AI Portraits for Founders & Teams",
-    description:
-      "Founder headshots that impress investors, customers, and partners. AI-generated from your photos in ~30 minutes. $29 — 14-day money-back guarantee.",
-    url: "https://snapprohead.com/headshots/startup",
-    images: [{ url: "https://snapprohead.com/hero.webp", width: 1200, height: 630 }],
-  },
-};
+export const metadata = getProfessionMetadata("startup");
 
 export default function StartupHeadshotsPage() {
   return (
@@ -43,17 +32,17 @@ export default function StartupHeadshotsPage() {
           <h2 className="text-xl font-semibold mt-10 mb-3">How It Works</h2>
           <ol className="list-decimal pl-5 space-y-2 text-muted-foreground mb-6">
             <li>Upload 10–12 selfies — casual or business, your choice.</li>
-            <li>AI generates 100+ professional startup headshots.</li>
+            <li>AI generates {TIERS.starter.marketingImageCount}+ professional startup headshots.</li>
             <li>Download and update your team page, LinkedIn, and pitch deck.</li>
           </ol>
 
           <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-6 mt-8 mb-10">
-            <p className="font-semibold text-lg">From $29 — 14-Day Money-Back Guarantee</p>
+            <p className="font-semibold text-lg">{PROFESSION_CARD_HEADLINE}</p>
             <p className="text-sm text-muted-foreground mt-1">
               Startup-friendly pricing. No minimums. No contracts. Just great headshots.
             </p>
             <Link
-              href="/templates"
+              href="/pricing"
               className="mt-4 inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition"
             >
               Get Your Startup Headshots
@@ -88,7 +77,7 @@ export default function StartupHeadshotsPage() {
                     name: "How fast can my team get headshots?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "Each pack is ready in ~30 minutes. Your entire team can have professional headshots in a single afternoon — no studio scheduling required.",
+                      text: `Each pack is ready in ${ESTIMATED_DELIVERY_LONG}. Your entire team can have professional headshots in a single afternoon — no studio scheduling required.`,
                     },
                   },
                   {

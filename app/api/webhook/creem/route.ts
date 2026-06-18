@@ -2,13 +2,10 @@ import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 import * as crypto from 'crypto';
-import { tierFromProductId, maxTier, isTier } from '@/lib/tiers';
+import { tierFromProductId } from '@/lib/tiers';
+import { fulfillOrderCredits, type OrderRow } from '@/lib/creem-order-credits';
+import { notifyPaymentReceived } from '@/lib/ops-notify';
 import { logger } from "@/lib/logger";
-
-// 向后兼容：旧 product_id 的 credit 映射
-const CREDITS_PER_PRODUCT: Record<string, number> = {
-  'prod_6F4zKTNhL3V7vWPUhnjZDZ': 1,  // 旧产品
-};
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -23,15 +20,17 @@ function verifySignature(payload: string, signature: string): boolean {
   return computed === signature;
 }
 
+const ORDER_SELECT =
+  'id, user_id, tier, credits_granted, creem_checkout_id';
+
 export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text();
     logger.log('CREEM webhook received');
 
-    // Verify signature
     const signature = req.headers.get('creem-signature') || '';
     const isValid = verifySignature(rawBody, signature);
-    
+
     let body: any;
     try {
       body = JSON.parse(rawBody);
@@ -40,30 +39,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    // CREEM webhook format:
-    // {
-    //   "id": "evt_...",
-    //   "eventType": "checkout.completed",
-    //   "created_at": 1728734325927,
-    //   "object": {
-    //     "id": "ch_...",
-    //     "object": "checkout",
-    //     "request_id": "userId",      // ← This is our user ID
-    //     "order": {
-    //       "id": "ord_...",
-    //       "product": "prod_...",
-    //       "customer": "cust_...",
-    //       "amount": 1000,
-    //       "currency": "EUR",
-    //       "status": "paid"
-    //     }
-    //   }
-    // }
-
     const eventType = body.eventType;
     const eventObject = body.object || {};
 
-    // Only process checkout.completed events
     if (eventType !== 'checkout.completed') {
       logger.log(`Skipping non-checkout event: ${eventType}`);
       return NextResponse.json({ received: true });
@@ -75,32 +53,34 @@ export async function POST(req: NextRequest) {
     }
     logger.log('Webhook signature verified ✓');
 
-    // Extract user ID from request_id
-    let referenceId: string | null = null;
-    
-    // CREEM puts user ID in request_id field
-    if (eventObject.request_id) {
-      referenceId = eventObject.request_id;
-    }
-
+    const referenceId: string | null = eventObject.request_id ?? null;
     if (!referenceId) {
-      logger.warn('No request_id found in webhook payload');
-      return NextResponse.json({ received: true });
+      logger.error('No request_id in webhook payload — cannot grant credits');
+      return NextResponse.json({ error: 'Missing request_id' }, { status: 400 });
     }
 
-    // Extract product info from order
     const order = eventObject.order || {};
     const productId: string = order.product || '';
     const checkoutId: string = eventObject.id || '';
     const amountCents: number = order.amount || 0;
     const currency: string = order.currency || 'USD';
 
-    // ⭐ product_id → tier 映射（利用 lib/tiers.ts 统一映射）
-    const tier = tierFromProductId(productId);
-    logger.log(`Product ${productId} → tier: ${tier}`);
+    if (!checkoutId) {
+      logger.error('No checkout id in webhook payload — cannot ensure idempotency');
+      return NextResponse.json({ error: 'Missing checkout id' }, { status: 400 });
+    }
 
-    // 向后兼容：旧 product_id 仍使用 CREDITS_PER_PRODUCT
-    const creditsToAdd = CREDITS_PER_PRODUCT[productId] || 1;
+    if (!productId) {
+      logger.error('No product id in webhook payload — cannot map tier');
+      return NextResponse.json({ error: 'Missing product id' }, { status: 400 });
+    }
+
+    const tier = tierFromProductId(productId);
+    if (!tier) {
+      logger.error(`Unknown Creem product_id: ${productId}`);
+      return NextResponse.json({ error: 'Unknown product id' }, { status: 500 });
+    }
+    logger.log(`Product ${productId} → tier: ${tier}`);
 
     const supabase = createClient<Database>(
       supabaseUrl,
@@ -114,76 +94,84 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    // ⭐ 1. 处理 credits 表：更新 credits + tier（使用 upgrade 逻辑，不降级）
-    const { data: existingCredits } = await supabase
-      .from('credits')
-      .select('*')
-      .eq('user_id', referenceId)
-      .single();
+    let orderRow: OrderRow | null = null;
 
-    if (existingCredits) {
-      // 决定最终 tier：不降级（tier 升级规则：starter < professional < executive）
-      const resolvedTier = maxTier(existingCredits.tier || 'starter', tier);
-      const newCredits = existingCredits.credits + creditsToAdd;
+    const { data: existingOrder } = await supabase
+      .from('orders')
+      .select(ORDER_SELECT)
+      .eq('creem_checkout_id', checkoutId)
+      .maybeSingle();
 
-      const { error } = await supabase
-        .from('credits')
-        .update({
-          credits: newCredits,
-          tier: resolvedTier,
-        })
-        .eq('user_id', referenceId);
-      
-      if (error) {
-        logger.error('Error updating credits:', error);
-        return NextResponse.json({ error: 'Failed to update credits' }, { status: 500 });
-      }
-      logger.log(`Updated credits for ${referenceId}: ${newCredits} credits, tier=${resolvedTier}`);
+    if (existingOrder) {
+      orderRow = existingOrder as OrderRow;
+      logger.log(`Duplicate checkout_id ${checkoutId}, checking credit fulfillment`);
     } else {
-      const { error } = await supabase
-        .from('credits')
+      const { data: insertedOrder, error: orderError } = await supabase
+        .from('orders')
         .insert({
           user_id: referenceId,
-          credits: creditsToAdd,
-          tier: tier,
-        });
-      
-      if (error) {
-        logger.error('Error creating credits:', error);
-        return NextResponse.json({ error: 'Failed to create credits' }, { status: 500 });
+          creem_checkout_id: checkoutId,
+          creem_product_id: productId,
+          tier,
+          amount_cents: amountCents,
+          currency,
+          status: 'paid',
+          raw_payload: body,
+          credits_granted: false,
+        })
+        .select(ORDER_SELECT)
+        .maybeSingle();
+
+      if (orderError) {
+        if (orderError.code === '23505') {
+          const { data: racedOrder } = await supabase
+            .from('orders')
+            .select(ORDER_SELECT)
+            .eq('creem_checkout_id', checkoutId)
+            .maybeSingle();
+          if (!racedOrder) {
+            logger.error('Duplicate checkout but order row missing after race');
+            return NextResponse.json({ error: 'Order lookup failed' }, { status: 500 });
+          }
+          orderRow = racedOrder as OrderRow;
+          logger.log(`Duplicate checkout_id ${checkoutId}, checking credit fulfillment`);
+        } else {
+          logger.error('Error inserting order:', orderError);
+          return NextResponse.json({ error: 'Failed to record order' }, { status: 500 });
+        }
+      } else if (insertedOrder) {
+        orderRow = insertedOrder as OrderRow;
+        logger.log(
+          `Order recorded: checkout=${checkoutId}, tier=${tier}, amount=${amountCents} ${currency}`
+        );
       }
-      logger.log(`Created credits for ${referenceId}: ${creditsToAdd} credits, tier=${tier}`);
     }
 
-    // ⭐ 2. 写入 orders 表（审计记录）
-    // 注意：使用 INSERT 而非 UPSERT，避免覆盖已有记录
-    // 如果同一 checkout_id 重复回调，会静默忽略（依赖唯一约束或检查）
-    const { error: orderError } = await supabase
-      .from('orders')
-      .insert({
-        user_id: referenceId,
-        creem_checkout_id: checkoutId || null,
-        creem_product_id: productId,
-        tier: tier,
-        amount_cents: amountCents,
-        currency: currency,
-        status: 'paid',
-        raw_payload: body,
+    if (!orderRow) {
+      logger.error('Order row missing after insert/lookup');
+      return NextResponse.json({ error: 'Order lookup failed' }, { status: 500 });
+    }
+
+    const { fulfilled, alreadyGranted } = await fulfillOrderCredits(supabase, orderRow);
+    if (!fulfilled) {
+      return NextResponse.json({ error: 'Failed to grant credits' }, { status: 500 });
+    }
+
+    if (!alreadyGranted) {
+      void notifyPaymentReceived({
+        tier,
+        amountCents,
+        currency,
+        checkoutId,
+        userId: referenceId,
       });
-
-    if (orderError) {
-      // 如果是因为重复 creem_checkout_id 导致的错误，不视为失败
-      if (orderError.code === '23505') {
-        logger.log(`Duplicate checkout_id ${checkoutId}, skipping orders insert`);
-      } else {
-        logger.error('Error inserting order:', orderError);
-        // 不阻塞主流程：credits 已成功更新
-      }
-    } else {
-      logger.log(`Order recorded: checkout=${checkoutId}, tier=${tier}, amount=${amountCents} ${currency}`);
     }
 
-    return NextResponse.json({ received: true });
+    return NextResponse.json({
+      received: true,
+      duplicate: alreadyGranted,
+      creditsGranted: !alreadyGranted,
+    });
   } catch (error) {
     logger.error('Webhook error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

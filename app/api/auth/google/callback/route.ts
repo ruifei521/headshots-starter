@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
-import { safeAuthRedirectPath } from '@/lib/auth-redirect';
+import { resolvePostLoginDestination } from '@/lib/auth-redirect';
 import { getSiteOrigin } from '@/lib/site-origin';
 import { logger } from '@/lib/logger';
 
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   }
 
   const redirectUri = `${origin}/api/auth/google/callback`;
-  const afterLogin = safeAuthRedirectPath(req.nextUrl.searchParams.get('state'));
+  const afterLogin = resolvePostLoginDestination(req.nextUrl.searchParams.get('state'));
 
   const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',

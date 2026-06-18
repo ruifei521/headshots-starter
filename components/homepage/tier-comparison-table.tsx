@@ -1,7 +1,8 @@
 "use client"
 
 import { Check, X, Minus } from "lucide-react"
-import { TIERS, type TierInfo } from "@/lib/tiers"
+import { COMPARISON_PRIVACY_ROW_LABEL } from "@/lib/data-retention-policy";
+import { TIERS, type TierInfo, formatOutfitBackgroundFeature } from "@/lib/tiers"
 
 /** 对比行定义 */
 interface ComparisonRow {
@@ -27,11 +28,19 @@ export default function TierComparisonTable() {
     },
     {
       label: "Headshots",
-      values: { starter: "40", professional: "60", executive: "100" },
+      values: {
+        starter: String(TIERS.starter.marketingImageCount),
+        professional: String(TIERS.professional.marketingImageCount),
+        executive: String(TIERS.executive.marketingImageCount),
+      },
     },
     {
       label: "Outfits & backgrounds",
-      values: { starter: "20+", professional: "40+", executive: "80+" },
+      values: {
+        starter: formatOutfitBackgroundFeature(TIERS.starter.outfitStyleCount, TIERS.starter.backgroundCount),
+        professional: formatOutfitBackgroundFeature(TIERS.professional.outfitStyleCount, TIERS.professional.backgroundCount),
+        executive: formatOutfitBackgroundFeature(TIERS.executive.outfitStyleCount, TIERS.executive.backgroundCount),
+      },
     },
     {
       label: "Resolution",
@@ -43,7 +52,11 @@ export default function TierComparisonTable() {
     },
     {
       label: "Delivery",
-      values: { starter: "~25 min", professional: "~25 min", executive: "~25 min" },
+      values: {
+        starter: TIERS.starter.estimatedTime,
+        professional: TIERS.professional.estimatedTime,
+        executive: TIERS.executive.estimatedTime,
+      },
     },
     {
       label: "Business formal",
@@ -82,7 +95,7 @@ export default function TierComparisonTable() {
       values: { starter: true, professional: true, executive: true },
     },
     {
-      label: "30-day privacy",
+      label: COMPARISON_PRIVACY_ROW_LABEL,
       values: { starter: true, professional: true, executive: true },
     },
   ];

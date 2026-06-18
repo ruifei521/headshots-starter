@@ -1,6 +1,12 @@
 {
   "buildCommand": "rm -rf .next && next build",
   "installCommand": "npm install",
+  "crons": [
+    {
+      "path": "/api/cron/reconcile-stale-models",
+      "schedule": "0 3 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

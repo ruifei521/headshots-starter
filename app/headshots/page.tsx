@@ -1,5 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import {
+  HEADSHOT_PROFESSION_SLUGS,
+} from "@/lib/profession-metadata";
+import { BLOG_GUIDES, PROFESSION_LABELS } from "@/lib/internal-links";
 
 export const metadata: Metadata = {
   title: "All Headshot Styles – Professional AI Portraits by Industry",
@@ -10,55 +14,68 @@ export const metadata: Metadata = {
   },
 };
 
-interface Category {
-  slug: string;
-  name: string;
-}
-
-const CATEGORIES: Category[] = [
-  { slug: "linkedin", name: "LinkedIn" },
-  { slug: "lawyer", name: "Lawyer" },
-  { slug: "realtor", name: "Realtor" },
-  { slug: "executive", name: "Executive" },
-  { slug: "corporate", name: "Corporate" },
-  { slug: "business", name: "Business" },
-  { slug: "professional", name: "Professional" },
-  { slug: "portfolio", name: "Portfolio" },
-  { slug: "teacher", name: "Teacher" },
-  { slug: "nurse", name: "Nurse" },
-  { slug: "consultant", name: "Consultant" },
-  { slug: "accountant", name: "Accountant" },
-  { slug: "dentist", name: "Dentist" },
-  { slug: "doctor", name: "Doctor" },
-  { slug: "c-suite", name: "C-Suite" },
-  { slug: "startup", name: "Startup" },
-  { slug: "actor", name: "Actor" },
-];
-
 export default function HeadshotsIndexPage() {
   return (
     <main className="min-h-screen">
       <section className="py-16 md:py-24">
         <div className="max-w-4xl mx-auto px-4">
+          <Link
+            href="/"
+            className="text-sm text-primary hover:underline mb-4 inline-block"
+          >
+            ← Back to home
+          </Link>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
             All Headshot Styles
           </h1>
-          <p className="text-muted-foreground mb-8">
-            Professional AI headshots for every industry. Choose your style below.
+          <p className="text-muted-foreground mb-4">
+            Professional AI headshots for every industry. Choose your style below
+            or read our{" "}
+            <Link href="/blog" className="text-primary hover:underline">
+              industry guides
+            </Link>
+            .
+          </p>
+          <p className="text-sm text-muted-foreground mb-8">
+            Compare tools:{" "}
+            <Link
+              href="/blog/best-ai-headshot-generators-2026"
+              className="text-primary hover:underline"
+            >
+              Best AI headshot generators (2026)
+            </Link>
           </p>
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {CATEGORIES.map((cat) => (
+            {HEADSHOT_PROFESSION_SLUGS.map((slug) => (
               <Link
-                key={cat.slug}
-                href={`/headshots/${cat.slug}`}
+                key={slug}
+                href={`/headshots/${slug}`}
                 className="block p-4 rounded-lg border hover:border-primary hover:shadow-sm transition-all"
               >
-                <h2 className="font-semibold text-lg">{cat.name} Headshots</h2>
+                <h2 className="font-semibold text-lg">
+                  {PROFESSION_LABELS[slug]} Headshots
+                </h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Professional AI headshots for {cat.name.toLowerCase()}s
+                  AI headshots for {PROFESSION_LABELS[slug].toLowerCase()}s
                 </p>
               </Link>
             ))}
+          </div>
+
+          <div className="mt-14 pt-10 border-t">
+            <h2 className="text-xl font-semibold mb-4">Headshot guides</h2>
+            <ul className="space-y-2">
+              {BLOG_GUIDES.map((guide) => (
+                <li key={guide.slug}>
+                  <Link
+                    href={`/blog/${guide.slug}`}
+                    className="text-primary font-medium hover:underline"
+                  >
+                    {guide.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>

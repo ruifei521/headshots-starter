@@ -1,5 +1,5 @@
-import { Shield, Clock, CreditCard, Users, Sparkles, Camera } from "lucide-react"
-
+import { Shield, Clock, CreditCard, Sparkles, Camera } from "lucide-react"
+import { HEADSHOT_PROFESSION_STYLES_SHORT } from "@/lib/marketing-copy";
 export default function TrustBadges() {
   return (
     <div className="flex flex-col items-center space-y-6">
@@ -14,7 +14,7 @@ export default function TrustBadges() {
         </div>
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-yellow-500" />
-          <span className="font-medium">12 Professional Styles</span>
+          <span className="font-medium">{HEADSHOT_PROFESSION_STYLES_SHORT}</span>
         </div>
         <div className="flex items-center gap-2">
           <Camera className="h-5 w-5 text-purple-500" />

@@ -1,21 +1,9 @@
-import { Metadata } from "next";
 import Link from "next/link";
+import { getProfessionMetadata } from "@/lib/profession-metadata";
+import { PROFESSION_CARD_HEADLINE } from "@/lib/refund-policy";
+import { TIERS } from "@/lib/tiers";
 
-export const metadata: Metadata = {
-  title: "C-Suite Headshots",
-  description:
-    "Executive headshots for CEOs, CFOs, and CTOs. Command authority with AI-generated professional portraits. Starting at $29 — 14-day money-back guarantee.",
-  alternates: {
-    canonical: "https://snapprohead.com/headshots/c-suite",
-  },
-  openGraph: {
-    title: "C-Suite Headshots – Executive AI Portraits for Business Leaders",
-    description:
-      "Executive-level professional headshots for CEOs, founders, and senior leadership. AI-generated in ~30 minutes. $29 with a 14-day guarantee.",
-    url: "https://snapprohead.com/headshots/c-suite",
-    images: [{ url: "https://snapprohead.com/hero.webp", width: 1200, height: 630 }],
-  },
-};
+export const metadata = getProfessionMetadata("c-suite");
 
 export default function CSuiteHeadshotsPage() {
   return (
@@ -43,17 +31,17 @@ export default function CSuiteHeadshotsPage() {
           <h2 className="text-xl font-semibold mt-10 mb-3">How It Works</h2>
           <ol className="list-decimal pl-5 space-y-2 text-muted-foreground mb-6">
             <li>Upload 10–12 selfies in business attire.</li>
-            <li>AI generates 100+ professional executive headshots.</li>
+            <li>AI generates {TIERS.starter.marketingImageCount}+ professional executive headshots.</li>
             <li>Download and use across LinkedIn, company website, and press materials.</li>
           </ol>
 
           <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-6 mt-8 mb-10">
-            <p className="font-semibold text-lg">From $29 — 14-Day Money-Back Guarantee</p>
+            <p className="font-semibold text-lg">{PROFESSION_CARD_HEADLINE}</p>
             <p className="text-sm text-muted-foreground mt-1">
               Executive-quality headshots without the executive price tag.
             </p>
             <Link
-              href="/templates"
+              href="/pricing"
               className="mt-4 inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition"
             >
               Get Your C-Suite Headshots

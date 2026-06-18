@@ -50,6 +50,23 @@ export default function ThreeDBeforeAfterGallery() {
   const nextSlide = () => goToSlide((activeIndexRef.current + 1) % galleryItems.length)
   const prevSlide = () => goToSlide((activeIndexRef.current - 1 + galleryItems.length) % galleryItems.length)
 
+  const touchStartX = useRef<number | null>(null)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0]?.clientX ?? null
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const start = touchStartX.current
+    const end = e.changedTouches[0]?.clientX
+    touchStartX.current = null
+    if (start == null || end == null) return
+    const delta = end - start
+    if (Math.abs(delta) < 40) return
+    if (delta < 0) nextSlide()
+    else prevSlide()
+  }
+
   // Gentle parallax
   useEffect(() => {
     const container = containerRef.current
@@ -85,15 +102,14 @@ export default function ThreeDBeforeAfterGallery() {
   return (
     <div className="w-full">
       <div className="text-center mb-8">
-        <div className="mb-6 mx-auto max-w-5xl rounded-lg border-2 border-sky-100 bg-[#FAFAFA] px-6 py-5 shadow-[0px_0px_75px_0px_rgba(0,0,0,0.07)] sm:px-8">
+        <div className="mb-6 mx-auto max-w-5xl rounded-lg border-2 border-sky-100 bg-[#FAFAFA] px-3 py-3 shadow-[0px_0px_75px_0px_rgba(0,0,0,0.07)] sm:px-8 sm:py-5">
           <Image
             src="/steps-hero.png"
-            alt="3 simple steps to professional AI headshots: Upload selfies, AI processes photos, Download 100+ headshots"
+            alt="3 simple steps to professional AI headshots: Upload selfies, AI processes photos, Download 40+ headshots"
             width={956}
             height={48}
             className="w-full h-auto"
-            priority
-            unoptimized
+            loading="lazy"
           />
         </div>
         <Badge variant="outline" className="mb-3">See the Transformation</Badge>
@@ -110,18 +126,22 @@ export default function ThreeDBeforeAfterGallery() {
           className="relative w-full transition-transform duration-200 ease-out"
           style={{ transformStyle: "preserve-3d" }}
         >
-          <div className="relative overflow-hidden rounded-2xl bg-card shadow-xl border">
+          <div
+            className="relative overflow-hidden rounded-2xl bg-card shadow-xl border"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeIndex}
-                className="flex flex-col md:flex-row"
+                className="flex flex-row"
                 initial={{ opacity: 0, x: direction * 60 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: direction * -60 }}
                 transition={{ duration: 0.35, ease: "easeInOut" }}
               >
                 {/* BEFORE */}
-                <div className="relative w-full md:w-1/2 aspect-[4/5]">
+                <div className="relative w-1/2 aspect-[3/4] sm:aspect-[4/5] md:w-1/2">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
                   <Image
                     src={current.before}
@@ -129,16 +149,21 @@ export default function ThreeDBeforeAfterGallery() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    priority
+                    loading="lazy"
                     quality={70}
                   />
-                  <div className="absolute top-4 left-4 z-20">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white">
+                  <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-20">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-black/60 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-semibold text-white">
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
                       BEFORE
                     </span>
                   </div>
-                  <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                    <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-primary/90 shadow-lg md:hidden">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                        <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+                      </svg>
+                    </div>
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -153,7 +178,7 @@ export default function ThreeDBeforeAfterGallery() {
                 </div>
 
                 {/* AFTER */}
-                <div className="relative w-full md:w-1/2 aspect-[4/5] overflow-hidden">
+                <div className="relative w-1/2 aspect-[3/4] sm:aspect-[4/5] md:w-1/2 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10" />
                   <motion.div
                     initial={{ scale: 1.1 }}
@@ -167,20 +192,20 @@ export default function ThreeDBeforeAfterGallery() {
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      priority
+                      loading="lazy"
                       quality={70}
                     />
                   </motion.div>
-                  <div className="absolute top-4 right-4 z-20">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/80 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white shadow-lg">
+                  <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/80 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-semibold text-white shadow-lg">
                       <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
                       AFTER
                     </span>
                   </div>
-                  <div className="absolute bottom-4 left-4 right-4 z-20">
-                    <div className="rounded-xl bg-black/50 backdrop-blur-sm px-4 py-3 text-white">
-                      <p className="text-sm font-semibold">{current.label}</p>
-                      <p className="text-xs text-white/70">Same person, different style</p>
+                  <div className="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 z-20">
+                    <div className="rounded-lg sm:rounded-xl bg-black/50 backdrop-blur-sm px-2 py-2 sm:px-4 sm:py-3 text-white">
+                      <p className="text-xs sm:text-sm font-semibold">{current.label}</p>
+                      <p className="text-[10px] sm:text-xs text-white/70 hidden sm:block">Same person, different style</p>
                     </div>
                   </div>
                 </div>
@@ -200,11 +225,18 @@ export default function ThreeDBeforeAfterGallery() {
                 key={index}
                 onClick={() => goToSlide(index)}
                 className={cn(
-                  "h-2 rounded-full transition-all duration-300",
-                  index === activeIndex ? "w-8 bg-primary" : "w-2 bg-gray-300 hover:bg-gray-400"
+                  "flex h-11 w-11 items-center justify-center rounded-full transition-all duration-300",
+                  index === activeIndex ? "bg-primary/15" : "hover:bg-muted"
                 )}
                 aria-label={`Go to slide ${index + 1}`}
-              />
+              >
+                <span
+                  className={cn(
+                    "block rounded-full transition-all duration-300",
+                    index === activeIndex ? "h-2.5 w-8 bg-primary" : "h-2.5 w-2.5 bg-gray-300"
+                  )}
+                />
+              </button>
             ))}
           </div>
           <button onClick={nextSlide} className="flex h-10 w-10 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition-all hover:scale-105" aria-label="Next">

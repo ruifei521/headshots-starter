@@ -4,12 +4,13 @@ import Link from "next/link";
 
 interface NavLinksProps {
   isLoggedIn?: boolean;
+  ready?: boolean;
 }
 
-export default function NavLinks({ isLoggedIn = false }: NavLinksProps) {
+export default function NavLinks({ isLoggedIn = false, ready = true }: NavLinksProps) {
   const links = [
     { href: "/examples", label: "Examples" },
-    { href: "/#pricing", label: "Pricing" },
+    { href: "/pricing", label: "Pricing" },
   ];
 
   return (
@@ -28,7 +29,7 @@ export default function NavLinks({ isLoggedIn = false }: NavLinksProps) {
           href="/overview"
           className="px-3 py-2 inline-flex items-center text-base font-semibold text-primary hover:text-primary/80 transition-colors cursor-pointer"
         >
-          My Models
+          My headshots
         </Link>
       )}
     </nav>

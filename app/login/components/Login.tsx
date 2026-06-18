@@ -8,14 +8,24 @@ import { createBrowserClient } from '@supabase/ssr';
 import { useState, useMemo, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { AiOutlineGoogle } from 'react-icons/ai';
-import { WaitingForMagicLink } from './WaitingForMagicLink';
+import { EmailCodeVerification } from './EmailCodeVerification';
 import { hardNavigate } from '@/lib/hard-navigate';
+import {
+  resolvePostLoginDestination,
+  authErrorMessage,
+  authErrorTitle,
+} from '@/lib/auth-redirect';
+import {
+  postLoginPathFromSearchParams,
+  isCheckoutIntent,
+} from '@/lib/checkout-url';
+import { getTierInfo } from '@/lib/tiers';
+import { isInAppBrowser, inAppBrowserHint } from '@/lib/in-app-browser';
 
 type Inputs = {
   email: string;
 };
 
-// Common disposable email domains (small subset for client-side check)
 const DISPOSABLE_DOMAINS = new Set([
   'tempmail.com', 'throwaway.com', 'guerrillamail.com', 'mailinator.com',
   '10minutemail.com', 'fakeinbox.com', 'trashmail.com', 'temp-mail.org',
@@ -28,34 +38,31 @@ export const Login = ({
   host: string | null;
   searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
-  // Magic Link 专用客户端 - 使用 implicit flow
-  // 关键修复：PKCE flow 依赖 code_verifier cookie，当用户在邮箱 App 内嵌浏览器
-  // 或不同浏览器中点击 Magic Link 时，cookie 不可用，导致 exchangeCodeForSession 失败
-  // implicit flow 将 token 直接放在 URL hash (#access_token=xxx) 中，由 HashAuthHandler 处理
-  // 不依赖 cookie，在任何浏览器上下文中都能可靠工作
-  const magicLinkClient = useMemo(() => {
-    return createBrowserClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { auth: { flowType: 'implicit' } }
-    );
-  }, []);
+  const supabase = useMemo(
+    () =>
+      createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      ),
+    []
+  );
 
+  const [step, setStep] = useState<'email' | 'code'>('email');
+  const [pendingEmail, setPendingEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isMagicLinkSent, setIsMagicLinkSent] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const inAppBrowser = useMemo(() => isInAppBrowser(), []);
   const { toast } = useToast();
 
-  // 处理 URL 中的错误参数（从 auth/callback 重定向回来的），只显示一次
   const errorMsg = searchParams?.error as string | undefined;
   useEffect(() => {
     if (errorMsg) {
       toast({
-        title: 'Login failed',
+        title: authErrorTitle(errorMsg),
         variant: 'destructive',
-        description: errorMsg,
+        description: authErrorMessage(errorMsg),
         duration: 8000,
       });
-      // 清除 URL 中的 error 参数，避免刷新时重复显示
       const url = new URL(window.location.href);
       url.searchParams.delete('error');
       window.history.replaceState({}, '', url.toString());
@@ -68,149 +75,205 @@ export const Login = ({
     formState: { errors, isSubmitted },
   } = useForm<Inputs>();
 
-  const protocol = host?.includes('localhost') ? 'http' : 'https';
+  const redirectAfterLogin = (searchParams?.redirect as string) || '';
+  const checkoutResumePath = postLoginPathFromSearchParams(searchParams);
+  const checkoutTier =
+    typeof searchParams?.tier === 'string' ? searchParams.tier : null;
+  const checkoutTierName = checkoutTier
+    ? getTierInfo(checkoutTier).name
+    : null;
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    setIsSubmitting(true);
-    try {
-      // 使用 implicit flow 客户端发送 Magic Link
-      // implicit flow：邮件链接重定向到根 URL，token 在 URL hash (#access_token=xxx) 中
-      // 由客户端 HashAuthHandler 组件（在 layout.tsx 中全局加载）读取 hash 并建立 session
-      // HashAuthHandler 在所有页面都运行，所以重定向到根路径 / 也能正确处理 token
-      const { error } = await magicLinkClient.auth.signInWithOtp({
-        email: data.email,
+  useEffect(() => {
+    if (isCheckoutIntent(searchParams)) {
+      if (checkoutResumePath) {
+        sessionStorage.setItem('postLoginRedirect', checkoutResumePath);
+      }
+      return;
+    }
+    sessionStorage.removeItem('postLoginRedirect');
+    if (redirectAfterLogin) {
+      sessionStorage.setItem(
+        'postLoginRedirect',
+        resolvePostLoginDestination(redirectAfterLogin)
+      );
+    }
+  }, [checkoutResumePath, redirectAfterLogin, searchParams]);
+
+    const sendLoginCode = async (email: string): Promise<boolean> => {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
         options: {
-          emailRedirectTo: `${protocol}://${host}`,
+          // No emailRedirectTo → Supabase sends a 6-digit OTP code (no magic link)
         },
       });
 
-      if (error) {
-        toast({
-          title: 'Error',
-          variant: 'destructive',
-          description: error.message,
-          duration: 5000,
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      setIsSubmitting(false);
+    if (error) {
       toast({
-        title: 'Email sent',
-        description: 'Check your inbox for a magic link to sign in.',
-        duration: 5000,
-      });
-      setIsMagicLinkSent(true);
-    } catch (error) {
-      setIsSubmitting(false);
-      toast({
-        title: 'Something went wrong',
+        title: 'Could not send code',
+        description: error.message,
         variant: 'destructive',
-        description:
-          'Please try again, if the problem persists, contact us at contact@snapprohead.com',
         duration: 5000,
       });
+      return false;
+    }
+    return true;
+  };
+
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    setIsSubmitting(true);
+    setPendingEmail(data.email);
+    const ok = await sendLoginCode(data.email);
+    setIsSubmitting(false);
+    if (ok) {
+      setStep('code');
     }
   };
 
-  // Save redirect param before OAuth flow
-  const redirectAfterLogin = searchParams?.redirect as string || '';
-  useEffect(() => {
-    if (redirectAfterLogin) {
-      sessionStorage.setItem('postLoginRedirect', redirectAfterLogin);
-    }
-  }, [redirectAfterLogin]);
-
   const signInWithGoogle = () => {
-    // OAuth 在 snapprohead.com 完成，Google 会显示「继续前往 snapprohead.com」
-    // 不再经 *.supabase.co 中转（signInWithOAuth 会显示 Supabase 子域名）
+    if (inAppBrowser) {
+      toast({
+        title: 'Open in Safari or Chrome',
+        description: inAppBrowserHint(),
+        duration: 10000,
+      });
+      return;
+    }
+
     const params = new URLSearchParams();
-    if (redirectAfterLogin) {
-      params.set('redirect', redirectAfterLogin);
+    let afterLogin =
+      sessionStorage.getItem('postLoginRedirect') || '/overview';
+    afterLogin = resolvePostLoginDestination(afterLogin);
+
+    if (afterLogin === '/overview') {
+      if (checkoutResumePath) {
+        afterLogin = checkoutResumePath;
+      } else if (redirectAfterLogin) {
+        afterLogin = resolvePostLoginDestination(redirectAfterLogin);
+      }
+    }
+
+    if (afterLogin !== '/overview') {
+      params.set('redirect', afterLogin);
     }
     const qs = params.toString();
     hardNavigate(`/api/auth/google${qs ? `?${qs}` : ''}`);
   };
 
-  if (isMagicLinkSent) {
-    return (
-      <WaitingForMagicLink toggleState={() => setIsMagicLinkSent(false)} />
-    );
-  }
-
   return (
-    <>
-      <div className='flex items-center justify-center p-8'>
-        <div className='flex flex-col gap-4 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 p-4 rounded-xl max-w-sm w-full'>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className='flex flex-col gap-2'
-          >
-            <div className='flex flex-col gap-4'>
-              <div className='flex flex-col gap-2'>
+    <div className="flex items-center justify-center p-8">
+      <div className="flex flex-col gap-4 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 p-4 rounded-xl max-w-sm w-full">
+        {step === 'code' ? (
+          <EmailCodeVerification
+            email={pendingEmail}
+            onBack={() => setStep('email')}
+            resending={isResending}
+            onResend={async () => {
+              setIsResending(true);
+              try {
+                return await sendLoginCode(pendingEmail);
+              } finally {
+                setIsResending(false);
+              }
+            }}
+          />
+        ) : (
+          <>
+              {isCheckoutIntent(searchParams) && (
+                <div
+                  className="rounded-lg border border-primary/25 bg-primary/5 px-3 py-2.5 text-sm"
+                  role="status"
+                >
+                  <p className="font-medium text-foreground">
+                    Sign in to complete your purchase
+                  </p>
+                  <p className="mt-1 text-muted-foreground text-xs leading-relaxed">
+                    {checkoutTierName
+                      ? `Your ${checkoutTierName} plan is saved. After sign-in you’ll continue to secure checkout.`
+                      : 'After sign-in you’ll continue to secure checkout.'}
+                  </p>
+                </div>
+              )}
+
+              <div>
+                <h1 className="text-xl font-semibold">Sign in</h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                  We'll email you a 6-digit code. Enter it here — no need to leave this page.
+                </p>
+              </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2">
                 <Input
-                  type='email'
-                  placeholder='Email'
+                  type="email"
+                  placeholder="Email"
+                  autoComplete="email"
                   {...register('email', {
                     required: true,
                     validate: {
                       emailIsValid: (value: string) =>
                         /^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) ||
                         'Please enter a valid email',
-                      emailDoesntHavePlus: (value: string) =>
-                        /^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) ||
-                        'Email addresses with a + are not allowed',
                       emailIsntDisposable: (value: string) => {
                         const domain = value.split('@')[1];
-                        return !DISPOSABLE_DOMAINS.has(domain) ||
-                          'Please use a permanent email address';
+                        return (
+                          !DISPOSABLE_DOMAINS.has(domain) ||
+                          'Please use a permanent email address'
+                        );
                       },
                     },
                   })}
                 />
                 {isSubmitted && errors.email && (
-                  <span className={'text-xs text-red-400'}>
+                  <span className="text-xs text-red-400">
                     {errors.email?.message || 'Email is required to sign in'}
                   </span>
                 )}
               </div>
-            </div>
+
+              <Button
+                isLoading={isSubmitting}
+                disabled={isSubmitting}
+                variant="outline"
+                className="w-full"
+                type="submit"
+              >
+                Send sign-in code
+              </Button>
+            </form>
+
+            <OR />
+
+            {inAppBrowser && (
+              <div
+                className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100"
+                role="status"
+              >
+                {inAppBrowserHint()}
+              </div>
+            )}
 
             <Button
-              isLoading={isSubmitting}
-              disabled={isSubmitting}
-              variant='outline'
-              className='w-full'
-              type='submit'
+              variant="outline"
+              className="w-full"
+              onClick={signInWithGoogle}
+              type="button"
             >
-              Continue with Email
+              <AiOutlineGoogle className="mr-2" />
+              Continue with Google
             </Button>
-          </form>
-
-          <OR />
-
-          <Button
-            variant='outline'
-            className='w-full'
-            onClick={signInWithGoogle}
-            type='button'
-          >
-            <AiOutlineGoogle className='mr-2' />
-            Continue with Google
-          </Button>
-        </div>
+          </>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
 export const OR = () => {
   return (
-    <div className='flex items-center my-1'>
-      <div className='border-b flex-grow mr-2 opacity-50' />
-      <span className='text-sm opacity-50'>OR</span>
-      <div className='border-b flex-grow ml-2 opacity-50' />
+    <div className="flex items-center my-1">
+      <div className="border-b flex-grow mr-2 opacity-50" />
+      <span className="text-sm opacity-50">OR</span>
+      <div className="border-b flex-grow ml-2 opacity-50" />
     </div>
   );
 };

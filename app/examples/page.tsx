@@ -5,11 +5,15 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Star } from "lucide-react"
 import { reviews } from "@/components/homepage/reviews-data"
-import { getExamplesJsonLd, type ReviewItem } from "@/lib/json-ld"
+import { getExamplesJsonLd } from "@/lib/json-ld"
 
 export const metadata: Metadata = {
-  title: "Customer Reviews & Examples | SnapProHead",
-  description: "See what our customers say about SnapProHead AI headshots. 4.9/5 stars from 50,000+ reviews.",
+  title: "Sample Reviews & Examples | SnapProHead",
+  description:
+    "Illustrative customer-style feedback and AI headshot examples from SnapProHead. See what professional results look like before you buy.",
+  alternates: {
+    canonical: "https://snapprohead.com/examples",
+  },
 }
 
 function StarRating({ rating }: { rating: number }) {
@@ -26,58 +30,32 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export default function ExamplesPage() {
-  // 精选 8 条有角色+详情的评价用于 Review Schema
-  const featuredReviews: ReviewItem[] = reviews
-    .filter((r) => r.role && r.text.length > 60)
-    .slice(0, 8)
-    .map((r) => ({
-      name: r.name,
-      role: r.role,
-      rating: r.rating,
-      date: r.date,
-      text: r.text,
-    }));
-
-  // 如果筛选后不足 8 条，补充无角色但有头像的
-  if (featuredReviews.length < 8) {
-    const extras = reviews
-      .filter((r) => !featuredReviews.find((f) => f.name === r.name))
-      .slice(0, 8 - featuredReviews.length)
-      .map((r) => ({
-        name: r.name,
-        rating: r.rating,
-        date: r.date,
-        text: r.text,
-      }));
-    featuredReviews.push(...extras);
-  }
-
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(getExamplesJsonLd(featuredReviews)),
+          __html: JSON.stringify(getExamplesJsonLd()),
         }}
       />
       <div className="min-h-screen">
       {/* Header */}
-      <section className="border-b bg-muted/30 py-12 md:py-20">
+      <section className="border-b bg-muted/30 py-8 md:py-20">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center gap-4 text-center">
+          <div className="flex flex-col items-center justify-center gap-3 sm:gap-4 text-center">
             <Badge variant="outline" className="mb-2">
-              Customer Reviews
+              Sample Testimonials
             </Badge>
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-              What Our Customers Say
+            <h1 className="text-2xl font-bold tracking-tighter sm:text-4xl md:text-5xl px-2">
+              What Professionals Say About AI Headshots
             </h1>
             <p className="max-w-[700px] text-muted-foreground text-lg">
-              Real feedback from real people who transformed their selfies into professional headshots.
+              Illustrative feedback representing typical experiences with AI
+              headshot tools. Photos on this site are AI-generated examples.
             </p>
 
-            {/* Rating Summary */}
             <div className="mt-4 flex flex-col items-center gap-2">
-              <div className="flex gap-1">
+              <div className="flex gap-1" aria-hidden>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
@@ -85,12 +63,9 @@ export default function ExamplesPage() {
                   />
                 ))}
               </div>
-              <div className="flex items-center gap-2 text-lg">
-                <span className="font-bold text-2xl">4.9</span>
-                <span className="text-muted-foreground">/ 5</span>
-                <span className="mx-2 text-muted-foreground">·</span>
-                <span className="text-muted-foreground">based on 50,000+ professionals</span>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                Sample testimonials for illustration — not verified third-party reviews
+              </p>
             </div>
           </div>
         </div>
@@ -153,13 +128,13 @@ export default function ExamplesPage() {
               Ready to get yours?
             </h2>
             <p className="max-w-[600px] text-muted-foreground text-lg">
-              Join thousands of professionals who trust SnapProHead for studio-quality AI headshots.
+              Studio-quality AI headshots from $29 — delivered in about 25 minutes.
             </p>
-            <a href="/#pricing">
+            <Link href="/pricing">
               <Button size="lg" className="mt-2">
                 Create Your Headshots Now
               </Button>
-            </a>
+            </Link>
           </div>
         </div>
       </section>

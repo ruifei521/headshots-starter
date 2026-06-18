@@ -125,6 +125,7 @@ export interface Database {
           amount_cents: number
           currency: string
           status: string
+          credits_granted: boolean
           raw_payload: Json | null
           created_at: string
         }
@@ -137,6 +138,7 @@ export interface Database {
           amount_cents: number
           currency?: string
           status?: string
+          credits_granted?: boolean
           raw_payload?: Json | null
           created_at?: string
         }
@@ -149,6 +151,7 @@ export interface Database {
           amount_cents?: number
           currency?: string
           status?: string
+          credits_granted?: boolean
           raw_payload?: Json | null
           created_at?: string
         }

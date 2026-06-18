@@ -1,18 +1,16 @@
 "use client"
 
 import { Check, Clock, Shield, ArrowRight, Zap, Star, X, DollarSign, Camera, Users, Palette } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { TIERS, type Tier, type TierInfo } from "@/lib/tiers"
-import { createBrowserClient } from "@supabase/ssr"
-import { useRouter } from "next/navigation"
-import { SocialProofBar, Testimonials } from "./trust-signals"
-
-// Default pack used when user clicks directly from pricing card
-const DEFAULT_PACK = 'corporate-headshots'
+import { PRICING_RETENTION_TRUST_LINE } from "@/lib/data-retention-policy";
+import { PRICING_TRUST_LINE } from "@/lib/refund-policy";
+import { STUDIO_PHOTOGRAPH_AVERAGE_USD, STUDIO_PHOTOGRAPH_SESSION_LABEL } from "@/lib/marketing-copy";
+import Link from "next/link"
+import { TIERS, type TierInfo, MAX_OUTFIT_BACKGROUND_SETS_LABEL } from "@/lib/tiers"
+import { CheckoutLink } from "@/components/CheckoutLink"
+import { checkoutGoPath, DEFAULT_PACK } from "@/lib/checkout-url"
 
 function checkoutHref(tier: string) {
-  const params = new URLSearchParams({ tier, pack: DEFAULT_PACK })
-  return `/api/creem/go?${params.toString()}`
+  return checkoutGoPath(tier, DEFAULT_PACK)
 }
 
 function trackBeginCheckout(info: TierInfo) {
@@ -37,8 +35,8 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
 
   return (
     <div
-      className={`relative flex flex-col rounded-xl border bg-card p-8 shadow-sm transition-all duration-200 hover:shadow-md ${
-        highlight ? "ring-2 ring-primary scale-[1.02]" : ""
+      className={`relative flex flex-col rounded-xl border bg-card p-5 sm:p-8 shadow-sm transition-all duration-200 hover:shadow-md ${
+        highlight ? "md:ring-2 md:ring-primary md:scale-[1.02]" : ""
       }`}
     >
       {/* Badge */}
@@ -56,16 +54,20 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
         </div>
       )}
 
+      <h3 className="text-center text-lg font-semibold text-foreground mb-4">
+        {info.name}
+      </h3>
+
       {/* Price */}
       <div className="flex items-baseline justify-center gap-2">
         <span className="text-lg text-muted-foreground line-through">${info.originalPrice}</span>
-        <span className="text-5xl font-extrabold">{info.priceLabel}</span>
+        <span className="text-4xl sm:text-5xl font-extrabold">{info.priceLabel}</span>
         <span className="text-sm text-muted-foreground">/pack</span>
       </div>
 
       {/* Image count */}
       <p className="mt-1 text-center text-sm text-muted-foreground">
-        {info.imageCount} HD headshots
+        {info.marketingImageCount} HD headshots
       </p>
 
       {/* Delivery time */}
@@ -85,28 +87,36 @@ function PricingCard({ info, highlight }: { info: TierInfo; highlight?: boolean 
       </ul>
 
       {/* CTA — native navigation to /api/creem/go (server 302 → Creem) */}
-      <Button
-        asChild
-        className={`w-full min-h-[48px] font-semibold text-base ${
+      <CheckoutLink
+        href={checkoutHref(info.tier)}
+        className={`inline-flex items-center justify-center w-full min-h-[48px] font-semibold text-base rounded-md px-4 py-2 transition-colors ${
           highlight
-            ? "bg-primary hover:bg-primary/90"
-            : "bg-secondary hover:bg-secondary/80 text-secondary-foreground"
+            ? "bg-primary hover:bg-primary/90 text-primary-foreground"
+            : "border border-primary/35 bg-primary/20 hover:bg-primary/30 text-primary"
         }`}
-        variant={highlight ? "default" : "secondary"}
+        onNavigate={() => trackBeginCheckout(info)}
       >
-        <a
-          href={checkoutHref(info.tier)}
-          onClick={() => trackBeginCheckout(info)}
-        >
-          {highlight ? `Get ${info.name}` : `Choose ${info.name}`}
-          <ArrowRight className="h-4 w-4 ml-2" />
-        </a>
-      </Button>
+        {highlight ? `Get ${info.name}` : `Choose ${info.name}`}
+        <ArrowRight className="h-4 w-4 ml-2" />
+      </CheckoutLink>
     </div>
   )
 }
 
-export default function ModernPricing() {
+type ModernPricingProps = {
+  /** Homepage marketing block above cards; off on /pricing */
+  showHeader?: boolean
+  /** Comparison table below cards */
+  showComparison?: boolean
+  /** Trust badges row under cards */
+  showTrustBadges?: boolean
+}
+
+export default function ModernPricing({
+  showHeader = true,
+  showComparison = true,
+  showTrustBadges = true,
+}: ModernPricingProps) {
   const tierList: TierInfo[] = [
     TIERS.starter,
     TIERS.professional,
@@ -116,29 +126,25 @@ export default function ModernPricing() {
   return (
     <div className="mx-auto max-w-5xl px-4">
       <div className="flex flex-col items-center justify-center space-y-8">
-        {/* Section Header */}
-        <div className="text-center space-y-4">
-          {/* 20% off banner */}
-          <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-1.5 text-sm font-semibold text-white">
-            🔥 20% off all plans — Limited time!
+        {showHeader && (
+          <div className="text-center space-y-4">
+            <div className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-1.5 text-sm font-semibold text-foreground border">
+              Launch pricing from $29 · Studio-quality results
+            </div>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+              Professional headshots for{" "}
+              <span className="text-primary">8x less</span>
+              <br />
+              than a physical photo shoot
+            </h2>
+            <p className="max-w-[700px] text-muted-foreground text-lg mx-auto">
+              The average cost of professional headshots in the United States is
+              ${STUDIO_PHOTOGRAPH_AVERAGE_USD}. Our packages start from $29.
+            </p>
           </div>
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            Professional headshots for{" "}
-            <span className="text-primary">8x less</span>
-            <br />
-            than a physical photo shoot
-          </h2>
-          <p className="max-w-[700px] text-muted-foreground text-lg mx-auto">
-            The average cost of professional headshots in the United States is
-            $232. Our packages start from $29.
-          </p>
-        </div>
+        )}
 
-        {/* ⭐ Social Proof Bar */}
-        <SocialProofBar />
-
-        {/* Three Pricing Cards */}
-        <div className="mt-8 grid w-full grid-cols-1 gap-6 md:grid-cols-3">
+        <div className={`grid w-full grid-cols-1 gap-6 md:grid-cols-3 ${showHeader ? "mt-8" : ""}`}>
           {tierList.map((tierInfo) => (
             <PricingCard
               key={tierInfo.tier}
@@ -148,34 +154,62 @@ export default function ModernPricing() {
           ))}
         </div>
 
-        {/* Trust Badges */}
-        <p className="flex items-center justify-center gap-3 text-sm text-muted-foreground flex-wrap">
-          <span className="flex items-center gap-1">
-            <Shield className="h-4 w-4 text-primary" />
-            30-day auto-delete
-          </span>
-          <span className="text-muted-foreground/40">·</span>
-          <span className="flex items-center gap-1">
-            <Check className="h-4 w-4 text-primary" />
-            Commercial license
-          </span>
-          <span className="text-muted-foreground/40">·</span>
-          <span className="flex items-center gap-1">
-            <Check className="h-4 w-4 text-primary" />
-            100% satisfaction guaranteed
-          </span>
-        </p>
+        {showTrustBadges && (
+          <p className="flex items-center justify-center gap-3 text-sm text-muted-foreground flex-wrap">
+            <span className="flex items-center gap-1">
+              <Shield className="h-4 w-4 text-primary" />
+              {PRICING_RETENTION_TRUST_LINE}
+            </span>
+            <span className="text-muted-foreground/40">·</span>
+            <span className="flex items-center gap-1">
+              <Check className="h-4 w-4 text-primary" />
+              Commercial license
+            </span>
+            <span className="text-muted-foreground/40">·</span>
+            <span className="flex items-center gap-1">
+              <Check className="h-4 w-4 text-primary" />
+              <Link href="/refund" className="hover:underline underline-offset-2">
+                {PRICING_TRUST_LINE}
+              </Link>
+            </span>
+          </p>
+        )}
 
-        {/* Comparison Table: SnapProHead vs Traditional Photographer */}
-        <div className="mt-16 max-w-3xl mx-auto w-full">
-          <h3 className="text-center text-2xl font-bold mb-2">
+        {showComparison && (
+        <div className="mt-12 md:mt-16 max-w-3xl mx-auto w-full">
+          <h3 className="text-center text-xl sm:text-2xl font-bold mb-2">
             SnapProHead vs Hiring a Photographer
           </h3>
-          <p className="text-center text-muted-foreground text-sm mb-8">
-            See why thousands choose AI headshots over traditional photoshoots.
+          <p className="text-center text-muted-foreground text-sm mb-6 sm:mb-8 px-2">
+            See why professionals choose AI headshots over traditional photoshoots.
           </p>
 
-          <div className="overflow-x-auto rounded-lg border">
+          {/* Mobile: stacked rows */}
+          <div className="md:hidden space-y-3">
+            {[
+              { label: "Cost", ours: "From $29", theirs: STUDIO_PHOTOGRAPH_SESSION_LABEL },
+              { label: "Time", ours: "As quick as 25 min", theirs: "2–3 work days" },
+              { label: "Headshots", ours: "Up to 100 per pack", theirs: "5–10 per person" },
+              { label: "Outfits", ours: `Up to ${MAX_OUTFIT_BACKGROUND_SETS_LABEL}`, theirs: "1–2 outfits" },
+            ].map((row) => (
+              <div key={row.label} className="rounded-lg border p-3 text-sm">
+                <p className="font-medium mb-2">{row.label}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-md bg-primary/5 px-2 py-1.5 text-center">
+                    <p className="text-[10px] text-primary font-semibold uppercase">SnapProHead</p>
+                    <p className="text-xs font-medium mt-0.5">{row.ours}</p>
+                  </div>
+                  <div className="rounded-md bg-muted/50 px-2 py-1.5 text-center text-muted-foreground">
+                    <p className="text-[10px] font-semibold uppercase">Studio</p>
+                    <p className="text-xs mt-0.5">{row.theirs}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden md:block overflow-x-auto rounded-lg border">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
@@ -199,7 +233,7 @@ export default function ModernPricing() {
                   <td className="px-4 py-3 text-center text-muted-foreground">
                     <span className="flex items-center justify-center gap-1.5">
                       <X className="h-4 w-4 text-red-400" />
-                      <span>$250+ per session</span>
+                      <span>{STUDIO_PHOTOGRAPH_SESSION_LABEL}</span>
                     </span>
                   </td>
                 </tr>
@@ -247,7 +281,7 @@ export default function ModernPricing() {
                   <td className="px-4 py-3 text-center">
                     <span className="flex items-center justify-center gap-1.5">
                       <Check className="h-4 w-4 text-green-500" />
-                      <span className="font-medium">80+ outfits & backgrounds</span>
+                      <span className="font-medium">Up to {MAX_OUTFIT_BACKGROUND_SETS_LABEL}</span>
                     </span>
                   </td>
                   <td className="px-4 py-3 text-center text-muted-foreground">
@@ -279,9 +313,7 @@ export default function ModernPricing() {
             </table>
           </div>
         </div>
-
-        {/* ⭐ Testimonials */}
-        <Testimonials />
+        )}
       </div>
     </div>
   )

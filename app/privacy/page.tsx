@@ -1,15 +1,25 @@
 import Link from "next/link";
+import {
+  LEGAL_ACCOUNT_DELETION,
+  LEGAL_DELETION_ON_REQUEST,
+  LEGAL_GENERATED_RETENTION_SECTION2,
+  LEGAL_GENERATED_RETENTION_SECTION5,
+  LEGAL_UPLOAD_RETENTION_SECTION2,
+  LEGAL_UPLOAD_RETENTION_SECTION5,
+} from "@/lib/data-retention-policy";
 
 export const metadata = {
   title: "Privacy Policy - SnapProHead",
   description: "SnapProHead Privacy Policy - How we collect, use, and protect your personal data and photos.",
+  alternates: {
+    canonical: "https://snapprohead.com/privacy",
+  },
 };
 
 export default function PrivacyPolicy() {
   return (
     <div className="container max-w-4xl py-16 px-4">
       <h1 className="text-3xl font-bold mb-8">Privacy Policy</h1>
-      <p className="text-sm text-muted-foreground mb-8">Last updated: May 17, 2026</p>
 
       <section className="space-y-6 text-muted-foreground">
         <div>
@@ -29,10 +39,10 @@ export default function PrivacyPolicy() {
           <ul className="list-disc pl-6 space-y-2">
             <li>Photos are sent to our AI processing provider (Astria AI) to train a custom model and generate headshots based on your likeness.</li>
             <li>Model training is necessary to produce accurate, personalized headshots — your photos are not used for any other purpose.</li>
-            <li><strong className="text-foreground">Original uploaded photos are automatically deleted within 7 days</strong> after your headshots are generated.</li>
-            <li><strong className="text-foreground">Generated headshots are stored for 30 days</strong>, after which they are automatically deleted.</li>
+            <li><strong className="text-foreground">{LEGAL_UPLOAD_RETENTION_SECTION2}</strong></li>
+            <li><strong className="text-foreground">{LEGAL_GENERATED_RETENTION_SECTION2}</strong></li>
             <li>We do not use your photos to train third-party AI models. Astria AI&apos;s data handling is governed by their privacy policy: <Link href="https://astria.ai/privacy" className="text-primary hover:underline" target="_blank">https://astria.ai/privacy</Link></li>
-            <li>You may request early deletion of your photos and generated images at any time by contacting us at <Link href="mailto:contact@snapprohead.com" className="text-primary hover:underline">contact@snapprohead.com</Link>.</li>
+            <li>{LEGAL_DELETION_ON_REQUEST}</li>
           </ul>
         </div>
 
@@ -61,11 +71,11 @@ export default function PrivacyPolicy() {
         <div>
           <h2 className="text-xl font-semibold text-foreground mb-3">5. Data Retention and Deletion</h2>
           <ul className="list-disc pl-6 space-y-2">
-            <li><strong className="text-foreground">Original uploaded photos:</strong> Automatically deleted within 7 days after headshot generation is complete.</li>
-            <li><strong className="text-foreground">Generated headshots:</strong> Stored for 30 days after generation, then automatically deleted.</li>
+            <li><strong className="text-foreground">{LEGAL_UPLOAD_RETENTION_SECTION5}</strong></li>
+            <li><strong className="text-foreground">{LEGAL_GENERATED_RETENTION_SECTION5}</strong></li>
             <li><strong className="text-foreground">Account data:</strong> Retained while your account is active.</li>
-            <li>You may request early deletion of your photos and generated images at any time by contacting us at <Link href="mailto:contact@snapprohead.com" className="text-primary hover:underline">contact@snapprohead.com</Link>.</li>
-            <li>Upon account deletion request, we will remove your personal data, uploaded photos, and generated images within 7 days.</li>
+            <li>{LEGAL_DELETION_ON_REQUEST}</li>
+            <li>{LEGAL_ACCOUNT_DELETION}</li>
           </ul>
         </div>
 

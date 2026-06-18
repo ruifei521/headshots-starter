@@ -15,7 +15,9 @@ import {
   getTierInfo,
   getCreemProductId,
   tierFromProductId,
+  parseCheckoutTier,
   maxTier,
+  formatOutfitBackgroundFeature,
 } from '@/lib/tiers';
 
 // ============================================
@@ -37,7 +39,10 @@ describe('TIERS constants', () => {
     expect(s.price).toBe(29);
     expect(s.originalPrice).toBe(37);
     expect(s.priceLabel).toBe('$29');
-    expect(s.imageCount).toBe(40);
+    expect(s.imageCount).toBe(45);
+    expect(s.marketingImageCount).toBe(40);
+    expect(s.outfitStyleCount).toBe(10);
+    expect(s.backgroundCount).toBe(10);
     expect(s.modelBranch).toBe('flux1');
     expect(s.resolution).toBe('1024×1024');
     expect(s.estimatedTime).toBe('~25 min');
@@ -52,7 +57,10 @@ describe('TIERS constants', () => {
     expect(p.price).toBe(39);
     expect(p.originalPrice).toBe(49);
     expect(p.priceLabel).toBe('$39');
-    expect(p.imageCount).toBe(60);
+    expect(p.imageCount).toBe(66);
+    expect(p.marketingImageCount).toBe(60);
+    expect(p.outfitStyleCount).toBe(20);
+    expect(p.backgroundCount).toBe(20);
     expect(p.modelBranch).toBe('flux1');
     expect(p.resolution).toBe('1024×1024');
     expect(p.estimatedTime).toBe('~25 min');
@@ -67,12 +75,26 @@ describe('TIERS constants', () => {
     expect(e.price).toBe(59);
     expect(e.originalPrice).toBe(74);
     expect(e.priceLabel).toBe('$59');
-    expect(e.imageCount).toBe(100);
+    expect(e.imageCount).toBe(108);
+    expect(e.marketingImageCount).toBe(100);
+    expect(e.outfitStyleCount).toBe(30);
+    expect(e.backgroundCount).toBe(30);
     expect(e.modelBranch).toBe('flux1');
     expect(e.resolution).toBe('1024×1024');
     expect(e.estimatedTime).toBe('~25 min');
     expect(e.badge).toBe('Best Value');
     expect(e.features.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('marketing image counts should be in ascending order', () => {
+    expect(TIERS.starter.marketingImageCount).toBeLessThan(TIERS.professional.marketingImageCount);
+    expect(TIERS.professional.marketingImageCount).toBeLessThan(TIERS.executive.marketingImageCount);
+  });
+
+  it('actual image counts should exceed marketing counts (customer surprise)', () => {
+    expect(TIERS.starter.imageCount).toBeGreaterThan(TIERS.starter.marketingImageCount);
+    expect(TIERS.professional.imageCount).toBeGreaterThan(TIERS.professional.marketingImageCount);
+    expect(TIERS.executive.imageCount).toBeGreaterThan(TIERS.executive.marketingImageCount);
   });
 
   it('image counts should be in ascending order', () => {
@@ -83,6 +105,12 @@ describe('TIERS constants', () => {
   it('prices should be in ascending order', () => {
     expect(TIERS.starter.price).toBeLessThan(TIERS.professional.price);
     expect(TIERS.professional.price).toBeLessThan(TIERS.executive.price);
+  });
+
+  it('formatOutfitBackgroundFeature should describe outfit and background sets', () => {
+    expect(formatOutfitBackgroundFeature(10, 10)).toBe('10 outfit & background sets');
+    expect(formatOutfitBackgroundFeature(30, 30)).toBe('30 outfit & background sets');
+    expect(formatOutfitBackgroundFeature(10, 8)).toBe('10 outfit styles & 8 backgrounds');
   });
 });
 
@@ -121,15 +149,14 @@ describe('PRODUCT_ID_TO_TIER', () => {
     expect(PRODUCT_ID_TO_TIER['prod_4Bcd1ZArXQXbWl7GWkxzUe']).toBe('executive');
   });
 
-  it('should map legacy product ID to starter (backward compatibility)', () => {
-    expect(PRODUCT_ID_TO_TIER['prod_6F4zKTNhL3V7vWPUhnjZDZ']).toBe('starter');
-    expect(PRODUCT_ID_TO_TIER['prod_31zqeJaVi4nCiCLGPz0F2K']).toBe('starter');
-  });
-
   it('all entries should be valid Tier values', () => {
     for (const [productId, tier] of Object.entries(PRODUCT_ID_TO_TIER)) {
       expect(['starter', 'professional', 'executive']).toContain(tier);
     }
+  });
+
+  it('should map exactly the three current Creem product IDs', () => {
+    expect(Object.keys(PRODUCT_ID_TO_TIER)).toHaveLength(3);
   });
 });
 
@@ -245,14 +272,26 @@ describe('tierFromProductId', () => {
     expect(tierFromProductId('prod_4Bcd1ZArXQXbWl7GWkxzUe')).toBe('executive');
   });
 
-  it('should map legacy product ID to starter (backward compatibility)', () => {
-    expect(tierFromProductId('prod_6F4zKTNhL3V7vWPUhnjZDZ')).toBe('starter');
+  it('should return null for unknown product IDs', () => {
+    expect(tierFromProductId('prod_unknown')).toBeNull();
+    expect(tierFromProductId('')).toBeNull();
+    expect(tierFromProductId('some_random_id')).toBeNull();
+  });
+});
+
+describe('parseCheckoutTier', () => {
+  it('accepts valid tier strings', () => {
+    expect(parseCheckoutTier('starter')).toBe('starter');
+    expect(parseCheckoutTier('professional')).toBe('professional');
+    expect(parseCheckoutTier('executive')).toBe('executive');
   });
 
-  it('should fallback to starter for unknown product IDs', () => {
-    expect(tierFromProductId('prod_unknown')).toBe('starter');
-    expect(tierFromProductId('')).toBe('starter');
-    expect(tierFromProductId('some_random_id')).toBe('starter');
+  it('rejects invalid or missing values', () => {
+    expect(parseCheckoutTier(null)).toBeNull();
+    expect(parseCheckoutTier(undefined)).toBeNull();
+    expect(parseCheckoutTier('')).toBeNull();
+    expect(parseCheckoutTier('premium')).toBeNull();
+    expect(parseCheckoutTier('STARTER')).toBeNull();
   });
 });
 
@@ -369,19 +408,6 @@ describe('End-to-end scenario: Purchase → Webhook → Training', () => {
 
     // Training still uses executive config
     const config = getTrainingConfig(resolvedTier);
-    expect(config.branch).toBe('flux1');
-  });
-
-  it('legacy product ID backward compatibility', () => {
-    // Old product ID from before the three-tier change
-    const legacyProductId = 'prod_6F4zKTNhL3V7vWPUhnjZDZ';
-
-    // Webhook maps it to starter
-    const tier = tierFromProductId(legacyProductId);
-    expect(tier).toBe('starter');
-
-    // Training uses starter config (now flux)
-    const config = getTrainingConfig(tier);
     expect(config.branch).toBe('flux1');
   });
 });

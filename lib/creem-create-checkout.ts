@@ -1,9 +1,8 @@
-import { getCreemProductId, isTier, type Tier } from '@/lib/tiers';
+import { getCreemProductId, parseCheckoutTier, type Tier } from '@/lib/tiers';
+import { DEFAULT_TRAIN_PACK } from '@/lib/default-pack';
 import { logger } from '@/lib/logger';
 
 const CREEM_API_BASE = 'https://api.creem.io/v1';
-const DEFAULT_TIER: Tier = 'starter';
-const DEFAULT_PACK = 'corporate-headshots';
 
 export type CreateCreemCheckoutInput = {
   userId: string;
@@ -22,16 +21,20 @@ export async function createCreemCheckoutUrl(
     return { error: 'Payment is not configured' };
   }
 
-  const effectiveTier: Tier =
-    input.tier && isTier(input.tier) ? input.tier : DEFAULT_TIER;
+  const effectiveTier: Tier | null = parseCheckoutTier(input.tier ?? null);
+  if (!effectiveTier) {
+    logger.error('Invalid or missing checkout tier:', input.tier);
+    return { error: 'invalid_tier' };
+  }
+
   const productId = getCreemProductId(effectiveTier);
-  const packParam = input.pack || DEFAULT_PACK;
+  const packParam = input.pack || DEFAULT_TRAIN_PACK;
 
   if (!productId) {
     return { error: `Unknown tier: ${effectiveTier}` };
   }
 
-  const successUrl = `${input.baseUrl}/overview/models/train/${packParam}?tier=${effectiveTier}`;
+  const successUrl = `${input.baseUrl}/overview/models/train/${packParam}?tier=${effectiveTier}&payment=success`;
 
   const response = await fetch(`${CREEM_API_BASE}/checkouts`, {
     method: 'POST',

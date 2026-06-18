@@ -72,7 +72,7 @@
 ## 三、三档定价体系
 
 ```
-Basic ($29, was $39)    → 40 HD headshots, 10 styles, sd15, ~45min
+Basic ($29, was $39)    → 40 HD headshots, 10 styles, sd15, ~25min
 Professional ($39, was $54) → 60 HD headshots, 15 styles, sd15, ~40min  ← Most Popular
 Executive ($59, was $79)    → 100 HD headshots, 25 styles, flux, ~25min ← Best Value
 ```
@@ -82,14 +82,6 @@ Executive ($59, was $79)    → 100 HD headshots, 25 styles, flux, ~25min ← Be
 starter:      prod_fWHFyTDAhVb1xqwS71esu
 professional: prod_453s1kOCIVZECDNqx9z1o3
 executive:    prod_4Bcd1ZArXQXbWl7GWkxzUe
-```
-
-### 向后兼容旧 ID（在 lib/tiers.ts PRODUCT_ID_TO_TIER 中）
-```
-prod_31zqeJaVi4nCiCLGPz0F2K → starter
-prod_6F4zKTNhL3V7vWPUhnjZDZ → starter
-prod_198ewWuQouDaQfEOT6kTvj → professional
-prod_1pZIlgHsKVk5YOK1QupnPP → executive
 ```
 
 ---

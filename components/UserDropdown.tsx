@@ -32,7 +32,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/overview" className="w-full cursor-pointer">
-            My Models
+            My headshots
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

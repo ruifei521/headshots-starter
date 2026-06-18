@@ -1,16 +1,10 @@
 import Link from "next/link"
+import { PROFESSION_HERO_SUFFIX } from "@/lib/refund-policy";
 import { Button } from "@/components/ui/button"
 import { Check, ArrowRight, Shield, Sparkles, Clock, Camera } from "lucide-react"
-import type { Metadata } from 'next'
+import { getProfessionMetadata } from "@/lib/profession-metadata";
 
-export const metadata: Metadata = {
-  title: 'AI Professional Portrait - AI Professional Headshots | SnapProHead',
-  description: 'Get professional ai professional portrait in ~30 minutes. AI-generated photos starting at $29 for 40+ HD headshots. 14-day money-back guarantee.',
-  openGraph: {
-    title: 'AI Professional Portrait by SnapProHead',
-    description: 'Professional ai professional portrait delivered in ~30 minutes. Starting at $29.',
-  },
-}
+export const metadata = getProfessionMetadata("ai-professional-portrait");
 
 export default function AiProfessionalPortraitHeadshotsPage() {
   return (
@@ -25,10 +19,10 @@ export default function AiProfessionalPortraitHeadshotsPage() {
         </h1>
         <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto mb-8">
           Get professional ai professional portrait that make the right impression.
-          Upload a few selfies and let our AI do the rest. Delivered in ~30 minutes.
+          Upload a few selfies and let our AI do the rest. Delivered in ~25 minutes.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/login">
+          <Link href="/pricing">
             <Button size="lg" className="gap-2 text-base px-8">
               Get Your AI Professional Portrait <ArrowRight className="h-4 w-4" />
             </Button>
@@ -45,8 +39,8 @@ export default function AiProfessionalPortraitHeadshotsPage() {
         </div>
         <div className="flex flex-col items-center text-center p-6">
           <Clock className="h-10 w-10 text-primary mb-4" />
-          <h3 className="font-semibold text-lg mb-2">Delivered in ~30 Minutes</h3>
-          <p className="text-muted-foreground">Upload your photos and get 40+ HD headshots in about 30 minutes. No appointment needed.</p>
+          <h3 className="font-semibold text-lg mb-2">Delivered in ~25 Minutes</h3>
+          <p className="text-muted-foreground">Upload your photos and get 40+ HD headshots in about 25 minutes. No appointment needed.</p>
         </div>
         <div className="flex flex-col items-center text-center p-6">
           <Camera className="h-10 w-10 text-primary mb-4" />
@@ -59,9 +53,9 @@ export default function AiProfessionalPortraitHeadshotsPage() {
       <div className="text-center bg-muted/30 rounded-2xl p-12 max-w-2xl mx-auto mb-20">
         <h2 className="text-3xl font-bold mb-4">Ready for Your AI Professional Portrait?</h2>
         <p className="text-muted-foreground text-lg mb-8">
-          Starting at just $29 for 40+ HD headshots. 14-day money-back guarantee.
+          {PROFESSION_HERO_SUFFIX}
         </p>
-        <Link href="/login">
+        <Link href="/pricing">
           <Button size="lg" className="gap-2 text-base px-8">
             Get Started Now <ArrowRight className="h-4 w-4" />
           </Button>
@@ -74,7 +68,7 @@ export default function AiProfessionalPortraitHeadshotsPage() {
         <div className="space-y-4">
           <details className="group border rounded-lg p-4">
             <summary className="font-medium cursor-pointer">How long does it take to get ai professional portrait?</summary>
-            <p className="mt-2 text-muted-foreground">About 30 minutes. Upload 4-10 selfies and our AI generates 40+ professional headshots.</p>
+            <p className="mt-2 text-muted-foreground">About 25 minutes. Upload 4-10 selfies and our AI generates 40+ professional headshots.</p>
           </details>
           <details className="group border rounded-lg p-4">
             <summary className="font-medium cursor-pointer">What kind of photos should I upload?</summary>
@@ -82,7 +76,7 @@ export default function AiProfessionalPortraitHeadshotsPage() {
           </details>
           <details className="group border rounded-lg p-4">
             <summary className="font-medium cursor-pointer">How much do ai professional portrait cost?</summary>
-            <p className="mt-2 text-muted-foreground">Starting at $29 for 40+ HD professional headshots. 14-day money-back guarantee.</p>
+            <p className="mt-2 text-muted-foreground">{PROFESSION_HERO_SUFFIX}</p>
           </details>
         </div>
       </div>

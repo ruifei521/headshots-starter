@@ -1,21 +1,9 @@
-import { Metadata } from "next";
 import Link from "next/link";
+import { getProfessionMetadata } from "@/lib/profession-metadata";
+import { PROFESSION_CARD_HEADLINE, DELIVERY_FAQ_READY } from "@/lib/refund-policy";
+import { TIERS } from "@/lib/tiers";
 
-export const metadata: Metadata = {
-  title: "Doctor Headshots",
-  description:
-    "Professional AI headshots for doctors. Present a trustworthy, professional image on your clinic website, Healthgrades, and social media. Starting at $29.",
-  alternates: {
-    canonical: "https://snapprohead.com/headshots/doctor",
-  },
-  openGraph: {
-    title: "Doctor Headshots – Professional AI Portraits for Medical Professionals",
-    description:
-      "Command trust and confidence with AI-generated professional headshots for doctors. From your photos in ~30 minutes. $29 — 14-day guarantee.",
-    url: "https://snapprohead.com/headshots/doctor",
-    images: [{ url: "https://snapprohead.com/hero.webp", width: 1200, height: 630 }],
-  },
-};
+export const metadata = getProfessionMetadata("doctor");
 
 export default function DoctorHeadshotsPage() {
   return (
@@ -43,17 +31,17 @@ export default function DoctorHeadshotsPage() {
           <h2 className="text-xl font-semibold mt-10 mb-3">How It Works</h2>
           <ol className="list-decimal pl-5 space-y-2 text-muted-foreground mb-6">
             <li>Upload 10–12 selfies — wear your white coat or business attire.</li>
-            <li>AI generates 100+ professional doctor headshots in various styles.</li>
+            <li>AI generates {TIERS.starter.marketingImageCount}+ professional doctor headshots in various styles.</li>
             <li>Download your favorites and update your profiles instantly.</li>
           </ol>
 
           <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-6 mt-8 mb-10">
-            <p className="font-semibold text-lg">From $29 — 14-Day Money-Back Guarantee</p>
+            <p className="font-semibold text-lg">{PROFESSION_CARD_HEADLINE}</p>
             <p className="text-sm text-muted-foreground mt-1">
               Professional headshots for physicians — without a studio visit or hefty fee.
             </p>
             <Link
-              href="/templates"
+              href="/pricing"
               className="mt-4 inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition"
             >
               Get Your Doctor Headshots
@@ -88,7 +76,7 @@ export default function DoctorHeadshotsPage() {
                     name: "How fast will I receive my headshots?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "Most headshot packs are ready in about 30 minutes. You don't need to wait days for a photographer to edit and deliver.",
+                      text: `${DELIVERY_FAQ_READY} You don't need to wait days for a photographer to edit and deliver.`,
                     },
                   },
                   {

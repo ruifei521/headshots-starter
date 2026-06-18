@@ -2,7 +2,11 @@
 
 import { Component, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { logger } from '@/lib/logger';
+import {
+  isRecoverableClientError,
+  isDomReconciliationError,
+  tryAutoReloadForChunkError,
+} from '@/lib/chunk-error';
 
 interface Props {
   children: ReactNode;
@@ -11,6 +15,7 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
+  isChunkError: boolean;
 }
 
 /**
@@ -20,25 +25,44 @@ interface State {
 export class TrainModelZoneErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, isChunkError: false };
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    return {
+      hasError: true,
+      error,
+      isChunkError: isRecoverableClientError(error),
+    };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    logger.error('TrainModelZoneErrorBoundary caught:', {
-      message: error.message,
-      name: error.name,
-      stack: error.stack,
-      componentStack: errorInfo.componentStack,
-    });
-    console.error('=== TrainModelZone CRASH ===', error, errorInfo);
+    // Defer reload so React can finish the failed commit before navigation.
+    if (isRecoverableClientError(error)) {
+      window.setTimeout(() => tryAutoReloadForChunkError(error), 50);
+      return;
+    }
+
+    import('@/lib/report-error').then(({ reportError }) => {
+      reportError(error, {
+        area: 'training',
+        tags: { boundary: 'TrainModelZone' },
+        extra: { componentStack: errorInfo.componentStack },
+      });
+    }).catch(() => {});
   }
 
   handleRetry = () => {
-    this.setState({ hasError: false, error: null });
+    if (this.state.isChunkError) {
+      window.location.reload();
+      return;
+    }
+    // DOM reconciliation errors cannot be fixed by setState retry — reload.
+    if (this.state.error && isDomReconciliationError(this.state.error)) {
+      window.location.reload();
+      return;
+    }
+    this.setState({ hasError: false, error: null, isChunkError: false });
   };
 
   render() {
@@ -53,11 +77,12 @@ export class TrainModelZoneErrorBoundary extends Component<Props, State> {
           <div className="text-center">
             <p className="font-medium text-sm">Upload form failed to load</p>
             <p className="text-xs text-muted-foreground mt-1">
-              This might be a temporary issue. Try refreshing the page.
+              {this.state.isChunkError
+                ? 'A new version of this page is available. Please refresh to continue.'
+                : 'This might be a temporary issue. Try refreshing the page.'}
             </p>
           </div>
 
-          {/* Debug info */}
           {this.state.error && (
             <details className="text-left max-w-md w-full">
               <summary className="text-[10px] text-muted-foreground cursor-pointer">
@@ -72,7 +97,7 @@ export class TrainModelZoneErrorBoundary extends Component<Props, State> {
 
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={this.handleRetry}>
-              Retry
+              {this.state.isChunkError ? 'Reload page' : 'Retry'}
             </Button>
             <Button size="sm" onClick={() => window.location.reload()}>
               Refresh Page

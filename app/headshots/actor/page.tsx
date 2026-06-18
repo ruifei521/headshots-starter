@@ -1,17 +1,10 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Check, ArrowRight, Shield } from "lucide-react"
-import type { Metadata } from 'next'
+import { getProfessionMetadata } from "@/lib/profession-metadata";
+import { PROFESSION_PAGE_CTA, PROFESSION_HERO_SUFFIX } from "@/lib/refund-policy";
 
-export const metadata: Metadata = {
-  title: 'Actor Headshots - Professional AI Headshots for Actors & Performers',
-  description: 'Get professional AI actor headshots in ~30 minutes. Headshot photography for actors, performers, and entertainers. Multiple looks, one low price. Starting at $29 with 14-day guarantee.',
-  openGraph: {
-    title: 'AI Actor Headshots - Professional Headshot Photography',
-    description: 'Professional actor headshots in ~30 minutes. Multiple looks, starting at $29.',
-  },
-}
-
+export const metadata = getProfessionMetadata("actor");
 export default function ActorHeadshotsPage() {
   return (
     <div className="container px-4 md:px-6 py-16 md:py-24">
@@ -27,13 +20,13 @@ export default function ActorHeadshotsPage() {
           showcase your range — corporate, commercial, theatrical — all in one session.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/login">
+          <Link href="/pricing">
             <Button size="lg" className="group w-full sm:w-auto">
               Create Your Actor Headshots
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
-          <Link href="/templates">
+          <Link href="/headshots">
             <Button size="lg" variant="outline" className="w-full sm:w-auto">
               Browse Styles
             </Button>
@@ -42,7 +35,7 @@ export default function ActorHeadshotsPage() {
         <div className="mt-6 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
           <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> Multiple Character Looks</span>
           <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> Commercial & Theatrical</span>
-          <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> 12 Styles to Choose</span>
+          <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> 21 styles to choose</span>
         </div>
       </div>
 
@@ -55,14 +48,14 @@ export default function ActorHeadshotsPage() {
         <div className="grid grid-cols-2 gap-4 text-sm mb-6">
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 40+ HD headshots</div>
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Multiple backgrounds</div>
-          <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 12 professional styles</div>
+          <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 21 professional styles</div>
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Commercial license included</div>
         </div>
-        <Link href="/login">
+        <Link href="/pricing">
           <Button className="w-full">Get Started — $29</Button>
         </Link>
         <p className="text-center mt-4">
-          <Link href="/templates" className="text-sm text-primary hover:underline">Browse all 12 styles →</Link>
+          <Link href="/headshots" className="text-sm text-primary hover:underline">Browse all 21 styles →</Link>
         </p>
       </div>
 
@@ -70,13 +63,13 @@ export default function ActorHeadshotsPage() {
         <Shield className="h-12 w-12 mx-auto text-green-500 mb-4" />
         <h2 className="text-2xl font-bold mb-4">Ready for Your Close-Up?</h2>
         <p className="text-muted-foreground mb-6">
-          $29. 14-day money-back guarantee. Delivered in ~30 minutes.
+          {PROFESSION_PAGE_CTA}
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/login">
+          <Link href="/pricing">
             <Button size="lg">Create Your Actor Headshots Now</Button>
           </Link>
-          <Link href="/templates">
+          <Link href="/headshots">
             <Button size="lg" variant="outline">Browse All Styles</Button>
           </Link>
         </div>
@@ -87,9 +80,9 @@ export default function ActorHeadshotsPage() {
           '@context': 'https://schema.org','@type': 'FAQPage',
           mainEntity: [
             {'@type':'Question', name:'How much do actor headshots cost?',
-             acceptedAnswer:{'@type':'Answer', text:'Starting at $29 for 40+ HD professional headshots. 14-day money-back guarantee.'}},
+             acceptedAnswer:{'@type':'Answer', text: PROFESSION_HERO_SUFFIX}},
             {'@type':'Question', name:'How many looks can I get?',
-             acceptedAnswer:{'@type':'Answer', text:'12 professional styles including corporate, natural, commercial, and theatrical looks.'}},
+             acceptedAnswer:{'@type':'Answer', text:'21 professional styles including corporate, natural, commercial, and theatrical looks.'}},
           ]}
         )}}
       />

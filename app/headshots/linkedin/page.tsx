@@ -1,16 +1,10 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Check, ArrowRight, Shield, Sparkles, Clock, Camera } from "lucide-react"
-import type { Metadata } from 'next'
+import { getProfessionMetadata } from "@/lib/profession-metadata";
+import { PROFESSION_PAGE_CTA, PROFESSION_HERO_SUFFIX, DELIVERY_FAQ_ANSWER_40_PLUS, DELIVERY_HERO_PHRASE } from "@/lib/refund-policy";
 
-export const metadata: Metadata = {
-  title: 'LinkedIn Headshots - Professional AI Photos for Your Profile',
-  description: 'Get a professional LinkedIn headshot in ~30 minutes. AI-generated photos that get you noticed by recruiters. 40+ HD headshots, starting at $29. 14-day refund guarantee.',
-  openGraph: {
-    title: 'AI LinkedIn Headshots - Stand Out to Recruiters',
-    description: 'Professional LinkedIn photos in ~30 minutes. Starting at $29 for 40+ HD headshots.',
-  },
-}
+export const metadata = getProfessionMetadata("linkedin");
 
 export default function LinkedInHeadshotsPage() {
   return (
@@ -24,10 +18,10 @@ export default function LinkedInHeadshotsPage() {
         </h1>
         <p className="text-muted-foreground text-lg md:text-xl max-w-[800px] mx-auto mb-8">
           Recruiters judge your profile in seconds. Get a professional LinkedIn photo 
-          that gets you noticed, trusted, and hired — in just 30 minutes.
+          that gets you noticed, trusted, and hired � {DELIVERY_HERO_PHRASE}.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/login">
+          <Link href="/pricing">
             <Button size="lg" className="group w-full sm:w-auto">
               Create Your LinkedIn Headshots
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -42,14 +36,14 @@ export default function LinkedInHeadshotsPage() {
         <div className="mt-6 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
           <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> Recruiter-Approved</span>
           <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> Professional & Polished</span>
-          <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> 6 Styles to Choose</span>
+          <span className="flex items-center gap-1"><Check className="h-4 w-4 text-green-500" /> Multiple styles</span>
         </div>
       </div>
 
       <div className="mx-auto max-w-2xl mb-16 p-8 rounded-xl border bg-card">
         <h2 className="text-2xl font-bold mb-4">Perfect for Your LinkedIn Profile</h2>
         <p className="text-muted-foreground mb-4">
-          LinkedIn profiles with professional photos get 14x more profile views. 
+          LinkedIn profiles with professional photos tend to perform better in search and recruiter outreach.
           Our AI headshots are optimized for LinkedIn's format and professional standards.
         </p>
         <div className="grid grid-cols-2 gap-4 text-sm mb-6">
@@ -58,11 +52,11 @@ export default function LinkedInHeadshotsPage() {
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> 40+ HD headshots</div>
           <div className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" /> Multiple backgrounds</div>
         </div>
-        <Link href="/login">
-          <Button className="w-full">Get Started — $29</Button>
+        <Link href="/pricing">
+          <Button className="w-full">Get Started - $29</Button>
         </Link>
         <p className="text-center mt-4">
-          <Link href="/templates" className="text-sm text-primary hover:underline">Not sure which style? Browse all 12 →</Link>
+          <Link href="/headshots" className="text-sm text-primary hover:underline">Not sure which style? Browse all 21 styles</Link>
         </p>
       </div>
 
@@ -70,9 +64,9 @@ export default function LinkedInHeadshotsPage() {
         <h2 className="text-2xl font-bold text-center mb-8">Why Your LinkedIn Photo Matters</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { title: "14x More Views", desc: "Profiles with professional photos get 14x more views on LinkedIn." },
-            { title: "36x More Messages", desc: "A professional headshot leads to 36x more LinkedIn messages." },
-            { title: "First Impressions", desc: "Recruiters decide about you in just 7 seconds." },
+            { title: "Better Visibility", desc: "A polished photo helps your profile stand out in search and feed previews." },
+            { title: "More Engagement", desc: "Professional headshots can make messages and connection requests feel more credible." },
+            { title: "First Impressions", desc: "Recruiters and clients often decide in seconds whether to keep reading." },
           ].map((stat, i) => (
             <div key={i} className="p-6 rounded-xl border bg-card text-center">
               <h3 className="text-2xl font-bold text-primary mb-2">{stat.title}</h3>
@@ -86,13 +80,13 @@ export default function LinkedInHeadshotsPage() {
         <Shield className="h-12 w-12 mx-auto text-green-500 mb-4" />
         <h2 className="text-2xl font-bold mb-4">Upgrade Your LinkedIn Today</h2>
         <p className="text-muted-foreground mb-6">
-          $29. 14-day money-back guarantee. Delivered in ~30 minutes.
+          {PROFESSION_PAGE_CTA}
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/login">
+          <Link href="/pricing">
             <Button size="lg">Create Your LinkedIn Headshots Now</Button>
           </Link>
-          <Link href="/templates">
+          <Link href="/headshots">
             <Button size="lg" variant="outline">Browse All Styles</Button>
           </Link>
         </div>
@@ -108,15 +102,15 @@ export default function LinkedInHeadshotsPage() {
             mainEntity: [
               {
                 '@type': 'Question', name: 'How long does it take to get LinkedIn headshots?',
-                acceptedAnswer: { '@type': 'Answer', text: 'About 30 minutes. Upload 4-10 selfies and our AI generates 40+ professional headshots.' },
+                acceptedAnswer: { '@type': 'Answer', text: DELIVERY_FAQ_ANSWER_40_PLUS },
               },
               {
                 '@type': 'Question', name: 'What size should a LinkedIn profile picture be?',
-                acceptedAnswer: { '@type': 'Answer', text: 'LinkedIn recommends 400×400px. Our AI generates high-resolution headshots perfectly sized for LinkedIn.' },
+                acceptedAnswer: { '@type': 'Answer', text: 'LinkedIn recommends 400�400px. Our AI generates high-resolution headshots perfectly sized for LinkedIn.' },
               },
               {
                 '@type': 'Question', name: 'How much do LinkedIn headshots cost?',
-                acceptedAnswer: { '@type': 'Answer', text: 'Starting at $29 for 40+ HD professional headshots in your chosen style. 14-day money-back guarantee.' },
+                acceptedAnswer: { '@type': 'Answer', text: PROFESSION_HERO_SUFFIX },
               },
             ],
           }),

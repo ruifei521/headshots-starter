@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
+import { reportError } from "@/lib/report-error";
 import { useEffect, useState } from "react";
 
 function dumpError(err: unknown): string {
@@ -54,13 +55,14 @@ export default function Error({
   });
 
   useEffect(() => {
-    console.error("=== ERROR BOUNDARY CAUGHT ===");
-    console.error("Type:", typeof error);
-    console.error("InstanceOf Error:", error instanceof Error);
-    console.error("Raw:", error);
-    console.error("Dump:", dumpError(error));
-    console.error("URL:", window.location.href);
-    console.error("=========================");
+    reportError(error, {
+      area: "error-boundary",
+      extra: {
+        digest: error.digest,
+        dump: dumpError(error),
+        url: window.location.href,
+      },
+    });
   }, [error]);
 
   return (

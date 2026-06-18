@@ -5,8 +5,23 @@ import { logger } from "@/lib/logger";
 
 export const dynamic = 'force-dynamic';
 
-// Allowed MIME types
+// Allowed MIME types (extension fallback for browsers that omit HEIC/WEBP type)
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/heic', 'image/heif', 'image/webp'];
+const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.heic', '.heif'];
+const EXT_TO_MIME: Record<string, string> = {
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.heic': 'image/heic',
+  '.heif': 'image/heif',
+};
+
+function resolveImageContentType(file: File): string | null {
+  if (ALLOWED_TYPES.includes(file.type)) return file.type;
+  const ext = '.' + (file.name.split('.').pop()?.toLowerCase() ?? '');
+  return ALLOWED_EXTENSIONS.includes(ext) ? EXT_TO_MIME[ext] ?? null : null;
+}
 // Maximum file size (120MB)
 const MAX_FILE_SIZE = 120 * 1024 * 1024;
 
@@ -55,10 +70,10 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    // Server-side file type validation
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    const contentType = resolveImageContentType(file);
+    if (!contentType) {
       return NextResponse.json(
-        { error: `File type "${file.type}" is not allowed. Only PNG, JPG, HEIC, and WEBP are accepted.` },
+        { error: `File type "${file.type || 'unknown'}" is not allowed. Only PNG, JPG, HEIC, and WEBP are accepted.` },
         { status: 400 }
       );
     }
@@ -80,7 +95,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const { data, error } = await adminSupabase.storage
       .from('headshots')
       .upload(filePath, file, {
-        contentType: file.type,
+        contentType,
         upsert: false,
       });
 
@@ -97,8 +112,29 @@ export async function POST(request: Request): Promise<NextResponse> {
       .from('headshots')
       .getPublicUrl(filePath);
 
+    const publicUrl = urlData.publicUrl;
+
+    // ⭐ 验证 URL 是否可访问（bucket 必须是 public）
+    try {
+      const headRes = await fetch(publicUrl, { method: 'HEAD', signal: AbortSignal.timeout(5000) });
+      if (!headRes.ok) {
+        logger.error(`Uploaded file not accessible: HEAD ${headRes.status} for ${publicUrl}`);
+        // 尝试删除上传的文件，避免垃圾堆积
+        await adminSupabase.storage.from('headshots').remove([filePath]);
+        return NextResponse.json(
+          {
+            error: `Storage bucket "headshots" is not public. Astria cannot download your photos. Please make the bucket public in Supabase dashboard → Storage → headshots → Configuration → Public bucket.`,
+          },
+          { status: 500 }
+        );
+      }
+    } catch (verifyError) {
+      logger.warn('URL accessibility check failed (non-blocking):', verifyError);
+      // 验证失败不阻塞，继续返回 URL（可能是网络瞬态问题）
+    }
+
     return NextResponse.json({
-      url: urlData.publicUrl,
+      url: publicUrl,
       path: data.path,
     });
   } catch (error) {

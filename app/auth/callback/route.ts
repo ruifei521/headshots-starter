@@ -1,10 +1,10 @@
-import { createServerClient, parseCookieHeader, serializeCookieHeader } from "@supabase/ssr";
+import { createServerClient, parseCookieHeader } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
+import { resolvePostLoginDestination } from "@/lib/auth-redirect";
 
 export async function GET(req: NextRequest) {
   const requestUrl = new URL(req.url);
-  const params = Object.fromEntries(requestUrl.searchParams.entries());
 
   // 判断是否为 localhost 环境
   const isLocalhost = requestUrl.hostname === 'localhost' || requestUrl.hostname === '127.0.0.1';
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   const tokenHash = requestUrl.searchParams.get("token_hash");
   const token = requestUrl.searchParams.get("token");
   const type = requestUrl.searchParams.get("type");
-  const next = requestUrl.searchParams.get("next") || requestUrl.searchParams.get("redirect_to") || "/overview";
+  const next = resolvePostLoginDestination(requestUrl.searchParams.get("next"));
   const error = requestUrl.searchParams.get("error");
   const errorDescription = requestUrl.searchParams.get("error_description");
   const email = requestUrl.searchParams.get("email");
@@ -32,8 +32,8 @@ export async function GET(req: NextRequest) {
   }
 
   // 创建 Supabase 服务端客户端的辅助函数
-  const createSupabaseClient = () => {
-    const res = NextResponse.redirect(new URL(next, req.url));
+  const createSupabaseClient = (redirectTo: string) => {
+    const res = NextResponse.redirect(new URL(redirectTo, req.url));
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -62,7 +62,63 @@ export async function GET(req: NextRequest) {
     return { supabase, res };
   };
 
-  // 方法 1: PKCE 流程 - 使用 code 交换 session (新版 Supabase 默认)
+  // 优先 token_hash / OTP（邮箱 App 内打开无需 PKCE cookie）
+  if (tokenHash || (token && type === "magiclink")) {
+    const { supabase, res } = createSupabaseClient(next);
+
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      token_hash: (tokenHash || token) as string,
+      type: "magiclink",
+    });
+
+    if (verifyError) {
+      logger.error("token_hash verify failed:", verifyError.message);
+      return NextResponse.redirect(
+        `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
+      );
+    }
+
+    return res;
+  }
+
+  if (token && email) {
+    const { supabase, res } = createSupabaseClient(next);
+
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email: email,
+      token: token,
+      type: "magiclink",
+    });
+
+    if (verifyError) {
+      logger.error("verifyOtp (email+token) failed:", verifyError.message);
+      return NextResponse.redirect(
+        `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
+      );
+    }
+
+    return res;
+  }
+
+  if (token) {
+    const { supabase, res } = createSupabaseClient(next);
+
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      token_hash: token,
+      type: "magiclink",
+    });
+
+    if (verifyError) {
+      logger.error("plain token verify failed:", verifyError.message);
+      return NextResponse.redirect(
+        `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
+      );
+    }
+
+    return res;
+  }
+
+  // PKCE code — 仅在同浏览器点击 magic link 时有效
   if (code) {
     // 诊断：检查 code_verifier cookie 是否存在
     const hasCodeVerifier = cookieNames.some(name =>
@@ -77,7 +133,7 @@ export async function GET(req: NextRequest) {
       logger.warn("  - Middleware cleared the cookie (should be fixed by skipping /auth/ in middleware)");
     }
 
-    const { supabase, res } = createSupabaseClient();
+    const { supabase, res } = createSupabaseClient(next);
 
     const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
@@ -107,64 +163,6 @@ export async function GET(req: NextRequest) {
 
     // 确保所有 auth cookie 都被正确设置
     const setCookies = res.cookies.getAll();
-
-    return res;
-  }
-
-  // 方法 2: 带 email 的 token (新版 Magic Link)
-  if (token && email) {
-    const { supabase, res } = createSupabaseClient();
-
-    const { data, error: verifyError } = await supabase.auth.verifyOtp({
-      email: email,
-      token: token,
-      type: "magiclink",
-    });
-
-    if (verifyError) {
-      logger.error("verifyOtp (email+token) failed:", verifyError.message);
-      return NextResponse.redirect(
-        `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
-      );
-    }
-
-    return res;
-  }
-
-  // 方法 3: token_hash (旧版 Magic Link)
-  if (tokenHash || (token && type === "magiclink")) {
-    const { supabase, res } = createSupabaseClient();
-
-    const { data, error: verifyError } = await supabase.auth.verifyOtp({
-      token_hash: (tokenHash || token) as string,
-      type: "magiclink",
-    });
-
-    if (verifyError) {
-      logger.error("token_hash verify failed:", verifyError.message);
-      return NextResponse.redirect(
-        `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
-      );
-    }
-
-    return res;
-  }
-
-  // 方法 4: 纯 token (不带 email)
-  if (token) {
-    const { supabase, res } = createSupabaseClient();
-
-    const { data, error: verifyError } = await supabase.auth.verifyOtp({
-      token_hash: token,
-      type: "magiclink",
-    });
-
-    if (verifyError) {
-      logger.error("plain token verify failed:", verifyError.message);
-      return NextResponse.redirect(
-        `${requestUrl.origin}/login?error=${encodeURIComponent('Login link expired or invalid. Please try again.')}`
-      );
-    }
 
     return res;
   }

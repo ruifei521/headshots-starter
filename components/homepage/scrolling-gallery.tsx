@@ -1,45 +1,52 @@
 "use client"
 
 import Image from "next/image"
+import { motion } from "motion/react"
 
-// 32 AI-generated headshot examples from Astria.ai
-// Displayed in the hero section marquee gallery
-const galleryImages = Array.from({ length: 32 }, (_, i) => {
+const GALLERY_COUNT = 10
+const galleryImages = Array.from({ length: GALLERY_COUNT }, (_, i) => {
   const num = String(i + 1).padStart(2, "0")
   return `/gallery-images/${num}.jpg`
 })
 
-function MarqueeRow({ images, direction = "left", speed = 40 }: { images: string[]; direction?: "left" | "right"; speed?: number }) {
-  // Double the images for seamless infinite loop
+function MarqueeRow({
+  images,
+  speed = 40,
+}: {
+  images: string[]
+  speed?: number
+}) {
   const doubled = [...images, ...images]
 
   return (
     <div className="relative overflow-hidden">
-      {/* Fade edges */}
-      <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-gradient-to-r from-background to-transparent" />
-      <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-background to-transparent" />
+      <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-8 sm:w-16 md:w-24 bg-gradient-to-r from-background to-transparent" />
+      <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-8 sm:w-16 md:w-24 bg-gradient-to-l from-background to-transparent" />
 
-      <div
-        className="flex gap-3"
-        style={{
-          animation: `marquee-${direction} ${speed}s linear infinite`,
-          width: "max-content",
+      <motion.div
+        className="flex w-max gap-3"
+        aria-hidden
+        initial={{ x: 0 }}
+        animate={{ x: "-50%" }}
+        transition={{
+          duration: speed,
+          ease: "linear",
+          repeat: Infinity,
         }}
       >
         {doubled.map((src, i) => (
           <div
             key={`${src}-${i}`}
-            className="relative flex-shrink-0 w-28 h-36 sm:w-32 sm:h-40 md:w-36 md:h-48 rounded-xl overflow-hidden border bg-muted/20 shadow-sm hover:shadow-md transition-shadow duration-300 group"
+            className="relative flex-shrink-0 w-24 h-32 sm:w-28 sm:h-36 md:w-32 md:h-40 lg:w-36 lg:h-48 rounded-lg sm:rounded-xl overflow-hidden border bg-muted/20 shadow-sm"
           >
             <Image
               src={src}
-              alt={`AI headshot example`}
+              alt=""
               fill
               sizes="144px"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover !max-w-none !h-full"
               quality={55}
-              loading="lazy"
-              unoptimized
+              priority={i < 4}
             />
             <div className="absolute bottom-0 inset-x-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />
             <div className="absolute bottom-1.5 left-1.5 right-1.5">
@@ -50,26 +57,15 @@ function MarqueeRow({ images, direction = "left", speed = 40 }: { images: string
             </div>
           </div>
         ))}
-      </div>
+      </motion.div>
     </div>
   )
 }
 
 export default function ScrollingGallery() {
   return (
-    <div className="w-full space-y-3">
-      <style>{`
-        @keyframes marquee-left {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        @keyframes marquee-right {
-          0% { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
-        }
-      `}</style>
-
-      <MarqueeRow images={galleryImages} direction="left" speed={90} />
+    <div className="w-full" aria-label="AI headshot examples scrolling gallery">
+      <MarqueeRow images={galleryImages} speed={35} />
     </div>
   )
 }

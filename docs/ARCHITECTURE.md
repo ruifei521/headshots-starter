@@ -320,12 +320,12 @@ export const TIERS: Record<Tier, TierInfo> = {
     modelBranch: 'sd15',
     resolution: '512×768',
     estimatedImages: '~40 张',
-    estimatedTime: '~45 分钟',
+    estimatedTime: '~25 分钟',
     features: [
       '1 种职业风格（商务正装）',
       '约 40 张 AI 头像',
       '标准分辨率 512×768',
-      '~45 分钟交付',
+      '~25 分钟交付',
       '商业授权',
       '30 天自动删除保护隐私',
     ],
@@ -340,13 +340,13 @@ export const TIERS: Record<Tier, TierInfo> = {
     modelBranch: 'sd15',
     resolution: '512×768',
     estimatedImages: '~100 张',
-    estimatedTime: '~40 分钟',
+    estimatedTime: '~25 分钟',
     badge: 'Most Popular',
     features: [
       '3 种职业风格（商务 + 法律 + 自然）',
       '约 100 张 AI 头像',
       '标准分辨率 512×768',
-      '~40 分钟交付',
+      '~25 分钟交付',
       '商业授权',
       '30 天自动删除保护隐私',
     ],
@@ -579,7 +579,7 @@ sequenceDiagram
     TM->>DB: UPDATE credits SET credits = credits - 1
     TM-->>TZ: 200 {message: 'success'}
 
-    Note over Astria: Astria 训练中...（~30分钟）
+    Note over Astria: Astria 训练中...（~25分钟）
 
     Astria->>TWH: POST /astria/train-webhook<br/>{tune: {id: 12345, ...}}
     TWH->>TWH: 校验 webhook_secret

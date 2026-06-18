@@ -4,6 +4,8 @@
 // 禁止在其他文件硬编码 tier 字符串、价格
 // ============================================
 
+import { TIER_PRIVACY_FEATURE } from "@/lib/data-retention-policy";
+
 // ============================================
 // 套餐档位类型
 // ============================================
@@ -18,13 +20,41 @@ export interface TierInfo {
   price: number;          // 美元价格
   originalPrice: number;  // 原价（用于划线价展示）
   priceLabel: string;     // 价格标签
-  imageCount: number;     // 产出图片数量
+  imageCount: number;     // 实际产出图片数量（prompt 系统）
+  marketingImageCount: number; // 页面展示数量（给客户预期，实际略多）
+  outfitStyleCount: number; // 营销展示：服装+背景套数
+  backgroundCount: number;  // 与 outfitStyleCount 一致（每套含 outfit + background）
   modelBranch: 'sd15' | 'flux1';
   resolution: string;     // 分辨率描述
   estimatedTime: string;  // 预估时间
   badge?: string;         // 推荐标签（如 "Most Popular"）
   features: string[];     // 特性列表
 }
+
+/** Marketing copy: "10 outfit & background sets" */
+export function formatOutfitBackgroundFeature(
+  outfitStyleCount: number,
+  backgroundCount: number
+): string {
+  if (outfitStyleCount === backgroundCount) {
+    return `${outfitStyleCount} outfit & background sets`;
+  }
+  return `${outfitStyleCount} outfit styles & ${backgroundCount} backgrounds`;
+}
+
+/** Max outfit/background set count across tiers (pricing comparison tables). */
+export const MAX_OUTFIT_STYLE_COUNT = 30;
+export const MAX_BACKGROUND_COUNT = 30;
+export const MAX_OUTFIT_BACKGROUND_SETS_LABEL = formatOutfitBackgroundFeature(
+  MAX_OUTFIT_STYLE_COUNT,
+  MAX_BACKGROUND_COUNT
+);
+
+/** Site-wide marketing delivery time — all tiers use the same ~25 min promise. */
+export const ESTIMATED_DELIVERY_MINUTES = 25;
+export const ESTIMATED_DELIVERY_LABEL = `~${ESTIMATED_DELIVERY_MINUTES} min`;
+export const ESTIMATED_DELIVERY_LONG = `~${ESTIMATED_DELIVERY_MINUTES} minutes`;
+export const ESTIMATED_DELIVERY_FEATURE = `${ESTIMATED_DELIVERY_LABEL} fast delivery`;
 
 export const TIERS: Record<Tier, TierInfo> = {
   starter: {
@@ -33,17 +63,20 @@ export const TIERS: Record<Tier, TierInfo> = {
     price: 29,
     originalPrice: 37,
     priceLabel: '$29',
-    imageCount: 40,
+    imageCount: 45,
+    marketingImageCount: 40,
+    outfitStyleCount: 10,
+    backgroundCount: 10,
     modelBranch: 'flux1',
     resolution: '1024×1024',
-    estimatedTime: '~25 min',
+    estimatedTime: ESTIMATED_DELIVERY_LABEL,
     features: [
       '40 HD AI headshots',
-      '20+ outfits & backgrounds',
+      formatOutfitBackgroundFeature(10, 10),
       'Enhanced resolution 1024×1024 (Flux)',
-      '~25 min fast delivery',
+      ESTIMATED_DELIVERY_FEATURE,
       'Commercial license',
-      '30-day auto-delete privacy',
+      TIER_PRIVACY_FEATURE,
     ],
   },
   professional: {
@@ -52,18 +85,21 @@ export const TIERS: Record<Tier, TierInfo> = {
     price: 39,
     originalPrice: 49,
     priceLabel: '$39',
-    imageCount: 60,
+    imageCount: 66,
+    marketingImageCount: 60,
+    outfitStyleCount: 20,
+    backgroundCount: 20,
     modelBranch: 'flux1',
     resolution: '1024×1024',
-    estimatedTime: '~25 min',
+    estimatedTime: ESTIMATED_DELIVERY_LABEL,
     badge: 'Most Popular',
     features: [
       '60 HD AI headshots',
-      '40+ outfits & backgrounds',
+      formatOutfitBackgroundFeature(20, 20),
       'Enhanced resolution 1024×1024 (Flux)',
-      '~25 min fast delivery',
+      ESTIMATED_DELIVERY_FEATURE,
       'Commercial license',
-      '30-day auto-delete privacy',
+      TIER_PRIVACY_FEATURE,
     ],
   },
   executive: {
@@ -72,18 +108,21 @@ export const TIERS: Record<Tier, TierInfo> = {
     price: 59,
     originalPrice: 74,
     priceLabel: '$59',
-    imageCount: 100,
+    imageCount: 108,
+    marketingImageCount: 100,
+    outfitStyleCount: 30,
+    backgroundCount: 30,
     modelBranch: 'flux1',
     resolution: '1024×1024',
-    estimatedTime: '~25 min',
+    estimatedTime: ESTIMATED_DELIVERY_LABEL,
     badge: 'Best Value',
     features: [
       '100 HD AI headshots',
-      '80+ outfits & backgrounds',
+      formatOutfitBackgroundFeature(30, 30),
       'Enhanced resolution 1024×1024 (Flux)',
-      '~25 min fast delivery',
+      ESTIMATED_DELIVERY_FEATURE,
       'Commercial license',
-      '30-day auto-delete privacy',
+      TIER_PRIVACY_FEATURE,
     ],
   },
 };
@@ -97,17 +136,11 @@ export const CREEM_PRODUCT_IDS: Record<Tier, string> = {
   executive:    'prod_4Bcd1ZArXQXbWl7GWkxzUe',
 };
 
-// 反向映射：product_id → tier
+// 反向映射：product_id → tier（仅当前三档 Creem 产品）
 export const PRODUCT_ID_TO_TIER: Record<string, Tier> = {
   'prod_fWHFyTDAhVb1xqwS71esu': 'starter',
   'prod_453s1kOCIVZECDNqx9z1o3': 'professional',
   'prod_4Bcd1ZArXQXbWl7GWkxzUe': 'executive',
-  // 向后兼容：旧 product_id 映射为 starter
-  'prod_31zqeJaVi4nCiCLGPz0F2K': 'starter',
-  'prod_6F4zKTNhL3V7vWPUhnjZDZ': 'starter',
-  // 向后兼容：旧 professional/executive product_id
-  'prod_198ewWuQouDaQfEOT6kTvj': 'professional',
-  'prod_1pZIlgHsKVk5YOK1QupnPP': 'executive',
 };
 
 // ============================================
@@ -148,9 +181,15 @@ export function getCreemProductId(tier: Tier): string {
   return CREEM_PRODUCT_IDS[tier];
 }
 
-/** 根据 Creem product_id 映射 tier（含向后兼容） */
-export function tierFromProductId(productId: string): Tier {
-  return PRODUCT_ID_TO_TIER[productId] || 'starter';
+/** 根据 Creem product_id 映射 tier；未知 ID 返回 null（webhook 应拒绝处理） */
+export function tierFromProductId(productId: string): Tier | null {
+  return PRODUCT_ID_TO_TIER[productId] ?? null;
+}
+
+/** Validate tier from checkout URL / API body. */
+export function parseCheckoutTier(value: string | null | undefined): Tier | null {
+  if (!value || !isTier(value)) return null;
+  return value;
 }
 
 /** tier 升级比较：返回较高的 tier */

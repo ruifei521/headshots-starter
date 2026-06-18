@@ -19,9 +19,9 @@ const GENDERS = ['man', 'woman'] as const;
 // ============================================
 describe('TIER_IMAGE_COUNTS', () => {
   it('should have correct image counts for each tier', () => {
-    expect(TIER_IMAGE_COUNTS.starter).toBe(40);
-    expect(TIER_IMAGE_COUNTS.professional).toBe(60);
-    expect(TIER_IMAGE_COUNTS.executive).toBe(100);
+    expect(TIER_IMAGE_COUNTS.starter).toBe(45);
+    expect(TIER_IMAGE_COUNTS.professional).toBe(66);
+    expect(TIER_IMAGE_COUNTS.executive).toBe(108);
   });
 
   it('should be in ascending order', () => {
@@ -161,13 +161,6 @@ describe('getTierPrompts', () => {
         expect(p.text).toContain(type);
       }
     }
-    // person type: prompts contain 'man' or 'woman', not 'person'
-    const personPrompts = getTierPrompts('starter', 'person');
-    for (const p of personPrompts) {
-      expect(p.text).not.toContain('{type}');
-      const hasManOrWoman = p.text.includes('man') || p.text.includes('woman');
-      expect(hasManOrWoman).toBe(true);
-    }
   });
 
   it('should return correct number of prompts for each tier', () => {
@@ -181,19 +174,52 @@ describe('getTierPrompts', () => {
   it('should preserve num_images from templates (should be 1)', () => {
     const prompts = getTierPrompts('starter', 'man');
     const totalImages = prompts.reduce((sum, p) => sum + p.num_images, 0);
-    expect(totalImages).toBe(40);
+    expect(totalImages).toBe(45);
   });
 
-  it('should handle all type values', () => {
+  it('should handle man and woman type values', () => {
     for (const type of ['man', 'woman'] as const) {
       const prompts = getTierPrompts('starter', type);
       expect(prompts.length).toBeGreaterThan(0);
       expect(prompts[0].text).toContain(type);
     }
-    // person: should have interleaved man/woman prompts
-    const personPrompts = getTierPrompts('starter', 'person');
-    expect(personPrompts.length).toBe(40);
-    expect(personPrompts[0].text).toContain('man');
-    expect(personPrompts[1].text).toContain('woman');
+  });
+
+  it('should fallback unknown types to man prompts', () => {
+    const prompts = getTierPrompts('starter', 'person');
+    expect(prompts.length).toBe(TIER_IMAGE_COUNTS.starter);
+    expect(prompts[0].text).toContain('man');
+    expect(prompts[0].text).not.toContain('woman');
+  });
+
+  it('should follow Astria concise prompt structure (ohwx first, 3 slots per outfit)', () => {
+    const proWoman = getTierPrompts('professional', 'woman');
+    expect(proWoman[0].text.startsWith('ohwx woman')).toBe(true);
+    expect(proWoman[0].text).toContain('tight close-up headshot');
+    expect(proWoman[0].text).toContain('cropped at collarbone');
+    expect(proWoman[0].text).toContain('front-facing');
+    expect(proWoman[0].text).toContain('natural skin texture');
+    expect(proWoman[0].text).toContain('head level');
+    expect(proWoman[0].text).not.toContain('luminous face');
+    expect(proWoman[0].text).toContain('pure white seamless studio backdrop');
+    expect(proWoman[1].text).toContain('three-quarter view turned right');
+    expect(proWoman[1].text).toContain('face toward camera not profile');
+    expect(proWoman[1].text).toContain('warm closed-lip smile');
+    expect(proWoman[1].text).toContain('light grey seamless studio backdrop');
+    expect(proWoman[2].text).toContain('arms crossed at chest');
+    expect(proWoman[2].text).toContain('front-facing');
+    expect(proWoman[2].text).toContain('soft even studio lighting');
+    expect(proWoman[2].text).not.toContain('key light from left');
+    expect(proWoman[0].text).not.toContain('75% of frame height');
+    expect(proWoman[0].text).not.toContain('aspect ratio');
+
+    const basicMan = getTierPrompts('starter', 'man');
+    const outfit1Slots = basicMan.slice(0, 3);
+    expect(outfit1Slots).toHaveLength(3);
+    expect(outfit1Slots[0].text).toContain('front-facing');
+    expect(outfit1Slots[1].text).toContain('three-quarter view turned right');
+    expect(outfit1Slots[2].text).toContain('arms crossed at chest');
+    expect(outfit1Slots[0].text).not.toContain('warm closed-lip smile');
+    expect(outfit1Slots[0].text.split(/[\s,]+/).filter(Boolean).length).toBeLessThan(55);
   });
 });

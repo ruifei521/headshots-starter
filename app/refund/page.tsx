@@ -1,45 +1,54 @@
 import Link from "next/link";
+import {
+  REFUND_CONTACT_EMAIL,
+  REFUND_GUARANTEE_LABEL,
+  REFUND_HERO_LINE,
+  REFUND_META_DESCRIPTION,
+  REFUND_WINDOW_DAYS,
+  REFUND_WINDOW_LINE,
+} from "@/lib/refund-policy";
 
 export const metadata = {
   title: "Refund Policy - SnapProHead",
-  description: "14-day unconditional refund guarantee. If you're not happy with your headshots, we'll refund your entire purchase, no questions asked.",
+  description: REFUND_META_DESCRIPTION,
+  alternates: {
+    canonical: "https://snapprohead.com/refund",
+  },
 };
 
 export default function RefundPolicy() {
   return (
     <div className="container max-w-3xl py-16 px-4">
-      {/* Hero section */}
       <div className="text-center mb-12">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 mb-4">
           <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-          14-Day Unconditional Guarantee
+          {REFUND_GUARANTEE_LABEL}
         </div>
         <h1 className="text-3xl font-bold mb-4">Love Your Headshots, or Get a Full Refund</h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          If you don&apos;t get a single headshot you&apos;re happy with, we&apos;ll refund your entire purchase. 
-          <strong className="text-foreground"> No questions asked.</strong>
+          {REFUND_HERO_LINE}
         </p>
       </div>
 
-      {/* Simple policy section */}
       <section className="space-y-8">
         <div className="rounded-xl border bg-card p-6">
           <h2 className="text-xl font-semibold mb-2">Our Promise</h2>
           <p className="text-muted-foreground">
-            We believe in our AI headshots. If for any reason you&apos;re not satisfied with your results, 
-            simply let us know within 14 days of your purchase and we&apos;ll issue a full refund — 
-            no fine print, no hoops to jump through.
+            We believe in our AI headshots. {REFUND_WINDOW_LINE} Refunds are
+            available when you are not satisfied with the headshots delivered in
+            your pack — no complicated forms required.
           </p>
         </div>
 
         <div className="rounded-xl border bg-card p-6">
           <h2 className="text-xl font-semibold mb-2">How to Request a Refund</h2>
           <p className="text-muted-foreground mb-3">
-            Just email us at the address below. Include your account email and order date — that&apos;s it.
+            Email us within {REFUND_WINDOW_DAYS} days of purchase. Include your
+            account email and order date.
           </p>
           <p className="text-lg font-medium">
-            <Link href="mailto:contact@snapprohead.com" className="text-primary hover:underline">
-              contact@snapprohead.com
+            <Link href={`mailto:${REFUND_CONTACT_EMAIL}`} className="text-primary hover:underline">
+              {REFUND_CONTACT_EMAIL}
             </Link>
           </p>
         </div>
@@ -49,7 +58,11 @@ export default function RefundPolicy() {
           <ul className="space-y-2 text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="text-green-500 mt-1">✓</span>
-              <span>We process your refund within 5-10 business days</span>
+              <span>We review your request and respond within 2 business days</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-500 mt-1">✓</span>
+              <span>Approved refunds are processed within 5–10 business days</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-500 mt-1">✓</span>
@@ -63,17 +76,25 @@ export default function RefundPolicy() {
         </div>
 
         <div className="rounded-xl border bg-card p-6">
-          <h2 className="text-xl font-semibold mb-2">Not Happy With the Quality?</h2>
+          <h2 className="text-xl font-semibold mb-2">Quality Concerns</h2>
           <p className="text-muted-foreground">
-            If you&apos;d like to give it another try before requesting a refund, we can offer free regeneration 
-            or additional credits at no charge. Just reach out — we&apos;re here to help.
+            If results look off because of upload quality or a technical issue,
+            email us before the {REFUND_WINDOW_DAYS}-day window closes. We will
+            help troubleshoot or process a refund if we cannot deliver usable
+            headshots. Additional re-runs are not sold separately — each purchase
+            includes one training run for the selected pack.
           </p>
         </div>
 
         <div className="text-center pt-4 text-muted-foreground">
-          <p>Questions? Contact us at{' '}
-            <Link href="mailto:contact@snapprohead.com" className="text-primary hover:underline">
-              contact@snapprohead.com
+          <p>
+            See also our{" "}
+            <Link href="/terms" className="text-primary hover:underline">
+              Terms of Service
+            </Link>
+            . Questions?{" "}
+            <Link href={`mailto:${REFUND_CONTACT_EMAIL}`} className="text-primary hover:underline">
+              {REFUND_CONTACT_EMAIL}
             </Link>
           </p>
         </div>

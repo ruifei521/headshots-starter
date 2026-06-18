@@ -1,21 +1,8 @@
-import { Metadata } from "next";
 import Link from "next/link";
+import { getProfessionMetadata } from "@/lib/profession-metadata";
+import { PROFESSION_CARD_HEADLINE, REFUND_FAQ_ANSWER, DELIVERY_FAQ_READY_40 } from "@/lib/refund-policy";
 
-export const metadata: Metadata = {
-  title: "Teacher Headshots – Professional AI Portraits for Educators",
-  description:
-    "Professional AI headshots for teachers. Build trust with students and parents on school websites, staff directories, and social media. Starting at $29 for 40+ HD photos in ~30 minutes.",
-  alternates: {
-    canonical: "https://snapprohead.com/headshots/teacher",
-  },
-  openGraph: {
-    title: "Teacher Headshots – Professional AI Portraits for Educators",
-    description:
-      "Warm, professional headshots for teachers. From your selfies in ~30 minutes. $29 — 14-day guarantee.",
-    url: "https://snapprohead.com/headshots/teacher",
-    images: [{ url: "https://snapprohead.com/hero.webp", width: 1200, height: 630 }],
-  },
-};
+export const metadata = getProfessionMetadata("teacher");
 
 export default function TeacherHeadshotsPage() {
   return (
@@ -48,12 +35,12 @@ export default function TeacherHeadshotsPage() {
           </ol>
 
           <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-6 mt-8 mb-10">
-            <p className="font-semibold text-lg">From $29 — 14-Day Money-Back Guarantee</p>
+            <p className="font-semibold text-lg">{PROFESSION_CARD_HEADLINE}</p>
             <p className="text-sm text-muted-foreground mt-1">
               Professional headshots for educators — no studio visit needed.
             </p>
             <Link
-              href="/templates"
+              href="/pricing"
               className="mt-4 inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition"
             >
               Get Your Teacher Headshots
@@ -88,7 +75,7 @@ export default function TeacherHeadshotsPage() {
                     name: "How long does it take to get my teacher headshots?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "Most orders are ready within 30 minutes. You'll receive 40+ HD photos to choose from.",
+                      text: DELIVERY_FAQ_READY_40,
                     },
                   },
                   {
@@ -104,7 +91,7 @@ export default function TeacherHeadshotsPage() {
                     name: "What if I don't like the results?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "We offer a 14-day money-back guarantee — no questions asked. If you're not satisfied with your teacher headshots, we'll refund your purchase in full.",
+                      text: REFUND_FAQ_ANSWER,
                     },
                   },
                   {

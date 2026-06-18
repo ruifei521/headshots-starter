@@ -2,11 +2,8 @@ import { Database } from "@/types/supabase";
 import { createClient } from "@supabase/supabase-js";
 import * as crypto from "crypto";
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { logger } from "@/lib/logger";
-import { render } from "@react-email/components";
-import { createElement } from "react";
-import HeadshotsReadyEmail from "@/emails/headshots-ready";
+import { sendHeadshotsReadyEmail } from "@/lib/email-notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +36,7 @@ if (!supabaseServiceRoleKey) {
 async function downloadAndUploadToStorage(
   astriaUrl: string,
   modelId: number,
+  promptId: number,
   imageIndex: number
 ): Promise<string> {
   const BUCKET = 'headshots';
@@ -54,8 +52,8 @@ async function downloadAndUploadToStorage(
   
   const buffer = Buffer.from(await downloadRes.arrayBuffer());
   
-  // Step 2: Upload to Supabase Storage
-  const fileName = `model-${modelId}/${imageIndex}-${Date.now()}.jpg`;
+  // Step 2: Upload to Supabase Storage (deterministic path for webhook retries)
+  const fileName = `model-${modelId}/p${promptId}-${imageIndex}.jpg`;
   const uploadUrl = `${supabaseUrl}/storage/v1/object/${BUCKET}/${fileName}`;
   
   const uploadRes = await fetch(uploadUrl, {
@@ -205,6 +203,7 @@ export async function POST(request: Request) {
 
     // ⭐ 幂等保护：逐张处理 — 下载 → 转存 Supabase → 写入 DB
     let savedCount = 0;
+    let failedCount = 0;
     await Promise.all(
       allHeadshots.map(async (image, idx) => {
         try {
@@ -212,11 +211,20 @@ export async function POST(request: Request) {
           
           // Step 1: 尝试下载并上传到 Supabase Storage
           try {
-            storageUrl = await downloadAndUploadToStorage(image, Number(model.id), idx);
+            storageUrl = await downloadAndUploadToStorage(
+              image,
+              Number(model.id),
+              prompt.id,
+              idx
+            );
             logger.log(`Prompt webhook: image ${idx} uploaded to Supabase Storage`);
-          } catch (uploadErr: any) {
-            logger.error(`Prompt webhook: failed to upload image ${idx} to storage, falling back to Astria URL: ${uploadErr?.message}`);
-            storageUrl = image; // fallback: 直接存 Astria URL（可能不可访问）
+          } catch (uploadErr: unknown) {
+            failedCount += 1;
+            logger.error(
+              `Prompt webhook: failed to upload image ${idx} to storage:`,
+              uploadErr instanceof Error ? uploadErr.message : uploadErr
+            );
+            return;
           }
           
           // Step 2: 检查幂等（用 Supabase URL 检查，因为 Astria URL 可能重复）
@@ -229,7 +237,8 @@ export async function POST(request: Request) {
 
           if (existing) {
             logger.log(`Prompt webhook: skipping duplicate image for model ${model.id}`);
-            return; // 已存在，跳过
+            savedCount += 1;
+            return;
           }
 
           const { error: imageError } = await supabase.from("images").insert({
@@ -238,21 +247,37 @@ export async function POST(request: Request) {
           });
 
           if (imageError) {
+            failedCount += 1;
             logger.error(`Prompt webhook: failed to insert image for model ${model.id}:`, imageError);
           } else {
-            savedCount++;
+            savedCount += 1;
           }
         } catch (err) {
+          failedCount += 1;
           logger.error(`Prompt webhook: error processing image for model ${model.id}:`, err);
         }
       })
     );
 
+    const expectedCount = allHeadshots?.length ?? 0;
+    if (expectedCount > 0 && failedCount > 0) {
+      logger.error(
+        `Prompt webhook: model ${model.id} prompt ${prompt.id} — ${failedCount}/${expectedCount} image(s) failed`
+      );
+      return NextResponse.json(
+        {
+          message: "Image processing failed",
+          saved: savedCount,
+          failed: failedCount,
+        },
+        { status: 503 }
+      );
+    }
+
     // ⭐ 更新 models.images_generated（累加本次保存的图片数）
-    // 容错：如果列不存在（migration 未执行），跳过进度更新但不影响图片保存
+    // 容错：如果列不存在（migration 未执行），跳过进度更新但不影响完成检测
     if (savedCount > 0) {
-      let newCount = savedCount; // fallback: 仅算本次
-      let progressUpdated = false;
+      let newCount = savedCount;
       try {
         const { data: currentModel, error: selectError } = await supabase
           .from("models")
@@ -270,59 +295,56 @@ export async function POST(request: Request) {
           if (updateError) {
             logger.error(`Prompt webhook: failed to update images_generated for model ${model.id}:`, updateError);
           } else {
-            progressUpdated = true;
             logger.log(`Prompt webhook: model ${model.id} progress ${newCount}/${model.total_images || '?'}`);
           }
         }
-      } catch (progressErr: any) {
-        // 列不存在等情况 — 不影响核心流程
-        logger.warn(`Prompt webhook: images_generated column not available, skipping progress tracking: ${progressErr?.message}`);
+      } catch (progressErr: unknown) {
+        logger.warn(
+          `Prompt webhook: images_generated column not available, skipping progress tracking:`,
+          progressErr instanceof Error ? progressErr.message : progressErr
+        );
       }
 
-      if (progressUpdated) {
-        logger.log(`Prompt webhook: model ${model.id} progress ${newCount}/${model.total_images || '?'}`);
+      // ⭐ 完成检测：以 images 表的实际数量为准（不依赖 images_generated 列是否更新成功）
+      const { count: actualImageCount } = await supabase
+        .from("images")
+        .select("*", { count: "exact", head: true })
+        .eq("modelId", Number(model.id));
 
-        // ⭐ 完成检测：达标时标记 model.status = "completed" + 发送邮件
-        // 幂等保护：model.status 已是 "completed" 时跳过，避免重复发邮件
-        if (
-          model.total_images &&
-          newCount >= model.total_images &&
-          model.status !== "completed"
-        ) {
-          const { error: completeError } = await supabase
-            .from("models")
-            .update({ status: "completed" })
-            .eq("id", Number(model.id));
+      const isCompleted =
+        model.total_images &&
+        (actualImageCount ?? 0) >= model.total_images &&
+        model.status !== "completed";
 
-          if (completeError) {
-            logger.error(
-              `Prompt webhook: failed to mark model ${model.id} as completed:`,
-              completeError
-            );
-          } else {
-            logger.log(
-              `Prompt webhook: model ${model.id} COMPLETED — ${newCount}/${model.total_images} images ready!`
-            );
+      if (isCompleted) {
+        logger.log(`Prompt webhook: model ${model.id} actual images ${actualImageCount}/${model.total_images}, marking completed`);
 
-            // 发送完成邮件通知
-            if (resendApiKey) {
-              try {
-                const resend = new Resend(resendApiKey);
-                const emailHtml = await render(
-                  createElement(HeadshotsReadyEmail, { headshotCount: newCount })
-                );
-                await resend.emails.send({
-                  from: "SnapProHead <contact@snapprohead.com>",
-                  to: user?.email ?? "",
-                  subject: "Your AI headshots are ready!",
-                  html: emailHtml,
-                });
-              } catch (emailErr) {
-                logger.error(
-                  `Prompt webhook: failed to send completion email for model ${model.id}:`,
-                  emailErr
-                );
-              }
+        const { error: completeError } = await supabase
+          .from("models")
+          .update({ status: "completed", images_generated: actualImageCount ?? newCount })
+          .eq("id", Number(model.id));
+
+        if (completeError) {
+          logger.error(
+            `Prompt webhook: failed to mark model ${model.id} as completed:`,
+            completeError
+          );
+        } else {
+          logger.log(
+            `Prompt webhook: model ${model.id} COMPLETED — ${actualImageCount}/${model.total_images} images ready!`
+          );
+
+          if (resendApiKey && user?.email) {
+            const sent = await sendHeadshotsReadyEmail({
+              to: user.email,
+              modelId: Number(model.id),
+              modelName: model.name,
+              imageCount: actualImageCount ?? 0,
+            });
+            if (!sent) {
+              logger.error(
+                `Prompt webhook: failed to send completion email for model ${model.id}`
+              );
             }
           }
         }

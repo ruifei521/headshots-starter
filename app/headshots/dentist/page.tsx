@@ -1,21 +1,9 @@
-import { Metadata } from "next";
 import Link from "next/link";
+import { getProfessionMetadata } from "@/lib/profession-metadata";
+import { PROFESSION_CARD_HEADLINE, DELIVERY_FAQ_READY } from "@/lib/refund-policy";
+import { TIERS } from "@/lib/tiers";
 
-export const metadata: Metadata = {
-  title: "Dentist Headshots",
-  description:
-    "Professional AI headshots for dentists. Build trust with polished, approachable portraits for your practice website, Google Business Profile, and social media. Starting at $29.",
-  alternates: {
-    canonical: "https://snapprohead.com/headshots/dentist",
-  },
-  openGraph: {
-    title: "Dentist Headshots – Professional AI Portraits for Dental Professionals",
-    description:
-      "Present a confident, caring image for your dental practice. AI-generated headshots from your photos in ~30 minutes. $29 — 14-day guarantee.",
-    url: "https://snapprohead.com/headshots/dentist",
-    images: [{ url: "https://snapprohead.com/hero.webp", width: 1200, height: 630 }],
-  },
-};
+export const metadata = getProfessionMetadata("dentist");
 
 export default function DentistHeadshotsPage() {
   return (
@@ -44,17 +32,17 @@ export default function DentistHeadshotsPage() {
           <h2 className="text-xl font-semibold mt-10 mb-3">How It Works</h2>
           <ol className="list-decimal pl-5 space-y-2 text-muted-foreground mb-6">
             <li>Upload 10–12 selfies (any outfit, any background).</li>
-            <li>AI generates 100+ professional dentist headshots for you.</li>
+            <li>AI generates {TIERS.starter.marketingImageCount}+ professional dentist headshots for you.</li>
             <li>Pick your favorites and download them in minutes.</li>
           </ol>
 
           <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-6 mt-8 mb-10">
-            <p className="font-semibold text-lg">From $29 — 14-Day Money-Back Guarantee</p>
+            <p className="font-semibold text-lg">{PROFESSION_CARD_HEADLINE}</p>
             <p className="text-sm text-muted-foreground mt-1">
               No subscription. No surprises. Just pro-quality headshots for your dental practice.
             </p>
             <Link
-              href="/templates"
+              href="/pricing"
               className="mt-4 inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition"
             >
               Get Your Dentist Headshots
@@ -89,7 +77,7 @@ export default function DentistHeadshotsPage() {
                     name: "How long does it take to get my dentist headshots?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "Most orders are ready within 30 minutes. Our AI processes your photos quickly so you can get back to caring for patients.",
+                      text: `${DELIVERY_FAQ_READY} Our AI processes your photos quickly so you can get back to caring for patients.`,
                     },
                   },
                   {

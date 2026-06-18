@@ -28,11 +28,14 @@ export function validateConfig() {
 
   // Deployment URL 验证（仅当 URL 存在时检查）
   if (config.deploymentUrl && isVercelPreviewUrl(config.deploymentUrl)) {
-    if (isDev) console.warn(
-      'Invalid DEPLOYMENT_URL: Preview URLs cannot be used for webhooks.\n' +
-      'Please use either:\n' +
-      '1. Your production domain (e.g., your-app.com)\n' +
-      '2. For local development, use ngrok (e.g., your-tunnel.ngrok.io)'
+    console.warn(
+      'Invalid DEPLOYMENT_URL: Preview URLs cannot be used for Astria webhooks. Use https://snapprohead.com'
+    );
+  }
+
+  if (!isDev && !config.deploymentUrl) {
+    console.warn(
+      'DEPLOYMENT_URL is not set. Astria train/prompt webhooks may use the wrong host. Set DEPLOYMENT_URL=https://snapprohead.com'
     );
   }
 }

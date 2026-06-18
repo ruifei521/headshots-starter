@@ -4,11 +4,13 @@ import { Badge } from "@/components/ui/badge"
 import { Check, X, Camera, Clock, DollarSign, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { COMPARISON_REFUND_OURS, RETAKES_COMPARISON_LINE } from "@/lib/refund-policy"
+import { STUDIO_PHOTOGRAPH_SESSION_LABEL } from "@/lib/marketing-copy"
 
 const comparisons = [
   {
     feature: "Cost",
-    traditional: "$200 – $500 per session",
+    traditional: STUDIO_PHOTOGRAPH_SESSION_LABEL,
     ours: `$29`,
     icon: <DollarSign className="h-4 w-4" />,
   },
@@ -21,7 +23,7 @@ const comparisons = [
   {
     feature: "Turnaround Time",
     traditional: "3 – 7 business days",
-    ours: "~30 minutes",
+    ours: "~25 minutes",
     icon: <ArrowRight className="h-4 w-4" />,
   },
   {
@@ -33,7 +35,7 @@ const comparisons = [
   {
     feature: "Retakes / Edits",
     traditional: "$50 – $150 extra per round",
-    ours: "Multiple style regenerations",
+    ours: RETAKES_COMPARISON_LINE,
     icon: <Check className="h-4 w-4" />,
   },
   {
@@ -49,9 +51,9 @@ const comparisons = [
     icon: <Check className="h-4 w-4" />,
   },
   {
-    feature: "Money-Back Guarantee",
+    feature: "Satisfaction Guaranteed",
     traditional: "Rarely offered",
-    ours: "14-day full refund",
+    ours: COMPARISON_REFUND_OURS,
     icon: <Check className="h-4 w-4" />,
   },
 ]

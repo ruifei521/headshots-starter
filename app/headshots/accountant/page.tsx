@@ -1,21 +1,9 @@
-import { Metadata } from "next";
 import Link from "next/link";
+import { getProfessionMetadata } from "@/lib/profession-metadata";
+import { PROFESSION_CARD_HEADLINE, DELIVERY_FAQ_READY_40 } from "@/lib/refund-policy";
+import { REFUND_FAQ_ANSWER } from "@/lib/refund-policy";
 
-export const metadata: Metadata = {
-  title: "Accountant Headshots – Professional AI Portraits for Accounting Professionals",
-  description:
-    "Professional AI headshots for accountants. Build client confidence with a trustworthy, polished image for your firm website, LinkedIn, and business profiles. Starting at $29 for 40+ HD photos in ~30 minutes.",
-  alternates: {
-    canonical: "https://snapprohead.com/headshots/accountant",
-  },
-  openGraph: {
-    title: "Accountant Headshots – Professional AI Portraits for Accounting Professionals",
-    description:
-      "Trustworthy, professional headshots for accountants. From your selfies in ~30 minutes. $29 — 14-day guarantee.",
-    url: "https://snapprohead.com/headshots/accountant",
-    images: [{ url: "https://snapprohead.com/hero.webp", width: 1200, height: 630 }],
-  },
-};
+export const metadata = getProfessionMetadata("accountant");
 
 export default function AccountantHeadshotsPage() {
   return (
@@ -48,12 +36,12 @@ export default function AccountantHeadshotsPage() {
           </ol>
 
           <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-6 mt-8 mb-10">
-            <p className="font-semibold text-lg">From $29 — 14-Day Money-Back Guarantee</p>
+            <p className="font-semibold text-lg">{PROFESSION_CARD_HEADLINE}</p>
             <p className="text-sm text-muted-foreground mt-1">
               Professional headshots for CPAs and accounting professionals — no studio visit needed.
             </p>
             <Link
-              href="/templates"
+              href="/pricing"
               className="mt-4 inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition"
             >
               Get Your Accountant Headshots
@@ -88,7 +76,7 @@ export default function AccountantHeadshotsPage() {
                     name: "How long does it take to get my accountant headshots?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "Most orders are ready within 30 minutes. You'll receive 40+ HD photos to choose from — no need to wait days for a photographer.",
+                      text: `${DELIVERY_FAQ_READY_40} — no need to wait days for a photographer.`,
                     },
                   },
                   {
@@ -104,7 +92,7 @@ export default function AccountantHeadshotsPage() {
                     name: "What if I don't like the results?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "We offer a 14-day money-back guarantee — no questions asked. If you're not satisfied with your accountant headshots, we'll refund your purchase in full.",
+                      text: REFUND_FAQ_ANSWER,
                     },
                   },
                   {

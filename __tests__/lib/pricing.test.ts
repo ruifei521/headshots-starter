@@ -30,8 +30,9 @@ describe('pricing.ts — re-exports from tiers.ts', () => {
     expect(CREEM_PRODUCT_IDS.executive).toBeTruthy();
   });
 
-  it('should re-export PRODUCT_ID_TO_TIER with legacy mapping', () => {
-    expect(PRODUCT_ID_TO_TIER['prod_6F4zKTNhL3V7vWPUhnjZDZ']).toBe('starter');
+  it('should re-export PRODUCT_ID_TO_TIER with three current products', () => {
+    expect(Object.keys(PRODUCT_ID_TO_TIER)).toHaveLength(3);
+    expect(PRODUCT_ID_TO_TIER['prod_fWHFyTDAhVb1xqwS71esu']).toBe('starter');
   });
 
   it('should re-export all helper functions', () => {
@@ -84,9 +85,8 @@ describe('pricing.ts — function correctness (passthrough)', () => {
     expect(config.branch).toBe('flux1');
   });
 
-  it('tierFromProductId via pricing.ts should handle legacy IDs', () => {
-    expect(tierFromProductId('prod_6F4zKTNhL3V7vWPUhnjZDZ')).toBe('starter');
-    expect(tierFromProductId('prod_unknown_xyz')).toBe('starter');
+  it('tierFromProductId via pricing.ts should return null for unknown IDs', () => {
+    expect(tierFromProductId('prod_unknown_xyz')).toBeNull();
   });
 
   it('maxTier via pricing.ts should prevent downgrades', () => {

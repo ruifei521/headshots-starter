@@ -2,25 +2,24 @@ import { Database } from "@/types/supabase";
 import { createClient } from "@supabase/supabase-js";
 import * as crypto from "crypto";
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { logger } from "@/lib/logger";
-import { render } from "@react-email/components";
-import { createElement } from "react";
-import TrainingStartedEmail from "@/emails/training-started";
+import {
+  attachAstriaTuneToModel,
+  shouldSkipTrainWebhook,
+  submitPromptsAfterTraining,
+} from "@/lib/complete-tune-prompts";
+import {
+  isAstriaTuneFailure,
+  markTrainingFailedAndNotify,
+} from "@/lib/training-failure";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
-const resendApiKey = process.env.RESEND_API_KEY;
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const appWebhookSecret = process.env.APP_WEBHOOK_SECRET;
-
-if (!resendApiKey) {
-  logger.warn(
-    "We detected that the RESEND_API_KEY is missing from your environment variables. The app should still work but email notifications will not be sent. Please add your RESEND_API_KEY to your environment variables if you want to enable email notifications."
-  );
-}
 
 if (!supabaseUrl) {
   logger.warn("MISSING NEXT_PUBLIC_SUPABASE_URL - train-webhook will not function.");
@@ -30,6 +29,20 @@ if (!supabaseServiceRoleKey) {
   logger.warn("MISSING SUPABASE_SERVICE_ROLE_KEY - train-webhook will not function.");
 }
 
+type TunePayload = {
+  id: number;
+  title: string;
+  name: string;
+  steps: null;
+  trained_at: string | null;
+  started_training_at: string | null;
+  created_at: string;
+  updated_at: string;
+  expires_at: null;
+  error?: string;
+  status?: string;
+};
+
 export async function POST(request: Request) {
   // ⭐ 强制鉴权：webhook 必须配置 APP_WEBHOOK_SECRET，防止外部攻击者伪造回调
   if (!appWebhookSecret) {
@@ -38,19 +51,11 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-  type TuneData = {
-    id: number;
-    title: string;
-    name: string;
-    steps: null;
-    trained_at: null;
-    started_training_at: null;
-    created_at: string;
-    updated_at: string;
-    expires_at: null;
-  };
 
-  const incomingData = (await request.json()) as { tune: TuneData };
+  const incomingData = (await request.json()) as {
+    tune?: TunePayload;
+    error?: string;
+  };
 
   const { tune } = incomingData;
 
@@ -133,10 +138,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    // ⭐ 1. 读取 model 信息（仅用于日志）
     const { data: modelData, error: modelFetchError } = await supabase
       .from("models")
-      .select("id, name, tier, type, status")
+      .select("id, tier, type, status, name")
       .eq("id", Number(model_id))
       .single();
 
@@ -153,88 +157,76 @@ export async function POST(request: Request) {
     }
 
     const modelTier: string = modelData?.tier || 'starter';
-    const modelType: string = modelData?.type || 'person';
+    const modelType: string = modelData?.type || 'man';
     logger.log(`Train webhook: model_id=${model_id}, tier=${modelTier}, type=${modelType}`);
 
-    // ⭐ 幂等保护：如果 model 已经是 finished，说明 webhook 被重复回调，跳过积分扣减
-    if (modelData?.status === 'finished') {
-      logger.log(`Train webhook: Model ${model_id} already finished, skipping (idempotent)`);
+    if (
+      await shouldSkipTrainWebhook({
+        supabase,
+        modelId: Number(model_id),
+        status: modelData?.status ?? null,
+      })
+    ) {
+      logger.log(
+        `Train webhook: Model ${model_id} already ${modelData?.status}, skipping (idempotent)`
+      );
       return NextResponse.json(
         { message: "success", idempotent: true },
         { status: 200 }
       );
     }
 
-    if (resendApiKey) {
-      const resend = new Resend(resendApiKey);
-      const emailHtml = await render(
-        createElement(TrainingStartedEmail, { modelName: modelData?.name || 'Your Model' })
+    const astriaFailed =
+      !!incomingData.error ||
+      (tune != null && isAstriaTuneFailure(tune as Record<string, unknown>));
+
+    if (astriaFailed || !tune?.id) {
+      logger.error(
+        `Train webhook: Astria training failed for model ${model_id}`,
+        incomingData.error ?? tune?.error ?? "missing tune id"
       );
-      await resend.emails.send({
-        from: "SnapProHead <contact@snapprohead.com>",
-        to: user?.email ?? "",
-        subject: "Your AI headshot training has started!",
-        html: emailHtml,
+      await markTrainingFailedAndNotify({
+        supabase,
+        userId: user_id,
+        userEmail: user.email,
+        modelId: Number(model_id),
+        modelName: modelData.name,
+        reason: "astria_training",
       });
+      return NextResponse.json({ message: "success", failed: true }, { status: 200 });
     }
 
-    // ⭐ 2. 更新 model 状态为 finished
-    // prompts 已在 train-model 创建时通过 prompts_attributes 一并提交，
-    // Astria 训练完成后会自动跑所有 prompts，每个 prompt 完成时回调 prompt-webhook
-    // 兼容 pending（超时场景）和 processing（正常场景）
-    const { data: modelUpdated, error: modelUpdatedError } = await supabase
-      .from("models")
-      .update({
-        modelId: `${tune.id}`,
-        status: "finished",
-      })
-      .eq("id", Number(model_id))
-      .select();
-
-    if (modelUpdatedError) {
-      logger.error({ modelUpdatedError });
+    if (!(await attachAstriaTuneToModel(supabase, Number(model_id), tune.id))) {
       return NextResponse.json(
-        {
-          message: "Something went wrong!",
-        },
+        { message: "Something went wrong!" },
         { status: 500 }
       );
     }
 
-    if (!modelUpdated) {
-      logger.error("No model updated!");
-      logger.error({ modelUpdated });
+    const promptResult = await submitPromptsAfterTraining({
+      supabase,
+      modelId: Number(model_id),
+      userId: user_id,
+      userEmail: user.email,
+      modelName: modelData.name,
+      astriaTuneId: tune.id,
+      tier: modelTier,
+      type: modelType,
+    });
+
+    if (promptResult.outcome === "error") {
+      return NextResponse.json(
+        { message: "Something went wrong!" },
+        { status: 500 }
+      );
     }
 
-    // ⭐ 3. 扣减 credits（确保只有训练成功才扣）
-    // 之前 credit 扣减在 train-model 中，超时场景会导致扣了但请求可能未到达 Astria
-    // 现在统一由 train-webhook 回调确认训练成功后扣减
-    // 使用已有的原子 RPC deduct_credits(p_amount, p_user_id) 避免竞态条件
-    const paymentIsConfigured = !!(process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true" || process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true");
-    if (paymentIsConfigured) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: deducted, error: updateCreditError } = await (supabase.rpc as any)(
-          'deduct_credits',
-          { p_amount: 1, p_user_id: user_id }
-        );
-
-        if (updateCreditError) {
-          logger.error("train-webhook: Failed to deduct credits:", updateCreditError);
-        } else if (deducted) {
-          logger.log(`train-webhook: Credit deducted for user ${user_id}`);
-        } else {
-          logger.warn(`train-webhook: No credits to deduct for user ${user_id}`);
-        }
-      } catch (creditErr) {
-        // 不阻塞主流程：model 状态已更新，credits 扣减失败仅记录日志
-        logger.error("train-webhook: Credit deduction error:", creditErr);
-      }
-    }
+    // Credit deducted atomically at train-model start — no deduction here.
 
     return NextResponse.json(
       {
         message: "success",
+        promptsSubmitted: promptResult.outcome === "submitted",
       },
       { status: 200, statusText: "Success" }
     );

@@ -4,10 +4,15 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Metadata } from 'next'
+import { resolvePostLoginDestination } from "@/lib/auth-redirect";
+import { postLoginPathFromSearchParams } from "@/lib/checkout-url";
+import { CheckoutStatusHandlerSlot } from "@/components/CheckoutStatusHandlerSlot";
+
+import { META_LOGIN_DESCRIPTION } from '@/lib/refund-policy';
 
 export const metadata: Metadata = {
   title: 'Login - AI Professional Headshots',
-  description: 'Sign in to SnapProHead and start generating studio-quality AI headshots in ~30 minutes. Starting at $29 with a 14-day money-back guarantee.',
+  description: META_LOGIN_DESCRIPTION,
 }
 
 export const dynamic = "force-dynamic";
@@ -47,11 +52,19 @@ export default async function LoginPage({
   } = await supabase.auth.getUser();
 
   if (user) {
-    return redirect("/overview");
+    const resumePath = postLoginPathFromSearchParams(searchParams);
+    if (resumePath) {
+      return redirect(resumePath);
+    }
+    const redirectTo = resolvePostLoginDestination(
+      typeof searchParams?.redirect === "string" ? searchParams.redirect : undefined
+    );
+    return redirect(redirectTo);
   }
 
   return (
-    <div className="flex flex-col flex-1 w-full h-[calc(100vh-73px)]">
+    <div className="flex flex-col flex-1 w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)]">
+      <CheckoutStatusHandlerSlot />
       <Login host={host} searchParams={searchParams} />
     </div>
   );

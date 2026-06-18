@@ -1,6 +1,7 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { TRUST_CTA_LINE } from "@/lib/refund-policy"
 
 export default function StartNowCTA() {
   return (
@@ -14,7 +15,7 @@ export default function StartNowCTA() {
             No studio, no appointment, no hassle. Just upload 4-10 selfies and get 40+ studio-quality headshots in ~25 minutes.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/#pricing">
+            <Link href="/pricing">
               <Button size="lg" className="group text-base font-bold">
                 Start Now — $29
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -22,7 +23,7 @@ export default function StartNowCTA() {
             </Link>
           </div>
           <p className="text-xs text-muted-foreground mt-4">
-            14-day money-back guarantee • No hidden fees • Instant delivery
+            {TRUST_CTA_LINE}
           </p>
         </div>
       </div>

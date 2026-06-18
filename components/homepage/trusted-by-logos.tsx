@@ -13,7 +13,7 @@ export default function TrustedByLogos() {
           width={800}
           height={80}
           className="max-w-full h-auto opacity-70 hover:opacity-100 transition-opacity"
-          priority
+          loading="lazy"
         />
       </div>
     </div>

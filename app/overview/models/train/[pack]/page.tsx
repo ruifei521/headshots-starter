@@ -10,47 +10,40 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { FaArrowLeft, FaCreditCard } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 import { redirect } from 'next/navigation';
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logger";
-import { TIERS } from "@/lib/tiers";
+import { isPaymentEnabled } from "@/lib/payment-config";
+import { TrainModelSection } from "@/components/train/TrainModelSection";
+
+const PaymentSuccessBanner = nextDynamic(
+  () => import("@/components/PaymentSuccessBanner"),
+  { ssr: false }
+);
 
 export const dynamic = "force-dynamic";
-
-// ⭐ 完全客户端渲染，避免 SSR hydration mismatch 导致 insertBefore DOM 错误
-const TrainModelZone = nextDynamic(() => import("@/components/TrainModelZone"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex justify-center items-center py-20">
-      <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
-    </div>
-  ),
-});
-
-// ⭐ 隔离错误边界 — 即使 TrainModelZone 崩溃也不影响页面其他部分
-import { TrainModelZoneErrorBoundary } from "@/components/TrainModelZoneErrorBoundary";
 
 export default async function Index({
   params,
   searchParams,
 }: {
   params: { pack: string };
-  searchParams: { tier?: string };
+  searchParams: { tier?: string; payment?: string };
 }) {
-  // ⭐ 检查支付是否配置
-  const paymentIsConfigured =
-    process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true" ||
-    process.env.NEXT_PUBLIC_CREEM_IS_ENABLED === "true";
+  const paymentIsConfigured = isPaymentEnabled();
+  const paymentSuccess = searchParams.payment === "success";
+  const showPaymentSuccess = paymentSuccess;
 
-  // ⭐ 服务端检查用户 credits
+  // ⭐ 服务端检查用户 credits —— 使用 Service Role Key 绕过 RLS
   let hasCredits = true; // 默认允许（支付未配置时放行）
   if (paymentIsConfigured) {
     try {
-      const supabase = createServerClient(
+      // 用 Service Role Key 查 credits（Anon Key 可能被 RLS 拦截）
+      const supabaseService = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
         {
           cookies: {
             getAll() { return cookies().getAll(); },
@@ -62,31 +55,35 @@ export default async function Index({
           },
         }
       );
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabaseService.auth.getUser();
       if (user) {
-        const { data: credits } = await supabase
+        const { data: credits, error: creditsError } = await supabaseService
           .from("credits")
           .select("credits")
           .eq("user_id", user.id)
-          .single();
+          .order("id", { ascending: false })
+          .limit(1)
+          .maybeSingle();
         hasCredits = !!(credits && credits.credits >= 1);
       }
-    } catch (e) {
-      logger.warn("Credit check failed on train page, allowing access:", e);
-      // 检查失败时放行，由 API 层兜底
-      hasCredits = true;
+    } catch (e: unknown) {
+      logger.warn("Credit check failed on train page, denying access:", e);
+      hasCredits = false;
     }
   }
 
-  // ⭐ 无 credits 直接重定向到定价页
-  if (!hasCredits) {
-    redirect('/#pricing');
+  const awaitingCredits = paymentIsConfigured && !hasCredits && paymentSuccess;
+
+  // 无 credits 且非刚付完款 → 去定价页（付完款时等 webhook 到账）
+  if (!hasCredits && !paymentSuccess) {
+    redirect("/pricing?reason=no_credits");
   }
 
   return (
     <div className="w-full">
+      {showPaymentSuccess && <PaymentSuccessBanner tier={searchParams.tier} />}
       {/* GA4: fire purchase event once on client mount */}
-      <PurchaseTracker tier={searchParams.tier} />
+      <PurchaseTracker tier={searchParams.tier} requireCredits={paymentSuccess} />
       {/* Three-column layout */}
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Left: Good examples */}
@@ -142,82 +139,37 @@ export default async function Index({
                 <svg className="w-4 h-4 flex-shrink-0 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Change in backgrounds, lightning, clothing
+                Change in backgrounds, lighting, clothing
               </li>
             </ul>
           </div>
         </div>
 
         {/* Middle: Card */}
-        <div className="lg:col-span-6">
+        <div className="order-2 lg:order-none lg:col-span-6">
           <div id="train-model-container" className="flex flex-1 flex-col gap-2">
             <Link href="/overview" className="text-sm w-fit">
-              <Button variant={"outline"} className="h-7 text-xs px-2 py-0">
+              <Button variant="outline" className="min-h-11 text-sm px-3">
                 <FaArrowLeft className="mr-1" />
                 Go Back
               </Button>
             </Link>
 
-            {!hasCredits ? (
-              /* ⭐ 未付费用户：显示购买引导卡片 */
-              <Card className="p-2 border-amber-400/60">
+            <Card className="p-2 notranslate" translate="no">
                 <CardHeader className="px-3 pt-2 pb-0">
-                  <CardTitle className="text-amber-600">Credits Required</CardTitle>
+                  <CardTitle>Create your headshots</CardTitle>
                   <CardDescription className="text-xs mt-0">
-                    You need credits to train a model and generate headshots. Purchase a plan to get started.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-4 px-3 pb-4">
-                  <div className="flex flex-col gap-3">
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="rounded-lg border p-3 text-center">
-                        <div className="font-bold text-lg">{TIERS.starter.priceLabel}</div>
-                        <div className="text-xs text-muted-foreground">{TIERS.starter.name}</div>
-                        <div className="text-xs">{TIERS.starter.imageCount} headshots</div>
-                      </div>
-                      <div className="rounded-lg border-2 border-primary p-3 text-center relative">
-                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full">Popular</div>
-                        <div className="font-bold text-lg">{TIERS.professional.priceLabel}</div>
-                        <div className="text-xs text-muted-foreground">{TIERS.professional.name}</div>
-                        <div className="text-xs">{TIERS.professional.imageCount} headshots</div>
-                      </div>
-                      <div className="rounded-lg border p-3 text-center">
-                        <div className="font-bold text-lg">{TIERS.executive.priceLabel}</div>
-                        <div className="text-xs text-muted-foreground">{TIERS.executive.name}</div>
-                        <div className="text-xs">{TIERS.executive.imageCount} headshots</div>
-                      </div>
-                    </div>
-                    <Link href="/#pricing">
-                      <Button size="lg" className="w-full text-base font-bold">
-                        <FaCreditCard className="mr-2 h-5 w-5" />
-                        Purchase Credits to Start
-                      </Button>
-                    </Link>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Already purchased?{" "}
-                      <Link href="/overview" className="text-primary hover:underline">
-                        Go back to My Models
-                      </Link>
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              /* 已付费或支付未配置：正常显示训练表单 */
-              <Card className="p-2">
-                <CardHeader className="px-3 pt-2 pb-0">
-                  <CardTitle>Train Model</CardTitle>
-                  <CardDescription className="text-xs mt-0">
-                    Choose a name, type, and upload some photos to get started.
+                    Add a name, choose gender, and upload 4–10 photos to get started.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-3 px-3 pb-3">
-                  <TrainModelZoneErrorBoundary>
-                    <TrainModelZone packSlug={params.pack} />
-                  </TrainModelZoneErrorBoundary>
+                  <TrainModelSection
+                    packSlug={params.pack}
+                    initialHasCredits={hasCredits}
+                    awaitingCredits={awaitingCredits}
+                  />
                 </CardContent>
               </Card>
-            )}
           </div>
         </div>
 
@@ -280,7 +232,7 @@ export default async function Index({
                 <svg className="w-4 h-4 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Bad lightning, low quality, blurry
+                Bad lighting, low quality, blurry
               </li>
               <li className="flex items-center gap-2">
                 <svg className="w-4 h-4 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -304,23 +256,46 @@ export default async function Index({
           </div>
         </div>
 
-        {/* Mobile: Good/Bad below Card (only on small screens) */}
-        <div className="lg:hidden col-span-1 grid grid-cols-2 gap-4 mb-6">
-          <div>
-            <h4 className="font-bold text-base mb-2">Good examples</h4>
-            <div className="flex gap-2 mb-2">
-              <Image src="/howto/good-1.avif" alt="" width={100} height={80} className="max-w-full h-auto rounded max-h-20" />
-              <Image src="/howto/good-2.avif" alt="" width={100} height={80} className="max-w-full h-auto rounded max-h-20" />
-              <Image src="/howto/good-3.avif" alt="" width={100} height={80} className="max-w-full h-auto rounded max-h-20" />
+        {/* Mobile: upload guide above form on small screens */}
+        <div className="order-1 lg:order-last lg:hidden col-span-1 space-y-3 mb-2">
+          <details className="rounded-lg border p-3 text-sm bg-muted/30" open>
+            <summary className="cursor-pointer font-medium">Photo tips before you upload</summary>
+            <div className="mt-3 grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-2">Good examples</p>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {["good-1", "good-2", "good-3"].map((name) => (
+                    <div key={name} className="relative aspect-[4/5] rounded overflow-hidden bg-muted">
+                      <Image src={`/howto/${name}.avif`} alt="Good example" fill sizes="20vw" className="object-cover" />
+                    </div>
+                  ))}
+                </div>
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  <li>Shoulders-up or waist-up</li>
+                  <li>Look at the camera</li>
+                  <li>Different days &amp; backgrounds</li>
+                </ul>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-red-700 dark:text-red-400 mb-2">Avoid</p>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {["cropped", "funny-faces", "sunglasses"].map((name) => (
+                    <div key={name} className="relative aspect-[4/5] rounded overflow-hidden bg-muted">
+                      <Image src={`/howto/${name}.avif`} alt="Bad example" fill sizes="20vw" className="object-cover" />
+                    </div>
+                  ))}
+                </div>
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  <li>No hats, sunglasses, filters</li>
+                  <li>No group shots or cropped faces</li>
+                  <li>No blurry or low-light photos</li>
+                </ul>
+              </div>
             </div>
-          </div>
-          <div>
-            <h4 className="font-bold text-base mb-2">Bad examples</h4>
-            <div className="flex gap-2 mb-2">
-              <Image src="/howto/funny-faces.avif" alt="" width={100} height={80} className="max-w-full h-auto rounded max-h-20" />
-              <Image src="/howto/sunglasses.avif" alt="" width={100} height={80} className="max-w-full h-auto rounded max-h-20" />
-            </div>
-          </div>
+            <Link href="/howto" className="mt-3 inline-block text-primary text-xs underline underline-offset-2">
+              Full upload guide →
+            </Link>
+          </details>
         </div>
       </div>
     </div>
