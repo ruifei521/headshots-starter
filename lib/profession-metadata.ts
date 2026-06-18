@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PROFESSION_OG_TAGLINE } from "@/lib/refund-policy";
 
 const SITE = "https://snapprohead.com";
-const OG_IMAGE = `${SITE}/hero.webp`;
+const OG_IMAGE = `${SITE}/hero.png`;
 
 type ProfessionConfig = {
   title: string;

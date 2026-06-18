@@ -33,3 +33,8 @@ export function compareVsStudioPhotographerSnippet(
   const pct = percentCheaperThanStudio(packPrice);
   return `about ${pct}% cheaper than a ${STUDIO_PHOTOGRAPH_AVERAGE_LABEL} professional photographer`;
 }
+
+/** Train flow — model name input. */
+export const TRAIN_SET_NAME_LABEL = "Model Name";
+export const TRAIN_SET_NAME_DESCRIPTION = "Give your AI model a recognizable name (only you will see this).";
+export const TRAIN_SET_NAME_PLACEHOLDER = "e.g., My Professional Headshots";

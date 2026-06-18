@@ -22,6 +22,12 @@ export const TRAIN_CONSENT_UPLOAD_LINE =
 export const TRAIN_CONSENT_GENERATED_LINE =
   "Generated headshots stay in your account until you download them; we delete on request";
 
+/** Train flow consent bullets (used in TrainModelZone). */
+export const TRAIN_CONSENT_BULLETS = [
+  TRAIN_CONSENT_UPLOAD_LINE,
+  TRAIN_CONSENT_GENERATED_LINE,
+];
+
 /** Privacy policy — section 2 (how we use photos). */
 export const LEGAL_UPLOAD_RETENTION_SECTION2 =
   "Original uploaded photos are used solely for headshot generation. We delete them after your order completes, or within a reasonable period thereafter — whichever comes first.";

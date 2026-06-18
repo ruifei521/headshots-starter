@@ -82,7 +82,7 @@ export default function PrivacySection() {
 
               <div className="mb-4">
 
-                <Image src={icon} alt="" width={48} height={48} className="h-12 w-12" />
+                <Image src={icon} alt={title} width={48} height={48} className="h-12 w-12" />
 
               </div>
 

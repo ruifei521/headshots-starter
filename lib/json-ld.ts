@@ -271,6 +271,21 @@ export function getHomepageJsonLd() {
   };
 }
 
+/** 定价页：Product + FAQ + Breadcrumb */
+export function getPricingPageJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      generateProductSchema(),
+      generateFAQSchema(FAQ_DATA),
+      generateBreadcrumbSchema([
+        { name: "Home", url: SITE.url },
+        { name: "Pricing", url: `${SITE.url}/pricing` },
+      ]),
+    ],
+  };
+}
+
 /** Blog article: Article + Breadcrumb */
 export function getBlogArticleJsonLd(input: {
   title: string;
@@ -355,7 +370,7 @@ export function getExamplesJsonLd() {
         "@type": "WebPage",
         name: "Sample Reviews & Examples",
         description:
-          "Illustrative customer-style feedback and AI headshot examples from SnapProHead.",
+          "Preview AI-generated professional headshots and typical user feedback from SnapProHead.",
         url: `${SITE.url}/examples`,
         isPartOf: { "@type": "WebSite", name: SITE.name, url: SITE.url },
       },

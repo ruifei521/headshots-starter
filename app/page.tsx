@@ -7,15 +7,29 @@ import FAQSection from "@/components/homepage/FAQSection"
 import PrivacySection from "@/components/homepage/PrivacySection"
 import { getHomepageJsonLd } from "@/lib/json-ld"
 import { META_HOME_DESCRIPTION } from "@/lib/refund-policy"
+import { buildPageOpenGraph, buildPageTwitter, SITE_URL } from "@/lib/site-seo"
+
+const HOME_TITLE =
+  "SnapProHead - AI Professional Headshot Generator | Studio-Quality in ~25 Min"
 
 export const metadata: Metadata = {
   title: {
-    absolute: "SnapProHead - AI Professional Headshot Generator | Studio-Quality in ~25 Min",
+    absolute: HOME_TITLE,
   },
   description: META_HOME_DESCRIPTION,
+  alternates: {
+    canonical: SITE_URL,
+  },
+  openGraph: buildPageOpenGraph({
+    title: HOME_TITLE,
+    description: META_HOME_DESCRIPTION,
+  }),
+  twitter: buildPageTwitter({
+    title: HOME_TITLE,
+    description: META_HOME_DESCRIPTION,
+  }),
 }
 
-// ISR: regenerate page every hour — no auth needed on landing page
 export const revalidate = 3600
 
 export default function Index() {
@@ -27,9 +41,9 @@ export default function Index() {
       />
       <div>
         <HeroSection />
-        <PricingSection />
         <ExamplesSection />
-        <ClosingCtaSection />
+        <ClosingCtaSection ctaHref="#pricing" />
+        <PricingSection />
         <FAQSection />
         <PrivacySection />
       </div>

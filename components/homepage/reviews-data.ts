@@ -426,3 +426,11 @@ export const reviews: Review[] = [
     text: "Simple, fast, affordable. What more could you ask for?"
   }
 ]
+
+export const FEATURED_REVIEW_COUNT = 8
+
+export function getFeaturedReviews() {
+  return reviews
+    .filter((r) => r.text.length < 200 && r.rating >= 4)
+    .slice(0, FEATURED_REVIEW_COUNT)
+}

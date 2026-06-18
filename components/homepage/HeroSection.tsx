@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import dynamic from "next/dynamic"
 import TrustedByLogos from "@/components/homepage/trusted-by-logos"
+import ThreeDBeforeAfterGallery from "@/components/homepage/3d-before-after-gallery"
 import { TRUST_HERO_BADGE } from "@/lib/refund-policy"
 import { HERO_CHEAPER_THAN_STUDIO_LINE } from "@/lib/marketing-copy"
+import { TIERS } from "@/lib/tiers"
 
 const ScrollingGallery = dynamic(
   () => import("@/components/homepage/scrolling-gallery"),
@@ -14,18 +16,6 @@ const ScrollingGallery = dynamic(
     loading: () => (
       <div className="w-full h-32 sm:h-40 md:h-48 bg-muted/20 rounded-lg animate-pulse" aria-hidden />
     ),
-  }
-)
-
-const ThreeDBeforeAfterGallery = dynamic(
-  () => import("@/components/homepage/3d-before-after-gallery"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full aspect-[3/2] bg-muted/30 rounded-2xl flex items-center justify-center">
-        <div className="h-8 w-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>
-    )
   }
 )
 
@@ -43,11 +33,16 @@ export default function HeroSection() {
           <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-[800px] mx-auto px-1">
             Professional enough for LinkedIn. Natural enough to still be you. {HERO_CHEAPER_THAN_STUDIO_LINE}.
           </p>
-          <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/pricing" className="w-full sm:w-auto">
+          <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+            <Link href="#examples" className="w-full sm:w-auto">
               <Button size="lg" className="group w-full sm:w-auto">
-                Create Your Headshots Now
+                See Results
                 <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="#pricing" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                View pricing from ${TIERS.starter.price}
               </Button>
             </Link>
           </div>
@@ -61,21 +56,17 @@ export default function HeroSection() {
           </p>
         </div>
 
-        {/* Scrolling Gallery — infinite marquee of example headshots */}
         <div className="mt-8 -mx-4 md:-mx-6">
           <ScrollingGallery />
         </div>
 
-        {/* Trusted By Section — scrolling company logos for social proof */}
         <div className="mt-10">
           <TrustedByLogos />
         </div>
 
-        {/* Before/After Gallery — lazy loaded, only when visible */}
         <div className="mt-12">
           <ThreeDBeforeAfterGallery />
         </div>
-
       </div>
     </section>
   )

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, lazy } from "react"
+import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
@@ -98,6 +98,8 @@ export default function ThreeDBeforeAfterGallery() {
   }, [])
 
   const current = galleryItems[activeIndex]
+  const isFirstSlide = activeIndex === 0
+  const styleLabel = current.label.replace(/^[^\w]+/, "").trim()
 
   return (
     <div className="w-full">
@@ -145,11 +147,12 @@ export default function ThreeDBeforeAfterGallery() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
                   <Image
                     src={current.before}
-                    alt="Before"
+                    alt={`Before selfie — ${styleLabel}`}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    loading="lazy"
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    priority={isFirstSlide}
+                    loading={isFirstSlide ? "eager" : "lazy"}
                     quality={70}
                   />
                   <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-20">
@@ -188,11 +191,12 @@ export default function ThreeDBeforeAfterGallery() {
                   >
                     <Image
                       src={current.after}
-                      alt="After"
+                      alt={`After AI headshot — ${styleLabel}`}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      loading="lazy"
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      priority={isFirstSlide}
+                      loading={isFirstSlide ? "eager" : "lazy"}
                       quality={70}
                     />
                   </motion.div>
@@ -216,10 +220,19 @@ export default function ThreeDBeforeAfterGallery() {
 
         {/* Navigation */}
         <div className="mt-6 flex items-center justify-center gap-4">
-          <button onClick={prevSlide} className="flex h-10 w-10 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition-all hover:scale-105" aria-label="Previous">
+          <button onClick={prevSlide} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition-all hover:scale-105" aria-label="Previous">
             <ChevronLeft className="h-5 w-5" />
           </button>
-          <div className="flex items-center gap-2">
+
+          <p
+            className="md:hidden min-w-[3.5rem] text-center text-sm font-medium tabular-nums text-muted-foreground"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {activeIndex + 1} / {galleryItems.length}
+          </p>
+
+          <div className="hidden md:flex items-center gap-2">
             {galleryItems.map((_, index) => (
               <button
                 key={index}
@@ -228,7 +241,8 @@ export default function ThreeDBeforeAfterGallery() {
                   "flex h-11 w-11 items-center justify-center rounded-full transition-all duration-300",
                   index === activeIndex ? "bg-primary/15" : "hover:bg-muted"
                 )}
-                aria-label={`Go to slide ${index + 1}`}
+                aria-label={`Go to slide ${index + 1} of ${galleryItems.length}`}
+                aria-current={index === activeIndex ? "true" : undefined}
               >
                 <span
                   className={cn(
@@ -239,7 +253,8 @@ export default function ThreeDBeforeAfterGallery() {
               </button>
             ))}
           </div>
-          <button onClick={nextSlide} className="flex h-10 w-10 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition-all hover:scale-105" aria-label="Next">
+
+          <button onClick={nextSlide} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition-all hover:scale-105" aria-label="Next">
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>

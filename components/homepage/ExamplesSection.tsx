@@ -2,17 +2,18 @@ import Image from "next/image"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Star } from "lucide-react"
-import { reviews } from "@/components/homepage/reviews-data"
+import { getFeaturedReviews } from "@/components/homepage/reviews-data"
+import {
+  EXAMPLES_PHOTOS_LEDE,
+  EXAMPLES_TESTIMONIALS_HEADING,
+  EXAMPLES_TESTIMONIALS_LEDE,
+} from "@/lib/examples-marketing-copy"
 
-// 从滚动画廊中精选 8 张 Astria AI 生成的样片
 const exampleImages = ["01", "17", "08", "12", "16", "05", "24", "28"].map(
   (n) => `/gallery-images/${n}.jpg`
 )
 
-// 从 reviews 中选 8 条简短真实的评论（不展示头像）
-const featuredReviews = reviews
-  .filter((r) => r.text.length < 200 && r.rating >= 4)
-  .slice(0, 8)
+const featuredReviews = getFeaturedReviews()
 
 export default function ExamplesSection() {
   return (
@@ -24,7 +25,7 @@ export default function ExamplesSection() {
           </Badge>
           <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl md:text-5xl">Examples</h2>
           <p className="max-w-[700px] text-muted-foreground text-base sm:text-lg px-2">
-            These photos are not real. They were all created using AI.
+            {EXAMPLES_PHOTOS_LEDE}
           </p>
         </div>
         <div className="mt-8 grid gap-4 sm:gap-6 md:gap-8 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
@@ -37,7 +38,7 @@ export default function ExamplesSection() {
                 <div className="relative h-full w-full transition-all group-hover:scale-105">
                   <Image
                     src={src || "/placeholder.svg"}
-                    alt="AI Generated Headshot"
+                    alt={`Professional AI headshot example ${i + 1}`}
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     className="object-cover"
@@ -56,11 +57,14 @@ export default function ExamplesSection() {
           ))}
         </div>
 
-        <p className="mt-8 text-center text-sm text-muted-foreground">
-          Sample testimonials for illustration — not verified third-party reviews.
-        </p>
+        <div className="mt-10 text-center">
+          <h3 className="text-lg font-semibold sm:text-xl">{EXAMPLES_TESTIMONIALS_HEADING}</h3>
+          <p className="mt-2 max-w-[600px] mx-auto text-sm text-muted-foreground px-2">
+            {EXAMPLES_TESTIMONIALS_LEDE}
+          </p>
+        </div>
 
-        <div className="mt-4 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {featuredReviews.map((review, i) => (
             <div
               key={i}

@@ -41,7 +41,7 @@ function MarqueeRow({
           >
             <Image
               src={src}
-              alt=""
+              alt={`AI professional headshot sample ${(i % GALLERY_COUNT) + 1}`}
               fill
               sizes="144px"
               className="object-cover !max-w-none !h-full"

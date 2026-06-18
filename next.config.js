@@ -8,6 +8,17 @@ const nextConfig = {
     NEXT_PUBLIC_GA_ID: 'G-CEBQCJJXYN',
   },
 
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.snapprohead.com" }],
+        destination: "https://snapprohead.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {
