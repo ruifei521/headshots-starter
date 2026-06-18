@@ -1,9 +1,8 @@
 "use client"
 
 import Image from "next/image"
-import { motion } from "motion/react"
 
-const GALLERY_COUNT = 10
+const GALLERY_COUNT = 8
 const galleryImages = Array.from({ length: GALLERY_COUNT }, (_, i) => {
   const num = String(i + 1).padStart(2, "0")
   return `/gallery-images/${num}.jpg`
@@ -11,7 +10,7 @@ const galleryImages = Array.from({ length: GALLERY_COUNT }, (_, i) => {
 
 function MarqueeRow({
   images,
-  speed = 40,
+  speed = 35,
 }: {
   images: string[]
   speed?: number
@@ -23,16 +22,10 @@ function MarqueeRow({
       <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-8 sm:w-16 md:w-24 bg-gradient-to-r from-background to-transparent" />
       <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-8 sm:w-16 md:w-24 bg-gradient-to-l from-background to-transparent" />
 
-      <motion.div
-        className="flex w-max gap-3"
+      <div
+        className="flex w-max gap-3 snap-marquee-fallback"
         aria-hidden
-        initial={{ x: 0 }}
-        animate={{ x: "-50%" }}
-        transition={{
-          duration: speed,
-          ease: "linear",
-          repeat: Infinity,
-        }}
+        style={{ animationDuration: `${speed}s` }}
       >
         {doubled.map((src, i) => (
           <div
@@ -45,8 +38,9 @@ function MarqueeRow({
               fill
               sizes="144px"
               className="object-cover !max-w-none !h-full"
-              quality={55}
-              priority={i < 4}
+              quality={50}
+              priority={i < 2}
+              loading={i < 2 ? "eager" : "lazy"}
             />
             <div className="absolute bottom-0 inset-x-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />
             <div className="absolute bottom-1.5 left-1.5 right-1.5">
@@ -57,7 +51,7 @@ function MarqueeRow({
             </div>
           </div>
         ))}
-      </motion.div>
+      </div>
     </div>
   )
 }

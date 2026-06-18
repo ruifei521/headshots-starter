@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import dynamic from "next/dynamic"
 import TrustedByLogos from "@/components/homepage/trusted-by-logos"
-import ThreeDBeforeAfterGallery from "@/components/homepage/3d-before-after-gallery"
 import { TRUST_HERO_BADGE } from "@/lib/refund-policy"
 import { HERO_CHEAPER_THAN_STUDIO_LINE } from "@/lib/marketing-copy"
 import { TIERS } from "@/lib/tiers"
@@ -15,6 +14,19 @@ const ScrollingGallery = dynamic(
     ssr: false,
     loading: () => (
       <div className="w-full h-32 sm:h-40 md:h-48 bg-muted/20 rounded-lg animate-pulse" aria-hidden />
+    ),
+  }
+)
+
+const ThreeDBeforeAfterGallery = dynamic(
+  () => import("@/components/homepage/3d-before-after-gallery"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="w-full max-w-xl mx-auto aspect-[4/5] bg-muted/20 rounded-2xl animate-pulse"
+        aria-hidden
+      />
     ),
   }
 )

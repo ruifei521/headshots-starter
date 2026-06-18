@@ -42,8 +42,8 @@ export default function ExamplesSection() {
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     className="object-cover"
+                    quality={55}
                     loading={i < 2 ? "eager" : "lazy"}
-                    unoptimized
                   />
                   <div className="absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 rounded-full bg-primary/80 px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs text-white">
                     <span className="flex items-center gap-1">

@@ -89,12 +89,32 @@ export default function ThreeDBeforeAfterGallery() {
     }
   }, [isFlipping, isHovered])
 
-  // Autoplay — 只挂载一次，通过 ref 读取最新状态
+  // Autoplay only when visible — saves CPU and defers work below the fold
   useEffect(() => {
-    autoplayRef.current = setInterval(() => {
-      if (!isFlippingRef.current) nextSlide()
-    }, 4000)
-    return () => { if (autoplayRef.current) clearInterval(autoplayRef.current) }
+    const container = containerRef.current
+    if (!container) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          if (!autoplayRef.current) {
+            autoplayRef.current = setInterval(() => {
+              if (!isFlippingRef.current) nextSlide()
+            }, 4000)
+          }
+        } else if (autoplayRef.current) {
+          clearInterval(autoplayRef.current)
+          autoplayRef.current = null
+        }
+      },
+      { rootMargin: "100px", threshold: 0.1 }
+    )
+
+    observer.observe(container)
+    return () => {
+      observer.disconnect()
+      if (autoplayRef.current) clearInterval(autoplayRef.current)
+    }
   }, [])
 
   const current = galleryItems[activeIndex]

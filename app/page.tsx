@@ -1,10 +1,12 @@
 import type { Metadata } from "next"
+import dynamic from "next/dynamic"
 import HeroSection from "@/components/homepage/HeroSection"
-import PricingSection from "@/components/homepage/PricingSection"
 import ExamplesSection from "@/components/homepage/ExamplesSection"
 import ClosingCtaSection from "@/components/homepage/ClosingCtaSection"
-import FAQSection from "@/components/homepage/FAQSection"
-import PrivacySection from "@/components/homepage/PrivacySection"
+
+const PricingSection = dynamic(() => import("@/components/homepage/PricingSection"))
+const FAQSection = dynamic(() => import("@/components/homepage/FAQSection"))
+const PrivacySection = dynamic(() => import("@/components/homepage/PrivacySection"))
 import { getHomepageJsonLd } from "@/lib/json-ld"
 import { META_HOME_DESCRIPTION } from "@/lib/refund-policy"
 import { buildPageOpenGraph, buildPageTwitter, SITE_URL } from "@/lib/site-seo"
