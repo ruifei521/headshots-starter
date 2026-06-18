@@ -38,7 +38,7 @@ We tested with the same set of **12 neutral selfies** (indoor window light, no f
 
 | Tool | Price (entry) | Speed | Photos / $ | Privacy clarity | Best overall for |
 |------|---------------|-------|------------|-----------------|------------------|
-| [SnapProHead](/pricing) | $29 | ~25 min | High | 30-day auto-delete stated | Individuals wanting many photos fast |
+| [SnapProHead](/pricing) | $29 | ~25 min | High | Delete on request | Individuals wanting many photos fast |
 | Aragon AI | ~$35+ | Hours–1 day | Medium | Good; read tier details | Brand familiarity + style variety |
 | HeadshotPro | ~$29+ | ~10 min (claimed) | Medium–High | Good for teams | Company-wide rollouts |
 | BetterPic | ~$35+ | ~1 hour | Medium | Good consumer UX | Guided, premium checkout |
@@ -144,7 +144,7 @@ We're biased — but here's how we designed **SnapProHead** for people who need 
 - **~25 minute** delivery on typical runs (depends on queue and tier)
 - **Flux-enhanced** resolution (1024×1024) on paid plans
 - **Satisfaction Guaranteed** if you're not satisfied with your results
-- **30-day auto-delete** privacy posture for generated assets
+- **Delete on request** privacy posture — see our [privacy policy](/privacy)
 - Purpose-built pages for [LinkedIn](/headshots/linkedin), [lawyers](/headshots/lawyer), [realtors](/headshots/realtor), [doctors](/headshots/doctor), and [executives](/headshots/executive)
 
 ### Limitations
@@ -175,7 +175,7 @@ Consumer tools range from **under 30 minutes** to **24 hours**. If you have a de
 
 ### Is my data used to train other people's models?
 
-Policies differ. Read each vendor's terms for **training opt-out**, retention, and deletion. We publish a **30-day auto-delete** posture for generated assets; always verify the current policy at checkout.
+Policies differ. Read each vendor's terms for **training opt-out**, retention, and deletion. SnapProHead uses a **delete-on-request** policy; always verify the current terms on our [privacy page](/privacy) before uploading.
 
 ### Can I use AI headshots on a law firm or medical website?
 
@@ -231,7 +231,7 @@ Yes — modern AI headshots are indistinguishable from studio portraits at Linke
 
 ### Are AI headshots private?
 
-Privacy policies vary. SnapProHead commits to 30-day auto-delete on generated assets. Aragon and HeadshotPro publish policies on their sites. Read the policy before uploading — the [FTC's AI guidance](https://www.ftc.gov/business-guidance/blog/2023/02/using-artificial-intelligence-avoid-unfair-deceptive-practices) outlines what to look for.
+Privacy policies vary. SnapProHead supports **deletion on request** for uploads and generated images. Aragon and HeadshotPro publish policies on their sites. Read the policy before uploading — the [FTC's AI guidance](https://www.ftc.gov/business-guidance/blog/2023/02/using-artificial-intelligence-avoid-unfair-deceptive-practices) outlines what to look for.
 
 ### Can I use AI headshots for a job application or company website?
 

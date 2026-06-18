@@ -286,7 +286,7 @@ export function getPricingPageJsonLd() {
   };
 }
 
-/** Blog article: Article + Breadcrumb */
+/** Blog article: Article + Breadcrumb (+ optional FAQPage) */
 export function getBlogArticleJsonLd(input: {
   title: string;
   description: string;
@@ -295,48 +295,55 @@ export function getBlogArticleJsonLd(input: {
   dateModified?: string;
   imageUrl?: string;
   wordCount?: number;
+  faqs?: FAQItem[];
 }) {
   const url = `${SITE.url}/blog/${input.slug}`;
   const modified = input.dateModified ?? input.datePublished;
 
+  const graph: Record<string, unknown>[] = [
+    {
+      "@type": "Article",
+      headline: input.title,
+      description: input.description,
+      datePublished: input.datePublished,
+      dateModified: modified,
+      author: {
+        "@type": "Organization",
+        name: SITE.name,
+        url: SITE.url,
+      },
+      publisher: {
+        "@type": "Organization",
+        name: SITE.name,
+        url: SITE.url,
+        logo: {
+          "@type": "ImageObject",
+          url: SITE.logo,
+        },
+      },
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": url,
+      },
+      image: [input.imageUrl ?? SITE.logo],
+      ...(input.wordCount != null && input.wordCount > 0
+        ? { wordCount: input.wordCount }
+        : {}),
+    },
+    generateBreadcrumbSchema([
+      { name: "Home", url: SITE.url },
+      { name: "Blog", url: `${SITE.url}/blog` },
+      { name: input.title, url },
+    ]),
+  ];
+
+  if (input.faqs && input.faqs.length > 0) {
+    graph.push(generateFAQSchema(input.faqs));
+  }
+
   return {
     "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Article",
-        headline: input.title,
-        description: input.description,
-        datePublished: input.datePublished,
-        dateModified: modified,
-        author: {
-          "@type": "Organization",
-          name: SITE.name,
-          url: SITE.url,
-        },
-        publisher: {
-          "@type": "Organization",
-          name: SITE.name,
-          url: SITE.url,
-          logo: {
-            "@type": "ImageObject",
-            url: SITE.logo,
-          },
-        },
-        mainEntityOfPage: {
-          "@type": "WebPage",
-          "@id": url,
-        },
-        image: [input.imageUrl ?? SITE.logo],
-        ...(input.wordCount != null && input.wordCount > 0
-          ? { wordCount: input.wordCount }
-          : {}),
-      },
-      generateBreadcrumbSchema([
-        { name: "Home", url: SITE.url },
-        { name: "Blog", url: `${SITE.url}/blog` },
-        { name: input.title, url },
-      ]),
-    ],
+    "@graph": graph,
   };
 }
 

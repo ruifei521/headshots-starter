@@ -9,10 +9,18 @@ import { postLoginPathFromSearchParams } from "@/lib/checkout-url";
 import { CheckoutStatusHandlerSlot } from "@/components/CheckoutStatusHandlerSlot";
 
 import { META_LOGIN_DESCRIPTION } from '@/lib/refund-policy';
+import { SITE_URL } from '@/lib/site-seo';
 
 export const metadata: Metadata = {
   title: 'Login - AI Professional Headshots',
   description: META_LOGIN_DESCRIPTION,
+  alternates: {
+    canonical: `${SITE_URL}/login`,
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export const dynamic = "force-dynamic";

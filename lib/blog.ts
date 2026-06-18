@@ -95,3 +95,42 @@ export function formatBlogDate(isoDate: string): string {
     day: "numeric",
   });
 }
+
+export type BlogFaqItem = {
+  question: string;
+  answer: string;
+};
+
+/** Parse FAQ blocks from blog markdown (## FAQ / ## Frequently asked questions). */
+export function extractBlogFaqsFromMarkdown(content: string): BlogFaqItem[] {
+  const faqHeading = /^##\s+(?:FAQ|Frequently asked questions)\s*$/im;
+  const match = content.match(faqHeading);
+  if (!match || match.index == null) return [];
+
+  const faqSection = content.slice(match.index + match[0].length);
+  const endMatch = faqSection.match(/^##\s+/m);
+  const faqBody = endMatch?.index != null ? faqSection.slice(0, endMatch.index) : faqSection;
+
+  const faqs: BlogFaqItem[] = [];
+  const blocks = faqBody.split(/^###\s+/m).slice(1);
+
+  for (const block of blocks) {
+    const newline = block.indexOf("\n");
+    if (newline === -1) continue;
+
+    const question = block.slice(0, newline).trim();
+    let answer = block
+      .slice(newline + 1)
+      .trim()
+      .replace(/\*\*/g, "")
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (question && answer) {
+      faqs.push({ question, answer });
+    }
+  }
+
+  return faqs;
+}

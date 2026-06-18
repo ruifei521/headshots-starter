@@ -7,6 +7,7 @@ import {
   getAllPostSlugs,
   getCoverImageUrl,
   getPostBySlug,
+  extractBlogFaqsFromMarkdown,
 } from "@/lib/blog";
 import BlogPostBody from "@/components/blog/BlogPostBody";
 import BlogPostCta from "@/components/blog/BlogPostCta";
@@ -62,6 +63,7 @@ export default function BlogPostPage({ params }: Props) {
 
   const allPosts = getAllPosts();
   const wordCount = post.content.trim().split(/\s+/).filter(Boolean).length;
+  const faqs = extractBlogFaqsFromMarkdown(post.content);
 
   const jsonLd = getBlogArticleJsonLd({
     title: post.title,
@@ -71,6 +73,7 @@ export default function BlogPostPage({ params }: Props) {
     dateModified: post.updated,
     imageUrl: getCoverImageUrl(post.coverImage),
     wordCount,
+    faqs,
   });
 
   const showSampleStrip = post.slug === "best-ai-headshot-generators-2026";

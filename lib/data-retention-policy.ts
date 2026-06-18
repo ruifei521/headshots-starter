@@ -46,6 +46,10 @@ export const LEGAL_DELETION_ON_REQUEST = `You may request deletion of your photo
 
 export const LEGAL_ACCOUNT_DELETION = `Upon a verified account deletion request, we remove your personal data, uploaded photos, and generated images within ${DATA_DELETION_SLA_DAYS} business days.`;
 
+/** Privacy policy — section 3 (where photos are stored). */
+export const LEGAL_STORAGE_SECTION3 =
+  "Uploaded and generated images are stored in Supabase Storage (encrypted in transit via SSL/TLS).";
+
 /** Homepage privacy card. */
 export const HOMEPAGE_PRIVACY_CARD_TITLE = "You're in Control of Your Data";
 

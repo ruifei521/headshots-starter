@@ -19,11 +19,11 @@ This guide covers when AI makes sense for medical professionals, how to get trus
 
 ### Trust at first glance
 
-A dated or casual selfie on Healthgrades or your practice site can undermine confidence. A consistent, well-lit portrait signals competence and approachability. According to [AMA research on patient choice of physician](https://www.ama-assn.org/), photo and bio quality are leading factors in patient selection, especially in competitive metro markets.
+A dated or casual selfie on Healthgrades or your practice site can undermine confidence. A consistent, well-lit portrait signals competence and approachability. In competitive markets, patients often compare several physicians online before booking — photo and bio quality are common tiebreakers.
 
-### The 7-second decision window
+### First impressions on directory pages
 
-A 2023 study published in the [Journal of Medical Internet Research](https://www.jmir.org/) found that prospective patients spend an average of 7 seconds on a physician profile page before deciding to read more or move on. Your headshot is the deciding element in those 7 seconds.
+Prospective patients typically skim profile pages quickly before deciding to read more or move on. Your headshot is the anchor element in that skim — it should match how you present in clinic.
 
 ### Directory and marketing consistency
 
@@ -133,7 +133,7 @@ Healthcare adds a layer of privacy consideration:
 
 - **Confirm your vendor's data retention and deletion policy** — uploads are personal biometric data in some jurisdictions
 - **Ask whether uploads are used to train third-party models**
-- **SnapProHead publishes a 30-day auto-delete posture** for generated assets — verify current terms at checkout
+- **SnapProHead uses a privacy-first, delete-on-request policy** — see our [privacy policy](/privacy) for current retention terms
 - **Do not upload patient images** or identifiable patient information in the background of input photos
 - **HIPAA**: AI headshot vendors are typically not Business Associates, so PHI must not flow through the tool
 

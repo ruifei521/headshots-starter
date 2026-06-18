@@ -29,7 +29,7 @@ By the end, you'll know which tool fits your budget, deadline, and use case — 
 | **Best-known for** | Speed + photos per dollar | Team rollouts + corporate branding |
 | **Resolution** | 1024×1024 (Flux) | 1024×1024 standard |
 | **Refund / redo** | Satisfaction Guarantee — free redo if unhappy | Free redo; refund if photos not downloaded |
-| **Privacy** | 30-day auto-delete policy | Published privacy policy |
+| **Privacy** | Delete on request | Published privacy policy |
 | **Best for** | Solo professionals, fast turnaround | HR teams, agencies, high-volume corporate use |
 
 *Prices and features as of June 2026 — always confirm on each vendor's site before purchasing.*
@@ -67,7 +67,7 @@ All plans include full commercial rights, so you can use your photos on LinkedIn
 - **Lowest entry price** among reviewed competitors at $29
 - **~25 minute delivery** on typical runs — among the fastest in the market
 - **More photos per dollar** — 40+ headshots at the entry tier vs lower counts on comparable plans
-- **30-day auto-delete** privacy posture for generated assets
+- **Delete on request** privacy posture — see our [privacy policy](/privacy)
 - **Satisfaction Guarantee** — if you're not satisfied with your results, we'll refund you
 - Purpose-built landing pages for [LinkedIn](/headshots/linkedin), [lawyers](/headshots/lawyer), [realtors](/headshots/realtor), [doctors](/headshots/doctor), [executives](/headshots/executive), and 15+ other professions
 
@@ -148,7 +148,7 @@ If you're a solo professional, this difference is irrelevant. If you're outfitti
 
 **Both tools have published privacy policies — read them before uploading.**
 
-- **SnapProHead** commits to a 30-day auto-delete policy for generated assets. Your selfies are used only for your headshot generation, not for training shared models.
+- **SnapProHead** offers privacy-first handling with **delete on request** for uploads and generated images. Your selfies are used only for your headshot generation, not for training shared models. See our [privacy policy](/privacy).
 - **HeadshotPro** publishes its privacy policy on its website. Confirm current data retention and training opt-out details before upload.
 
 For an individual user, both privacy postures are reasonable. For a regulated industry (healthcare, legal, finance), evaluate which vendor's posture fits your compliance needs.
@@ -161,7 +161,7 @@ For an individual user, both privacy postures are reasonable. For a regulated in
 | Fastest predictable turnaround (~25 min) | **SnapProHead** |
 | Team rollout of 20+ employees | **HeadshotPro** |
 | Volume discounts for HR | **HeadshotPro** |
-| Privacy + deletion schedule clarity | **SnapProHead (30-day auto-delete)** |
+| Privacy + deletion schedule clarity | **SnapProHead (delete on request)** |
 | Solo professional LinkedIn refresh | **SnapProHead** |
 | Agency or B2B client headshots | **HeadshotPro** |
 | Value per photo (solo professional) | **SnapProHead** |

@@ -19,7 +19,7 @@ This guide explains what makes a strong legal portrait, where to use it, and how
 
 ### Your photo is part of the pitch
 
-On firm websites, potential clients scan partner grids in seconds. A sharp, consistent headshot supports the story that your team is established and trustworthy. According to [ABA TechReport findings on law firm marketing](https://www.americanbar.org/), bio photos are among the highest-engagement elements on a law firm website.
+On firm websites, potential clients scan partner grids in seconds. A sharp, consistent headshot supports the story that your team is established and trustworthy. Bio photos are typically among the most-viewed elements on a law firm "Our Team" page — often more than long-form bios.
 
 ### Directories and LinkedIn
 
@@ -155,7 +155,7 @@ Check your jurisdiction. Court filings typically require government-issued ID-st
 
 ### Can bar associations restrict AI headshots?
 
-As of 2026, no U.S. state bar has issued a specific rule against AI headshots in attorney advertising. The general duties of candor and truthful representation apply regardless of the production method.
+As of this writing, we are not aware of a U.S. state bar rule that specifically bans AI headshots in attorney advertising — but the general duties of candor and truthful representation apply regardless of production method. Confirm with your jurisdiction if unsure.
 
 ## Bottom line
 

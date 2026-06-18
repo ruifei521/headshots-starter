@@ -19,17 +19,19 @@ import {
 
 } from "@/lib/overview-data";
 import { loginRedirectPath } from "@/lib/login-redirect.server";
-
-
+import { SITE_URL } from "@/lib/site-seo";
 
 export const metadata: Metadata = {
-
   title: "Your AI Headshots Dashboard",
-
   description:
-
     "Manage your AI headshot models, view generated results, and create new professional headshots.",
-
+  alternates: {
+    canonical: `${SITE_URL}/overview`,
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 

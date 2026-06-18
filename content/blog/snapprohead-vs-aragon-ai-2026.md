@@ -31,7 +31,7 @@ By the end, you'll know which tool fits your budget, deadline, and use case — 
 | **Turnaround time** | ~25 minutes | Hours to 1 day |
 | **Resolution** | 1024×1024 (Flux) | 896×1088 (Standard) / 1792×2176 (Executive) |
 | **Refund / redo** | Satisfaction Guarantee — free redo if unhappy | Free redo; refund if photos not downloaded |
-| **Privacy** | 30-day auto-delete policy | Published privacy policy |
+| **Privacy** | Delete on request | Published privacy policy |
 | **Trust signals** | Growing review base | Google 4.8 · Trustpilot 4.9 · SOC 2 |
 | **Best for** | Speed + photos per dollar | Brand familiarity + style variety |
 
@@ -70,7 +70,7 @@ All plans include full commercial rights, so you can use your photos on LinkedIn
 - **Lowest entry price** among reviewed competitors at $29
 - **~25 minute delivery** on typical runs — among the fastest in the market
 - **More photos per dollar** — 40+ headshots at the entry tier vs lower counts on comparable plans
-- **30-day auto-delete** privacy posture for generated assets
+- **Delete on request** privacy posture — see our [privacy policy](/privacy)
 - **Satisfaction Guarantee** — if you're not satisfied with your results, we'll refund you
 - Purpose-built landing pages for [LinkedIn](/headshots/linkedin), [lawyers](/headshots/lawyer), [realtors](/headshots/realtor), [doctors](/headshots/doctor), [executives](/headshots/executive), and 15+ other professions
 
@@ -141,7 +141,7 @@ Real user feedback from Reddit (r/ChatGPT, r/ArtificialIntelligence) generally d
 
 **Both tools have published privacy policies — read them before uploading.**
 
-- **SnapProHead** commits to a 30-day auto-delete policy for generated assets. Your selfies are used only for your headshot generation, not for training shared models.
+- **SnapProHead** offers privacy-first handling with **delete on request** for uploads and generated images. Your selfies are used only for your headshot generation, not for training shared models. See our [privacy policy](/privacy).
 - **Aragon AI** publishes its privacy policy on its website and includes SOC 2 Type II certification — a strong signal for enterprise buyers concerned about compliance.
 
 For an individual user, both privacy postures are reasonable. For a regulated industry (healthcare, legal, finance), Aragon's SOC 2 certification may be required by your compliance team.
@@ -164,7 +164,7 @@ Both policies are competitive — neither is a meaningful differentiator unless 
 | Print-resolution headshots | **Aragon AI Executive (1792×2176)** |
 | Brand familiarity + enterprise trust | **Aragon AI** |
 | Team procurement (SSO, admin tools) | **Aragon AI** |
-| Privacy + deletion schedule clarity | **SnapProHead (30-day auto-delete)** |
+| Privacy + deletion schedule clarity | **SnapProHead (delete on request)** |
 | 50+ photo editing tools ecosystem | **Aragon AI** |
 | Value per photo (solo professional) | **SnapProHead** |
 

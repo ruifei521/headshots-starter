@@ -4,6 +4,7 @@ import {
   LEGAL_DELETION_ON_REQUEST,
   LEGAL_GENERATED_RETENTION_SECTION2,
   LEGAL_GENERATED_RETENTION_SECTION5,
+  LEGAL_STORAGE_SECTION3,
   LEGAL_UPLOAD_RETENTION_SECTION2,
   LEGAL_UPLOAD_RETENTION_SECTION5,
 } from "@/lib/data-retention-policy";
@@ -50,7 +51,7 @@ export default function PrivacyPolicy() {
           <h2 className="text-xl font-semibold text-foreground mb-3">3. Data Storage and Security</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>Your account data is stored securely in our database hosted by Supabase.</li>
-            <li>Uploaded and generated images are stored using Vercel Blob storage.</li>
+            <li>Uploaded and generated images: {LEGAL_STORAGE_SECTION3}</li>
             <li>We implement industry-standard security measures to protect your data.</li>
             <li>While we strive to protect your personal information, no method of transmission over the Internet is 100% secure.</li>
           </ul>
@@ -62,8 +63,8 @@ export default function PrivacyPolicy() {
           <ul className="list-disc pl-6 space-y-2">
             <li><strong className="text-foreground">Supabase:</strong> Database and authentication services</li>
             <li><strong className="text-foreground">Creem:</strong> Payment processing (acting as Merchant of Record)</li>
-            <li><strong className="text-foreground">Vercel:</strong> Application hosting and file storage</li>
-            <li><strong className="text-foreground">AI Processing Provider:</strong> For headshot generation (photos are sent to our AI provider for model training and image generation as part of the service)</li>
+            <li><strong className="text-foreground">Vercel:</strong> Application hosting</li>
+            <li><strong className="text-foreground">Astria AI:</strong> AI model training and headshot generation</li>
           </ul>
           <p className="mt-3">Each third-party provider has their own privacy policy governing the use of your information.</p>
         </div>

@@ -22,6 +22,15 @@ function getRateLimitConfig(pathname: string): { maxRequests: number; windowMs: 
   return { maxRequests: 120, windowMs: 60_000 };
 }
 
+/** Payment + Astria webhooks can burst (100+ callbacks per order) — never rate-limit. */
+function isWebhookPath(pathname: string): boolean {
+  return (
+    pathname === '/astria/train-webhook' ||
+    pathname === '/astria/prompt-webhook' ||
+    pathname === '/api/webhook/creem'
+  );
+}
+
 function checkRateLimit(request: NextRequest): { allowed: boolean; retryAfter?: number } {
   const now = Date.now();
   if (now - lastCleanup > CLEANUP_INTERVAL) {
@@ -59,19 +68,23 @@ function continueWithPath(request: NextRequest, init?: ResponseInit) {
 }
 
 export async function middleware(request: NextRequest) {
-  // Rate limiting — check before any processing
-  const rateLimitResult = checkRateLimit(request);
-  if (!rateLimitResult.allowed) {
-    return new NextResponse(
-      JSON.stringify({ error: 'Too many requests. Please try again later.' }),
-      {
-        status: 429,
-        headers: {
-          'Content-Type': 'application/json',
-          'Retry-After': String(rateLimitResult.retryAfter || 60),
-        },
-      }
-    );
+  const pathname = request.nextUrl.pathname;
+
+  // Webhooks must never hit per-IP rate limits (Executive tier ≈ 100+ prompt callbacks).
+  if (!isWebhookPath(pathname)) {
+    const rateLimitResult = checkRateLimit(request);
+    if (!rateLimitResult.allowed) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Too many requests. Please try again later.' }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': String(rateLimitResult.retryAfter || 60),
+          },
+        }
+      );
+    }
   }
 
   // 判断是否为 localhost 环境

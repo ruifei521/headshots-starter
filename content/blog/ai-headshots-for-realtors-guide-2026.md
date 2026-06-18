@@ -19,11 +19,11 @@ This guide covers what buyers look for in an agent photo, how to shoot your self
 
 ### Buyers choose people, not just properties
 
-A warm, professional portrait on your profile suggests you are accessible, organized, and successful enough to represent their largest asset. According to the [National Association of Realtors 2024 Member Profile](https://www.nar.realtor/research-and-statistics/research-reports/guide-to-realtor-credentials-and-designations), 89% of buyers used a real estate agent in 2023 — and the first impression of that agent's photo heavily influences the contact decision.
+A warm, professional portrait on your profile suggests you are accessible, organized, and successful enough to represent their largest asset. [NAR research on buyer–agent trends](https://www.nar.realtor/research-and-statistics) consistently shows most transactions involve a licensed agent — and your profile photo is often the first signal buyers use before they read your bio or reviews.
 
 ### The science of trust in profile photos
 
-Research from the [American Psychological Association](https://www.apa.org/pubs/journals) on facial perception shows that viewers form trust judgments from a photo in under 100 milliseconds. For realtors, that means your Zillow thumbnail needs to convey warmth and competence before a buyer even reads your bio.
+First-impression research in social psychology shows people form quick judgments from faces and photos — often before reading any text. For realtors, that means your Zillow thumbnail should convey warmth and competence at a glance.
 
 ### Every channel repeats your face
 
@@ -40,7 +40,7 @@ Consistency across channels builds recognition in your farm area. A unified look
 
 ### Approachable and professional
 
-- **Genuine smile or confident neutral expression** — research published by [Harvard Business Review](https://hbr.org/) suggests authentic warmth outperforms posed formality for service professionals
+- **Genuine smile or confident neutral expression** — authentic warmth usually outperforms stiff formality for client-facing service roles
 - **Business casual or blazer** — match your market (luxury vs. suburban)
 - **Clean background** — outdoor soft blur, neutral studio, or bright office
 
@@ -86,7 +86,7 @@ Review [examples](/examples) and [business headshots](/headshots/business) for a
 
 ### Time and cost compared to a studio
 
-A traditional realtor photo shoot — per a typical [Realtor Magazine photographer cost guide](https://magazine.realtor/) — runs $150–$400 and takes 1–3 weeks to schedule, shoot, and receive edited files. AI generation from SnapProHead delivers 40+ usable images in about 25 minutes for $29. The math favors AI for day-to-day brand refresh; traditional photography still wins for major annual campaigns.
+A traditional realtor photo shoot typically runs **$150–$400** and takes **1–3 weeks** to schedule, shoot, and receive edited files (industry estimates vary by market). AI generation from SnapProHead delivers 40+ usable images in about 25 minutes for $29. The math favors AI for day-to-day brand refresh; traditional photography still wins for major annual campaigns.
 
 ## AI vs photographer for real estate agents
 
@@ -138,7 +138,7 @@ Yes if you export high-resolution files; always run a print proof. We recommend 
 
 ### How often should realtors update headshots?
 
-At least every **18–24 months**, or after brokerage rebrand, major hairstyle change, or weight change. NAR [research on agent branding](https://www.nar.realtor/) suggests fresh photography correlates with higher contact rates.
+At least every **18–24 months**, or after brokerage rebrand, major hairstyle change, or weight change. Fresh photography keeps your brand aligned with how you look today.
 
 ### Can teams get matching backgrounds?
 

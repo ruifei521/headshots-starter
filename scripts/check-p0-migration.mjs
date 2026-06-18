@@ -50,10 +50,24 @@ const anonHeaders = {
 };
 
 async function checkUniqueCheckoutIndex() {
+  const existingRes = await fetch(
+    `${url}/rest/v1/orders?select=user_id&limit=1`,
+    { headers: serviceHeaders }
+  );
+  if (!existingRes.ok) {
+    console.log('orders unique index: SKIP (cannot read orders table)');
+    return;
+  }
+  const existing = await existingRes.json();
+  const userId = existing[0]?.user_id;
+  if (!userId) {
+    console.log('orders unique index: SKIP (no orders yet — index may still exist)');
+    return;
+  }
+
   const testCheckoutId = `test_p0_${Date.now()}`;
-  const fakeUserId = '00000000-0000-0000-0000-000000000001';
   const payload = {
-    user_id: fakeUserId,
+    user_id: userId,
     creem_checkout_id: testCheckoutId,
     creem_product_id: 'prod_test',
     tier: 'starter',
@@ -80,7 +94,8 @@ async function checkUniqueCheckoutIndex() {
     body: JSON.stringify(payload),
   });
 
-  if (second.status === 409 || (await second.text()).includes('duplicate')) {
+  const secondBody = await second.text();
+  if (second.status === 409 || secondBody.includes('duplicate') || secondBody.includes('23505')) {
     console.log('orders unique index: OK (duplicate checkout rejected)');
   } else {
     console.log('orders unique index: MISSING (duplicate checkout was allowed)');
