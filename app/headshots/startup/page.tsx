@@ -1,99 +1,12 @@
-import Link from "next/link";
 import { getProfessionMetadata } from "@/lib/profession-metadata";
-import { PROFESSION_CARD_HEADLINE } from "@/lib/refund-policy";
-import { ESTIMATED_DELIVERY_LONG } from "@/lib/tiers";
-import { TIERS } from "@/lib/tiers";
+import { getProfessionPageData } from "@/lib/profession-content";
+import ProfessionPage from "@/components/headshots/ProfessionPage";
+import { notFound } from "next/navigation";
 
 export const metadata = getProfessionMetadata("startup");
 
-export default function StartupHeadshotsPage() {
-  return (
-    <main className="min-h-screen">
-      <section className="py-16 md:py-24">
-        <div className="max-w-2xl mx-auto px-4">
-          <Link href="/headshots" className="text-sm text-blue-600 hover:underline mb-4 inline-block">
-            ← Browse All Styles
-          </Link>
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Startup Headshots
-          </h1>
-          <p className="text-lg text-muted-foreground mb-6">
-            In the startup world, your team page is often the second page investors and customers visit. Make every face count with professional headshots that say "we're serious."
-          </p>
-
-          <h2 className="text-xl font-semibold mt-10 mb-3">Why Startup Headshots Matter</h2>
-          <ul className="list-disc pl-5 space-y-2 text-muted-foreground mb-6">
-            <li><strong>Investor confidence</strong> – A polished team page signals professionalism and readiness.</li>
-            <li><strong>Customer trust</strong> – Real faces build trust faster than logos or stock photos.</li>
-            <li><strong>Crunchbase & LinkedIn presence</strong> – Professional photos improve your startup's credibility on business platforms.</li>
-            <li><strong>Team culture showcase</strong> – Show the people behind the product with consistent, high-quality portraits.</li>
-          </ul>
-
-          <h2 className="text-xl font-semibold mt-10 mb-3">How It Works</h2>
-          <ol className="list-decimal pl-5 space-y-2 text-muted-foreground mb-6">
-            <li>Upload 10–12 selfies — casual or business, your choice.</li>
-            <li>AI generates {TIERS.starter.marketingImageCount}+ professional startup headshots.</li>
-            <li>Download and update your team page, LinkedIn, and pitch deck.</li>
-          </ol>
-
-          <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-6 mt-8 mb-10">
-            <p className="font-semibold text-lg">{PROFESSION_CARD_HEADLINE}</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Startup-friendly pricing. No minimums. No contracts. Just great headshots.
-            </p>
-            <Link
-              href="/pricing"
-              className="mt-4 inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition"
-            >
-              Get Your Startup Headshots
-            </Link>
-          </div>
-
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "FAQPage",
-                mainEntity: [
-                  {
-                    "@type": "Question",
-                    name: "Can I get headshots for my entire startup team?",
-                    acceptedAnswer: {
-                      "@type": "Answer",
-                      text: "Yes! Each team member can order their own pack. Consistent headshot styles create a unified, professional team page that impresses investors and customers.",
-                    },
-                  },
-                  {
-                    "@type": "Question",
-                    name: "Will these look good on my investor pitch deck?",
-                    acceptedAnswer: {
-                      "@type": "Answer",
-                      text: "Absolutely. Our AI-generated headshots are high-resolution and professional, perfect for pitch decks, Y Combinator applications, and investor presentations.",
-                    },
-                  },
-                  {
-                    "@type": "Question",
-                    name: "How fast can my team get headshots?",
-                    acceptedAnswer: {
-                      "@type": "Answer",
-                      text: `Each pack is ready in ${ESTIMATED_DELIVERY_LONG}. Your entire team can have professional headshots in a single afternoon — no studio scheduling required.`,
-                    },
-                  },
-                  {
-                    "@type": "Question",
-                    name: "Can I use these on Crunchbase and LinkedIn?",
-                    acceptedAnswer: {
-                      "@type": "Answer",
-                      text: "Yes. Our headshots are optimized for all platforms including LinkedIn, Crunchbase, AngelList, your company website, and social media profiles.",
-                    },
-                  },
-                ],
-              }),
-            }}
-          />
-        </div>
-      </section>
-    </main>
-  );
+export default function HeadshotsPage() {
+  const data = getProfessionPageData("startup");
+  if (!data) notFound();
+  return <ProfessionPage data={data} />;
 }
