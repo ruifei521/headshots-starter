@@ -25,7 +25,6 @@ export default function BlogCoverImage({
         priority={priority}
         sizes={sizes}
         className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-        unoptimized
       />
     </div>
   );

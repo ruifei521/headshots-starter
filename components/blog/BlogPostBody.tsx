@@ -50,7 +50,6 @@ export default function BlogPostBody({ content }: { content: string }) {
               fill
               sizes="(max-width: 768px) 100vw, 720px"
               className="object-cover"
-              unoptimized
             />
           </div>
           {alt ? (
