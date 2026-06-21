@@ -102,14 +102,15 @@ export type BlogFaqItem = {
 };
 
 /** Parse ALL FAQ blocks from blog markdown (## FAQ / ## Frequently asked questions).
- *  Uses matchAll to capture every FAQ section — not just the first one.
+ *  Uses RegExp.exec() loop to capture every FAQ section — not just the first one.
  *  Deduplicates questions that appear in multiple sections (case-insensitive). */
 export function extractBlogFaqsFromMarkdown(content: string): BlogFaqItem[] {
-  const faqHeading = /^##\s+(?:FAQ|Frequently asked questions)\s*$/gim;
+  const faqHeadingGlobal = /^##\s+(?:FAQ|Frequently asked questions)\s*$/gim;
   const faqs: BlogFaqItem[] = [];
   const seen = new Set<string>();
 
-  for (const match of content.matchAll(faqHeading)) {
+  let match: RegExpExecArray | null;
+  while ((match = faqHeadingGlobal.exec(content)) !== null) {
     if (match.index == null) continue;
 
     const faqSection = content.slice(match.index + match[0].length);
@@ -118,7 +119,8 @@ export function extractBlogFaqsFromMarkdown(content: string): BlogFaqItem[] {
 
     const blocks = faqBody.split(/^###\s+/m).slice(1);
 
-    for (const block of blocks) {
+    for (let i = 0; i < blocks.length; i++) {
+      const block = blocks[i];
       const newline = block.indexOf("\n");
       if (newline === -1) continue;
 
