@@ -101,33 +101,43 @@ export type BlogFaqItem = {
   answer: string;
 };
 
-/** Parse FAQ blocks from blog markdown (## FAQ / ## Frequently asked questions). */
+/** Parse ALL FAQ blocks from blog markdown (## FAQ / ## Frequently asked questions).
+ *  Uses matchAll to capture every FAQ section — not just the first one.
+ *  Deduplicates questions that appear in multiple sections (case-insensitive). */
 export function extractBlogFaqsFromMarkdown(content: string): BlogFaqItem[] {
-  const faqHeading = /^##\s+(?:FAQ|Frequently asked questions)\s*$/im;
-  const match = content.match(faqHeading);
-  if (!match || match.index == null) return [];
-
-  const faqSection = content.slice(match.index + match[0].length);
-  const endMatch = faqSection.match(/^##\s+/m);
-  const faqBody = endMatch?.index != null ? faqSection.slice(0, endMatch.index) : faqSection;
-
+  const faqHeading = /^##\s+(?:FAQ|Frequently asked questions)\s*$/gim;
   const faqs: BlogFaqItem[] = [];
-  const blocks = faqBody.split(/^###\s+/m).slice(1);
+  const seen = new Set<string>();
 
-  for (const block of blocks) {
-    const newline = block.indexOf("\n");
-    if (newline === -1) continue;
+  for (const match of content.matchAll(faqHeading)) {
+    if (match.index == null) continue;
 
-    const question = block.slice(0, newline).trim();
-    let answer = block
-      .slice(newline + 1)
-      .trim()
-      .replace(/\*\*/g, "")
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-      .replace(/\s+/g, " ")
-      .trim();
+    const faqSection = content.slice(match.index + match[0].length);
+    const endMatch = faqSection.match(/^##\s+/m);
+    const faqBody = endMatch?.index != null ? faqSection.slice(0, endMatch.index) : faqSection;
 
-    if (question && answer) {
+    const blocks = faqBody.split(/^###\s+/m).slice(1);
+
+    for (const block of blocks) {
+      const newline = block.indexOf("\n");
+      if (newline === -1) continue;
+
+      const question = block.slice(0, newline).trim();
+      let answer = block
+        .slice(newline + 1)
+        .trim()
+        .replace(/\*\*/g, "")
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (!question || !answer) continue;
+
+      // Skip duplicate questions (first occurrence wins)
+      const key = question.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+
       faqs.push({ question, answer });
     }
   }

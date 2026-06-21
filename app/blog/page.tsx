@@ -4,12 +4,29 @@ import BlogCard from "@/components/blog/BlogCard";
 import BlogTrustBar from "@/components/blog/BlogTrustBar";
 import { getBlogIndexJsonLd } from "@/lib/json-ld";
 
+const BLOG_COVER = "https://snapprohead.com/gallery-images/12.jpg";
+
 export const metadata: Metadata = {
   title: "Blog — AI Headshot Guides & Comparisons",
   description:
     "Expert guides on AI professional headshots, LinkedIn photos, generator comparisons, and tips to look your best on camera.",
   alternates: {
     canonical: "https://snapprohead.com/blog",
+  },
+  openGraph: {
+    title: "SnapProHead Blog — AI Headshot Guides & Comparisons",
+    description:
+      "Expert guides on AI professional headshots, LinkedIn photos, generator comparisons, and tips to look your best on camera.",
+    type: "website",
+    url: "https://snapprohead.com/blog",
+    images: [{ url: BLOG_COVER, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SnapProHead Blog — AI Headshot Guides & Comparisons",
+    description:
+      "Expert guides on AI professional headshots, LinkedIn photos, generator comparisons, and tips to look your best on camera.",
+    images: [BLOG_COVER],
   },
 };
 
