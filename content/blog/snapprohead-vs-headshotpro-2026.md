@@ -167,6 +167,8 @@ For an individual user, both privacy postures are reasonable. For a regulated in
 | Agency or B2B client headshots | **HeadshotPro** |
 | Value per photo (solo professional) | **SnapProHead** |
 
+Still weighing options? [Browse real examples](/examples) to see actual output quality, or [compare all plans](/pricing) to find the right tier for your needs.
+
 ## Frequently asked questions
 
 ### Is SnapProHead really comparable to HeadshotPro in quality?

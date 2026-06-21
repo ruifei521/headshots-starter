@@ -168,6 +168,8 @@ Both policies are competitive — neither is a meaningful differentiator unless 
 | 50+ photo editing tools ecosystem | **Aragon AI** |
 | Value per photo (solo professional) | **SnapProHead** |
 
+Still weighing options? [Browse real examples](/examples) to see actual output quality, or [compare all plans](/pricing) to find the right tier for your needs.
+
 ## Frequently asked questions
 
 ### Is SnapProHead really comparable to Aragon AI in quality?
