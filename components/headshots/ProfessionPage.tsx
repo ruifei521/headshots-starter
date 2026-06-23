@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Check, ArrowRight, Shield } from "lucide-react";
-import { generateFAQSchema } from "@/lib/json-ld";
 import type { FAQItem } from "@/lib/json-ld";
 
 export type ProfessionPageData = {
@@ -23,15 +22,8 @@ export type ProfessionPageData = {
 };
 
 export default function ProfessionPage({ data }: { data: ProfessionPageData }) {
-  const jsonLd = generateFAQSchema(data.faqs);
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
       <div className="container px-4 md:px-6 py-16 md:py-24">
         {/* ======== Hero ======== */}
         <div className="mx-auto max-w-3xl text-center mb-16">

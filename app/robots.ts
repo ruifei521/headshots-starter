@@ -7,6 +7,9 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/overview/'],
     },
-    sitemap: 'https://snapprohead.com/sitemap.xml',
+    sitemap: [
+      'https://snapprohead.com/sitemap.xml',
+      'https://snapprohead.com/image-sitemap.xml',
+    ],
   }
 }

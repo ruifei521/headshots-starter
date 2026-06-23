@@ -308,9 +308,8 @@ export function getBlogArticleJsonLd(input: {
       datePublished: input.datePublished,
       dateModified: modified,
       author: {
-        "@type": "Organization",
-        name: SITE.name,
-        url: SITE.url,
+        "@type": "Person",
+        name: "SnapProHead Team",
       },
       publisher: {
         "@type": "Organization",

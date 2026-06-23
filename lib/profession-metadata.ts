@@ -18,21 +18,30 @@ export const HEADSHOT_PROFESSION_SLUGS = [
   "ai-headshot-generator",
   "ai-professional-portrait",
   "architect",
+  "author",
   "business",
   "c-suite",
   "consultant",
   "corporate",
   "dentist",
   "doctor",
+  "engineer",
   "executive",
+  "finance",
   "lawyer",
   "linkedin",
+  "marketing",
+  "military",
+  "model",
   "nurse",
   "portfolio",
   "professional",
   "professional-headshot-photographer",
   "realtor",
+  "remote-worker",
+  "sales",
   "startup",
+  "student",
   "teacher",
 ] as const;
 
@@ -185,6 +194,70 @@ const PROFESSIONS: Record<HeadshotProfessionSlug, ProfessionConfig> = {
     description:
       "Professional AI headshots for startup founders and teams. Look investable on your site, pitch deck, and press. 40+ HD photos from $29 in ~25 minutes.",
     ogTitle: "Startup Headshots – Founder & Team AI Portraits",
+    ogDescription: PROFESSION_OG_TAGLINE,
+  },
+  author: {
+    title: "Author Headshots – AI Portraits for Writers & Authors",
+    description:
+      "Professional AI headshots for authors. Build credibility on book jackets, author websites, and LinkedIn. 40+ HD photos from $29 in ~25 minutes.",
+    ogTitle: "Author Headshots – Professional AI Portraits",
+    ogDescription: PROFESSION_OG_TAGLINE,
+  },
+  engineer: {
+    title: "Engineer Headshots – AI Portraits for Engineers",
+    description:
+      "Professional AI headshots for engineers. Present a polished image on company sites, GitHub, and LinkedIn. 40+ HD photos from $29 in ~25 minutes.",
+    ogTitle: "Engineer Headshots – Professional AI Portraits",
+    ogDescription: PROFESSION_OG_TAGLINE,
+  },
+  finance: {
+    title: "Finance Headshots – AI Portraits for Finance Professionals",
+    description:
+      "Professional AI headshots for finance professionals. Build client trust on firm websites, LinkedIn, and business profiles. 40+ HD photos from $29 in ~25 minutes.",
+    ogTitle: "Finance Headshots – Professional AI Portraits",
+    ogDescription: PROFESSION_OG_TAGLINE,
+  },
+  marketing: {
+    title: "Marketing Headshots – AI Portraits for Marketing Professionals",
+    description:
+      "Professional AI headshots for marketers. Look sharp on agency sites, LinkedIn, and client proposals. 40+ HD photos from $29 in ~25 minutes.",
+    ogTitle: "Marketing Headshots – Professional AI Portraits",
+    ogDescription: PROFESSION_OG_TAGLINE,
+  },
+  military: {
+    title: "Military Headshots – AI Portraits for Military Personnel",
+    description:
+      "Professional AI headshots for military personnel. Present a polished image for LinkedIn, civilian career transition, and official profiles. 40+ HD photos from $29.",
+    ogTitle: "Military Headshots – Professional AI Portraits",
+    ogDescription: PROFESSION_OG_TAGLINE,
+  },
+  model: {
+    title: "Model Headshots – AI Portraits for Models & Talent",
+    description:
+      "AI model headshots for comp cards, agency submissions, and portfolios. Multiple looks in ~25 minutes. 40+ HD photos from $29.",
+    ogTitle: "Model Headshots – AI Professional Portraits",
+    ogDescription: PROFESSION_OG_TAGLINE,
+  },
+  "remote-worker": {
+    title: "Remote Worker Headshots – AI Portraits for Remote Professionals",
+    description:
+      "Professional AI headshots for remote workers. Look credible on Zoom, Slack, LinkedIn, and your personal website. 40+ HD photos from $29 in ~25 minutes.",
+    ogTitle: "Remote Worker Headshots – Professional AI Portraits",
+    ogDescription:
+      "Remote professional headshots from selfies. Starting at $29.",
+  },
+  sales: {
+    title: "Sales Headshots – AI Portraits for Sales Professionals",
+    description:
+      "Professional AI headshots for sales professionals. Build instant trust on LinkedIn, email signatures, and company pages. 40+ HD photos from $29 in ~25 minutes.",
+    ogTitle: "Sales Headshots – Professional AI Portraits",
+    ogDescription: PROFESSION_OG_TAGLINE,
+  },
+  student: {
+    title: "Student Headshots – AI Portraits for Students & Graduates",
+    description:
+      "Professional AI headshots for students. Stand out on LinkedIn, internship applications, and university profiles. 40+ HD photos from $29 in ~25 minutes.",
+    ogTitle: "Student Headshots – Professional AI Portraits",
     ogDescription: PROFESSION_OG_TAGLINE,
   },
   teacher: {
