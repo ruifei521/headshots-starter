@@ -7,16 +7,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
-function resolveBaseUrl(req: NextRequest): string {
-  const origin = req.headers.get('origin');
-  if (origin?.startsWith('http')) return origin;
-  const host = req.headers.get('host');
-  if (host) {
-    const proto = host.includes('localhost') ? 'http' : 'https';
-    return `${proto}://${host}`;
-  }
-  return 'https://snapprohead.com';
-}
+import { resolveBaseUrl } from "@/lib/resolve-base-url";
 
 /**
  * Server-side checkout entry: browser follows redirects without client fetch/setState.

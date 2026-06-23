@@ -5,10 +5,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
-function resolveBaseUrl(req: NextRequest): string {
-  const origin = req.headers.get('origin') || req.headers.get('host') || 'https://snapprohead.com';
-  return origin.startsWith('http') ? origin : `https://${origin}`;
-}
+import { resolveBaseUrl } from "@/lib/resolve-base-url";
 
 export async function POST(req: NextRequest) {
   try {
