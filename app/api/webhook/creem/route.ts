@@ -53,10 +53,17 @@ export async function POST(req: NextRequest) {
     }
     logger.log('Webhook signature verified ✓');
 
-    const referenceId: string | null = eventObject.request_id ?? null;
+    // 提取 user_id 的优先级：
+    // 1. metadata.user_id（推荐，我们在创建 checkout 时传入）
+    // 2. customer.id（Creem 客户 ID）
+    // 3. request_id（旧版本兼容）
+    const referenceId: string | null = 
+      eventObject.metadata?.user_id ?? 
+      eventObject.customer?.id ?? 
+      eventObject.request_id ?? null;
     if (!referenceId) {
-      logger.error('No request_id in webhook payload — cannot grant credits');
-      return NextResponse.json({ error: 'Missing request_id' }, { status: 400 });
+      logger.error('No user identifier in webhook payload — cannot grant credits');
+      return NextResponse.json({ error: 'Missing user identifier' }, { status: 400 });
     }
 
     const order = eventObject.order || {};

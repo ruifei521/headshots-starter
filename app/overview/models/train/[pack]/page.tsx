@@ -41,15 +41,16 @@ export default async function Index({
   if (paymentIsConfigured) {
     try {
       // 用 Service Role Key 查 credits（Anon Key 可能被 RLS 拦截）
+      const cookieStore = cookies();
       const supabaseService = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!,
         {
           cookies: {
-            getAll() { return cookies().getAll(); },
+            getAll() { return cookieStore.getAll(); },
             setAll(cookiesToSet) {
               cookiesToSet.forEach(({ name, value, options }) => {
-                try { cookies().set(name, value, options); } catch {}
+                try { cookieStore.set(name, value, options); } catch {}
               });
             },
           },

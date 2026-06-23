@@ -5,7 +5,8 @@ import { ESTIMATED_DELIVERY_MINUTES } from "@/lib/tiers";
 import { logger } from "@/lib/logger";
 
 /** After estimated delivery + buffer, partial models are marked ready. */
-export const PARTIAL_COMPLETE_IDLE_MIN = ESTIMATED_DELIVERY_MINUTES + 5;
+// 30 分钟可能太短，调整为 60 分钟（1 小时）以确保足够时间
+export const PARTIAL_COMPLETE_IDLE_MIN = 60;
 
 type ModelRow = {
   id: number;

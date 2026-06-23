@@ -54,7 +54,10 @@ async function downloadAndUploadToStorage(
   
   // Step 2: Upload to Supabase Storage (deterministic path for webhook retries)
   const fileName = `model-${modelId}/p${promptId}-${imageIndex}.jpg`;
-  const uploadUrl = `${supabaseUrl}/storage/v1/object/${BUCKET}/${fileName}`;
+  
+  // 使用 Supabase Storage REST API 的正确端点
+  const storageBaseUrl = supabaseUrl!.replace(/\/$/, '');
+  const uploadUrl = `${storageBaseUrl}/storage/v1/object/${BUCKET}/${fileName}`;
   
   const uploadRes = await fetch(uploadUrl, {
     method: 'POST',
@@ -72,7 +75,7 @@ async function downloadAndUploadToStorage(
   }
   
   // Return public URL
-  return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${fileName}`;
+  return `${storageBaseUrl}/storage/v1/object/public/${BUCKET}/${fileName}`;
 }
 
 export async function POST(request: Request) {

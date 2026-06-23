@@ -47,6 +47,9 @@ export async function createCreemCheckoutUrl(
       success_url: successUrl,
       request_id: input.userId,
       customer: input.email ? { email: input.email } : undefined,
+      metadata: {
+        user_id: input.userId,
+      },
     }),
   });
 

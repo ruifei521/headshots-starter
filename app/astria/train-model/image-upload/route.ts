@@ -34,8 +34,9 @@ export async function POST(request: Request): Promise<NextResponse> {
       cookies: {
         getAll() {
           // Next.js App Router: read cookies from Request
-          const cookie = request.headers.get('cookie') || '';
-          return cookie.split(';').map(c => {
+          const cookieHeader = request.headers.get('cookie') || '';
+          if (!cookieHeader) return [];
+          return cookieHeader.split(';').map(c => {
             const [name, ...rest] = c.trim().split('=');
             return { name, value: rest.join('=') };
           });
