@@ -27,14 +27,18 @@ export default function ThreeDBeforeAfterGallery() {
   const isFlippingRef = useRef(isFlipping)
   isFlippingRef.current = isFlipping
 
-  // 8 pairs matching getheadshots.ai image set
+  // 10 pairs — selfie → AI headshot transformation
   const galleryItems: GalleryItem[] = [
     { before: "/homepage/before0001.jpg", after: "/homepage/example0001.jpg", label: "① Corporate" },
     { before: "/homepage/before0002.jpg", after: "/homepage/example0002.jpg", label: "② Executive" },
-    { before: "/homepage/before0001.jpg", after: "/homepage/example0004.jpg", label: "③ Natural" },
-    { before: "/homepage/before0002.jpg", after: "/homepage/example0006.jpg", label: "④ Contemporary" },
-    { before: "/homepage/before0001.jpg", after: "/homepage/example0005.jpg", label: "⑤ Professional" },
-    { before: "/homepage/before0002.jpg", after: "/homepage/example0007.jpg", label: "⑥ Modern" },
+    { before: "/homepage/before0003.jpg", after: "/homepage/example0003.jpg", label: "③ Classic Studio" },
+    { before: "/homepage/before0001.jpg", after: "/homepage/example0004.jpg", label: "④ Natural" },
+    { before: "/homepage/before0002.jpg", after: "/homepage/example0005.jpg", label: "⑤ Professional" },
+    { before: "/homepage/before0003.jpg", after: "/homepage/example0006.jpg", label: "⑥ Contemporary" },
+    { before: "/homepage/before0001.jpg", after: "/homepage/example0007.jpg", label: "⑦ Modern" },
+    { before: "/homepage/before0002.jpg", after: "/homepage/example0008.jpg", label: "⑧ Business Casual" },
+    { before: "/homepage/before0003.jpg", after: "/homepage/example0009.jpg", label: "⑨ Creative" },
+    { before: "/homepage/before0001.jpg", after: "/homepage/example0010.jpg", label: "⑩ Editorial" },
   ]
 
   const goToSlide = (index: number) => {
