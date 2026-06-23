@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
+import https from "https";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET() {
-  const https = require("https");
 
   async function fetchUrl(url: string): Promise<{ status: number; title: string; snippet: string }> {
     return new Promise((resolve) => {
