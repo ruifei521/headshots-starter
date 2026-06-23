@@ -80,6 +80,14 @@ export default async function Index() {
 
   } catch (e) {
 
+    const errorMessage = e instanceof Error ? e.message : String(e);
+
+    // 区分不同类型的错误
+    if (errorMessage.includes("Auth session missing") || errorMessage.includes("not authenticated")) {
+      logger.warn("Overview page: user session expired, redirecting to login:", e);
+      return redirect(loginRedirectPath());
+    }
+
     logger.error(
 
       "Overview page: Supabase query failed, showing empty state:",
