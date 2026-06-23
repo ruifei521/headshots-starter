@@ -135,7 +135,8 @@ export default function ThreeDBeforeAfterGallery() {
             width={956}
             height={48}
             className="w-full h-auto"
-            loading="lazy"
+            loading="eager"
+            priority
           />
         </div>
         <Badge variant="outline" className="mb-3">See the Transformation</Badge>
