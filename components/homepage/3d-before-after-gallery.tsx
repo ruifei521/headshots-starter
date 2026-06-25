@@ -27,18 +27,15 @@ export default function ThreeDBeforeAfterGallery() {
   const isFlippingRef = useRef(isFlipping)
   isFlippingRef.current = isFlipping
 
-  // 10 pairs — selfie → AI headshot transformation
+  // 7 real pairs — selfie → AI headshot transformation
   const galleryItems: GalleryItem[] = [
-    { before: "/homepage/before0001.jpg", after: "/homepage/example0001.jpg", label: "① Corporate" },
-    { before: "/homepage/before0002.jpg", after: "/homepage/example0002.jpg", label: "② Executive" },
-    { before: "/homepage/before0003.jpg", after: "/homepage/example0003.jpg", label: "③ Classic Studio" },
-    { before: "/homepage/before0001.jpg", after: "/homepage/example0004.jpg", label: "④ Natural" },
-    { before: "/homepage/before0002.jpg", after: "/homepage/example0005.jpg", label: "⑤ Professional" },
-    { before: "/homepage/before0003.jpg", after: "/homepage/example0006.jpg", label: "⑥ Contemporary" },
-    { before: "/homepage/before0001.jpg", after: "/homepage/example0007.jpg", label: "⑦ Modern" },
-    { before: "/homepage/before0002.jpg", after: "/homepage/example0008.jpg", label: "⑧ Business Casual" },
-    { before: "/homepage/before0003.jpg", after: "/homepage/example0009.jpg", label: "⑨ Creative" },
-    { before: "/homepage/before0001.jpg", after: "/homepage/example0010.jpg", label: "⑩ Editorial" },
+    { before: "/homepage/02_before.jpg", after: "/homepage/02_after.jpg", label: "① Corporate" },
+    { before: "/homepage/03_before.jpg", after: "/homepage/03_after.jpg", label: "② Executive" },
+    { before: "/homepage/05_before.jpg", after: "/homepage/05_after.jpg", label: "③ Classic Studio" },
+    { before: "/homepage/07_before.jpg", after: "/homepage/07_after.jpg", label: "④ Natural Light" },
+    { before: "/homepage/08_before.jpg", after: "/homepage/08_after.jpg", label: "⑤ Professional" },
+    { before: "/homepage/09_before.jpg", after: "/homepage/09_after.jpg", label: "⑥ Contemporary" },
+    { before: "/homepage/11_before.jpg", after: "/homepage/11_after.jpg", label: "⑦ Business Casual" },
   ]
 
   const goToSlide = (index: number) => {
